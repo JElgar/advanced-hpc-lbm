@@ -16,6 +16,9 @@ all: $(EXE)
 $(EXE): $(EXE).c
 	$(CC) $(CFLAGS) $^ $(LIBS) -o $@
 
+profile: $(EXE).c
+	$(CC) $(CFLAGS) -pg $^ $(LIBS) -o $@
+
 check:
 	python check/check.py --ref-av-vels-file=$(REF_AV_VELS_FILE) --ref-final-state-file=$(REF_FINAL_STATE_FILE) --av-vels-file=$(AV_VELS_FILE) --final-state-file=$(FINAL_STATE_FILE)
 
