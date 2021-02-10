@@ -17,7 +17,7 @@ $(EXE): $(EXE).c
 	$(CC) $(CFLAGS) $^ $(LIBS) -o $@
 
 profile-run: $(EXE).c
-	$(CC) $(CFLAGS) -pg $^ $(LIBS) -o $@
+	$(CC) $(CFLAGS) -pg $^ $(LIBS) -o $(EXE)
 
 profile-generate: $(EXE).c
 	gprof $(EXE) gmon.out > profile.txt
