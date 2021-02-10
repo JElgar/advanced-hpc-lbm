@@ -3,7 +3,8 @@
 EXE=d2q9-bgk
 
 CC=gcc
-CFLAGS= -std=c99 -Wall -O3
+# CFLAGS= -std=c99 -Wall -O3
+CFLAGS = -std=c99 -Wall -Ofast -mtune=native
 LIBS = -lm
 
 FINAL_STATE_FILE=./final_state.dat
@@ -14,7 +15,7 @@ REF_AV_VELS_FILE=check/128x128.av_vels.dat
 all: $(EXE)
 
 $(EXE): $(EXE).c
-	$(CC) $(CFLAGS) $^ $(LIBS) -o3 -o $@
+	$(CC) $(CFLAGS) $^ $(LIBS) -o $@
 
 profile-run: $(EXE).c
 	$(CC) $(CFLAGS) -pg $^ $(LIBS) -o $(EXE)
