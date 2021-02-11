@@ -283,7 +283,7 @@ int propagate_and_rebound(const t_param params, t_speed* cells, t_speed* tmp_cel
 int collision(const t_param params, t_speed* cells, t_speed* tmp_cells, char* obstacles)
 {
   const float c_sq = 1.f / 3.f; /* square of speed of sound */
-  const float c_2sq = 1.f / 3.f; /* 2 times square of speed of sound */
+  const float c_2sq = 2.f * c_sq; /* 2 times square of speed of sound */
   const float c_2cu = c_2sq * c_sq; /* 2 times cube of speed of sound */
   const float w0 = 4.f / 9.f;  /* weighting factor */
   const float w1 = 1.f / 9.f;  /* weighting factor */
@@ -368,7 +368,7 @@ int collision(const t_param params, t_speed* cells, t_speed* tmp_cells, char* ob
                                          + (u[7] * u[7]) / c_2cu
                                          - u_sq / (2.f * c_sq));
         d_equ[8] = w2 * local_density * (1.f + u[8] / c_sq
-                                         + (u[8] * u[8]) / c_2cu
+                                         + (u[8] * u[8]) / c_2cu 
                                          - u_sq / (2.f * c_sq));
 
         /* relaxation step */
