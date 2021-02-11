@@ -1,0 +1,17 @@
+[
+ {
+  "directory": "/home/jelgar/Documents/uni/Year3/hpc/advanced-hpc-lbm",
+  "arguments": [
+   "gcc",
+   "-std=c99",
+   "-Wall",
+   "-Ofast",
+   "-mtune=native",
+   "d2q9-bgk.c",
+   "-lm",
+   "-o",
+   "d2q9-bgk"
+  ],
+  "file": "d2q9-bgk.c"
+ }
+]
