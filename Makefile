@@ -23,6 +23,12 @@ profile-run: $(EXE).c
 profile-generate: $(EXE).c
 	gprof $(EXE) gmon.out > profile.txt
 
+submit-clean:
+	make clean
+	make
+	sbatch job_submit_d2q9-bgk
+
+
 check:
 	python check/check.py --ref-av-vels-file=$(REF_AV_VELS_FILE) --ref-final-state-file=$(REF_FINAL_STATE_FILE) --av-vels-file=$(AV_VELS_FILE) --final-state-file=$(FINAL_STATE_FILE)
 
