@@ -233,13 +233,7 @@ int accelerate_flow(const t_param params, t_speed* cells, char* obstacles)
   return EXIT_SUCCESS;
 }
 
-int propagate_and_rebound(const t_param params, t_speed* cells, t_speed* tmp_cells, char* obstacles)
-{
-  /* loop over _all_ cells */
-  for (int jj = 0; jj < params.ny; jj++)
-  {
-    for (int ii = 0; ii < params.nx; ii++)
-    {
+int propagate_single_cell(const t_param params, t_speed* cells, t_speed *tmp_cells, int ii, int jj) {
       /* determine indices of axis-direction neighbours
       ** respecting periodic boundary conditions (wrap around) */
       int y_n = (jj + 1) % params.ny;
@@ -258,6 +252,18 @@ int propagate_and_rebound(const t_param params, t_speed* cells, t_speed* tmp_cel
       tmp_cells[ii + jj*params.nx].speeds[6] = cells[x_e + y_s*params.nx].speeds[6]; /* north-west */
       tmp_cells[ii + jj*params.nx].speeds[7] = cells[x_e + y_n*params.nx].speeds[7]; /* south-west */
       tmp_cells[ii + jj*params.nx].speeds[8] = cells[x_w + y_n*params.nx].speeds[8]; /* south-east */
+  
+      return EXIT_SUCCESS;
+}
+
+int propagate_and_rebound(const t_param params, t_speed* cells, t_speed* tmp_cells, char* obstacles)
+{
+  /* loop over _all_ cells */
+  for (int jj = 0; jj < params.ny; jj++)
+  {
+    for (int ii = 0; ii < params.nx; ii++)
+    {
+      propagate_single_cell(params, cells, tmp_cells, ii, jj);
       
       /* if the cell contains an obstacle */
       if (obstacles[jj*params.nx + ii])
@@ -345,8 +351,7 @@ int collision(const t_param params, t_speed* cells, t_speed* tmp_cells, char* ob
         /* equilibrium densities */
         float d_equ[NSPEEDS];
         /* zero velocity density: weight w0 */
-        d_equ[0] = w0 * local_density
-                   * (1.f - u_sq / (c_2sq));
+        d_equ[0] = w0 * local_density * (1.f - u_sq / (c_2sq));
         /* axis speeds: weight w1 */
         float w1ld = w1 * local_density;
         d_equ[1] = w1ld * (1.f + u[1] / c_sq + (u[1] * u[1]) / c_2cu - u_sqd2sq);
