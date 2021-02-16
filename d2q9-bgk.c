@@ -270,27 +270,23 @@ int propagate_rebound_and_collisions(const t_param params, t_speed* cells, t_spe
   {
     for (int ii = 0; ii < params.nx; ii++)
     {
+      propagate_single_cell(params, cells, tmp_cells, ii, jj);
+      
       /* if the cell contains an obstacle */
       if (obstacles[jj*params.nx + ii])
       {
-        int y_n = (jj + 1) % params.ny;
-        int x_e = (ii + 1) % params.nx;
-        int y_s = (jj == 0) ? (jj + params.ny - 1) : (jj - 1);
-        int x_w = (ii == 0) ? (ii + params.nx - 1) : (ii - 1);
         /* called after propagate, so taking values from scratch space
         ** mirroring, and writing into main grid */
-        tmp_cells2[ii + jj*params.nx].speeds[1] = cells[x_e + jj*params.nx].speeds[3];
-        tmp_cells2[ii + jj*params.nx].speeds[2] = cells[ii + y_n*params.nx].speeds[4];
-        tmp_cells2[ii + jj*params.nx].speeds[3] = cells[x_w + jj*params.nx].speeds[1];
-        tmp_cells2[ii + jj*params.nx].speeds[4] = cells[ii + y_s*params.nx].speeds[2];
-        tmp_cells2[ii + jj*params.nx].speeds[5] = cells[x_e + y_n*params.nx].speeds[7];
-        tmp_cells2[ii + jj*params.nx].speeds[6] = cells[x_w + y_n*params.nx].speeds[8];
-        tmp_cells2[ii + jj*params.nx].speeds[7] = cells[x_w + y_s*params.nx].speeds[5];
-        tmp_cells2[ii + jj*params.nx].speeds[8] = cells[x_e + y_s*params.nx].speeds[6];
+        tmp_cells2[ii + jj*params.nx].speeds[1] = tmp_cells[ii + jj*params.nx].speeds[3];
+        tmp_cells2[ii + jj*params.nx].speeds[2] = tmp_cells[ii + jj*params.nx].speeds[4];
+        tmp_cells2[ii + jj*params.nx].speeds[3] = tmp_cells[ii + jj*params.nx].speeds[1];
+        tmp_cells2[ii + jj*params.nx].speeds[4] = tmp_cells[ii + jj*params.nx].speeds[2];
+        tmp_cells2[ii + jj*params.nx].speeds[5] = tmp_cells[ii + jj*params.nx].speeds[7];
+        tmp_cells2[ii + jj*params.nx].speeds[6] = tmp_cells[ii + jj*params.nx].speeds[8];
+        tmp_cells2[ii + jj*params.nx].speeds[7] = tmp_cells[ii + jj*params.nx].speeds[5];
+        tmp_cells2[ii + jj*params.nx].speeds[8] = tmp_cells[ii + jj*params.nx].speeds[6];
       } else
       {
-        propagate_single_cell(params, cells, tmp_cells, ii, jj);
-      
         /* compute local density total */
         float local_density = 0.f;
 
