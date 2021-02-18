@@ -344,8 +344,16 @@ int propagate_rebound_and_collisions(const t_param params, t_speed* cells, t_spe
         d_equ[7] = w2ld * (1.f + u[7] / c_sq + (u[7] * u[7]) / c_2cu - u_sqd2sq);
         d_equ[8] = w2ld * (1.f + u[8] / c_sq + (u[8] * u[8]) / c_2cu - u_sqd2sq);
 
+        tmp_cells[ii + jj*params.nx].speeds[0] = 
+            cells[ii + jj*params.nx].speeds[0] 
+          + params.omega
+          * (
+              (w0 * local_density * (1.f - u_sq / (c_2sq))) - cells[ii + jj*params.nx].speeds[0]
+            )
+          ;
+;
         /* relaxation step */
-        for (int kk = 0; kk < NSPEEDS; kk++)
+        for (int kk = 1; kk < NSPEEDS; kk++)
         {
           // Here is the problem we are going to change cells here!
           tmp_cells[ii + jj*params.nx].speeds[kk] = tmp_cells[ii + jj*params.nx].speeds[kk]
