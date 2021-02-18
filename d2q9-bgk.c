@@ -355,7 +355,7 @@ int propagate_rebound_and_collisions(const t_param params, t_speed* cells, t_spe
   }
 
   // Point cells to the result scratch space
-  *cells = *tmp_cells;
+  cells = tmp_cells;
 
   return EXIT_SUCCESS;
 }
