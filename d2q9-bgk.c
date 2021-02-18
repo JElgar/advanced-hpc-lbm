@@ -198,6 +198,7 @@ int timestep(const t_param params, t_speed* cells, t_speed* tmp_cells, char* obs
 {
   accelerate_flow(params, cells, obstacles);
   propagate_rebound_and_collisions(params, cells, tmp_cells, obstacles);
+  swap(&cells, &tmp_cells);
   // collision(params, cells, tmp_cells, obstacles);
   return EXIT_SUCCESS;
 }
@@ -356,7 +357,6 @@ int propagate_rebound_and_collisions(const t_param params, t_speed* cells, t_spe
   }
 
   // Point cells to the result scratch space
-  swap(&cells, &tmp_cells);
   // *cells = *tmp_cells;
   // for (int jj = 0; jj < params.ny; jj++)
   // {
