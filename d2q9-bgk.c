@@ -124,6 +124,7 @@ float calc_reynolds(const t_param params, t_speed* cells, char* obstacles);
 /* utility functions */
 void die(const char* message, const int line, const char* file);
 void usage(const char* exe);
+void swap(t_speed** cells, t_speed** cells2);
 
 /*
 ** main program:
@@ -355,16 +356,17 @@ int propagate_rebound_and_collisions(const t_param params, t_speed* cells, t_spe
   }
 
   // Point cells to the result scratch space
+  swap(&cells, &tmp_cells);
   // *cells = *tmp_cells;
-  for (int jj = 0; jj < params.ny; jj++)
-  {
-    for (int ii = 0; ii < params.nx; ii++)
-    {
-      for (int kk = 0; kk < NSPEEDS; kk++) {
-        cells[ii + jj*params.nx].speeds[kk] = tmp_cells[ii + jj*params.nx].speeds[kk];
-      }
-    }
-  }
+  // for (int jj = 0; jj < params.ny; jj++)
+  // {
+  //   for (int ii = 0; ii < params.nx; ii++)
+  //   {
+  //     for (int kk = 0; kk < NSPEEDS; kk++) {
+  //       cells[ii + jj*params.nx].speeds[kk] = tmp_cells[ii + jj*params.nx].speeds[kk];
+  //     }
+  //   }
+  // }
 
   return EXIT_SUCCESS;
 }
@@ -717,4 +719,9 @@ void usage(const char* exe)
 {
   fprintf(stderr, "Usage: %s <paramfile> <obstaclefile>\n", exe);
   exit(EXIT_FAILURE);
+}
+
+void swap(t_speed** cells, t_speed** cells2) {
+  /* Sets pointer of first value to same as second value */
+  *cells = *cells2;
 }
