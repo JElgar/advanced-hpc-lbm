@@ -295,21 +295,21 @@ int propagate_rebound_and_collisions(const t_param params, t_speed* cells, t_spe
 
         /* compute x velocity component */
         float u_x = (
-            tmp_cells[ii + jj*params.nx].speeds[1]
-          - tmp_cells[ii + jj*params.nx].speeds[3]
-          + tmp_cells[ii + jj*params.nx].speeds[5]
-          - tmp_cells[ii + jj*params.nx].speeds[6]
-          - tmp_cells[ii + jj*params.nx].speeds[7]
-          + tmp_cells[ii + jj*params.nx].speeds[8]
+            cells[x_w + jj*params.nx].speeds[1]
+          - cells[x_e + jj*params.nx].speeds[3]
+          + cells[x_w + y_s*params.nx].speeds[5]
+          - cells[x_e + y_s*params.nx].speeds[6]
+          - cells[x_e + y_n*params.nx].speeds[7]
+          + cells[x_w + y_n*params.nx].speeds[8]
         ) / local_density;
         /* compute y velocity component */
         float u_y = (
-            tmp_cells[ii + jj*params.nx].speeds[2]
-          - tmp_cells[ii + jj*params.nx].speeds[4]
-          + tmp_cells[ii + jj*params.nx].speeds[5]
-          + tmp_cells[ii + jj*params.nx].speeds[6]
-          - tmp_cells[ii + jj*params.nx].speeds[7]
-          - tmp_cells[ii + jj*params.nx].speeds[8]
+            cells[ii + y_s*params.nx].speeds[2]
+          - cells[ii + y_n*params.nx].speeds[4]
+          + cells[x_w + y_s*params.nx].speeds[5]
+          + cells[x_e + y_s*params.nx].speeds[6]
+          - cells[x_e + y_n*params.nx].speeds[7]
+          - cells[x_w + y_n*params.nx].speeds[8]
           ) / local_density;
 
         /* velocity squared */
@@ -355,18 +355,6 @@ int propagate_rebound_and_collisions(const t_param params, t_speed* cells, t_spe
       }
     }
   }
-
-  // Point cells to the result scratch space
-  // *cells = *tmp_cells;
-  // for (int jj = 0; jj < params.ny; jj++)
-  // {
-  //   for (int ii = 0; ii < params.nx; ii++)
-  //   {
-  //     for (int kk = 0; kk < NSPEEDS; kk++) {
-  //       cells[ii + jj*params.nx].speeds[kk] = tmp_cells[ii + jj*params.nx].speeds[kk];
-  //     }
-  //   }
-  // }
 
   return EXIT_SUCCESS;
 }
