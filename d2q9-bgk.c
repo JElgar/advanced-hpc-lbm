@@ -198,7 +198,6 @@ int timestep(const t_param params, t_speed** cells, t_speed** tmp_cells, char* o
 {
   accelerate_flow(params, *cells, obstacles);
   propagate_rebound_and_collisions(params, *cells, *tmp_cells, obstacles);
-
   swap(cells, tmp_cells);
   // collision(params, cells, tmp_cells, obstacles);
   return EXIT_SUCCESS;
@@ -723,6 +722,8 @@ void usage(const char* exe)
 }
 
 void swap(t_speed** cells, t_speed** cells2) {
-  /* Sets pointer of first value to same as second value */
+  /* Swaps pointers of cells */
+  t_speed *tmp = *cells;
   *cells = *cells2;
+  *cells2 = tmp;
 }
