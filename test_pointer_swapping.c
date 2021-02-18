@@ -37,16 +37,16 @@ int swap(t_speed** cells, t_speed** cells2) {
   return 0;
 }
 
-int do_some_thing(t_speed* cells, t_speed* cells2) {
+int do_some_thing(t_speed** cells, t_speed** cells2) {
   for (int jj = 0; jj < 2; jj++)
   {
     for (int ii = 0; ii < 2; ii++)
     {
-      cells2[ii + jj*2].speeds[0] = 3;
+      (*cells2)[ii + jj*2].speeds[0] = 3;
     }
   }
 
-  swap(&cells, &cells2);
+  swap(cells, cells2);
 }
 
 
@@ -62,7 +62,7 @@ int main(int argc, char* argv[])
   assert(cells[0].speeds[0] == 1);
   assert(cells2[0].speeds[0] == 2);
 
-  do_some_thing(cells, cells2);
+  do_some_thing(&cells, &cells2);
 
   // swap(&cells, &cells2);
 

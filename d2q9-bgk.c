@@ -101,7 +101,7 @@ int initialise(const char* paramfile, const char* obstaclefile,
 ** accelerate_flow(), propagate(), rebound() & collision()
 */
 
-int timestep(const t_param params, t_speed* cells, t_speed* tmp_cells, char* obstacles);
+int timestep(const t_param params, t_speed** cells, t_speed** tmp_cells, char* obstacles);
 int accelerate_flow(const t_param params, t_speed* cells, char* obstacles);
 int propagate_rebound_and_collisions(const t_param params, t_speed* cells, t_speed* tmp_cells, char* obstacles);
 int write_values(const t_param params, t_speed* cells, char* obstacles, float* av_vels);
@@ -165,7 +165,7 @@ int main(int argc, char* argv[])
 
   for (int tt = 0; tt < params.maxIters; tt++)
   {
-    timestep(params, cells, tmp_cells, obstacles);
+    timestep(params, &cells, &tmp_cells, obstacles);
     av_vels[tt] = av_velocity(params, cells, obstacles);
 #ifdef DEBUG
     printf("==timestep: %d==\n", tt);
@@ -194,11 +194,12 @@ int main(int argc, char* argv[])
   return EXIT_SUCCESS;
 }
 
-int timestep(const t_param params, t_speed* cells, t_speed* tmp_cells, char* obstacles)
+int timestep(const t_param params, t_speed** cells, t_speed** tmp_cells, char* obstacles)
 {
-  accelerate_flow(params, cells, obstacles);
-  propagate_rebound_and_collisions(params, cells, tmp_cells, obstacles);
-  swap(&cells, &tmp_cells);
+  accelerate_flow(params, *cells, obstacles);
+  propagate_rebound_and_collisions(params, *cells, *tmp_cells, obstacles);
+
+  swap(cells, tmp_cells);
   // collision(params, cells, tmp_cells, obstacles);
   return EXIT_SUCCESS;
 }
