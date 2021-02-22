@@ -101,9 +101,9 @@ int initialise(const char* paramfile, const char* obstaclefile,
 ** accelerate_flow(), propagate(), rebound() & collision()
 */
 
-int timestep(const t_param params, t_speed** cells, t_speed** tmp_cells, char* obstacles);
+float timestep(const t_param params, t_speed** cells, t_speed** tmp_cells, char* obstacles);
 int accelerate_flow(const t_param params, t_speed* cells, char* obstacles);
-int propagate_rebound_and_collisions(const t_param params, t_speed* cells, t_speed* tmp_cells, char* obstacles);
+float propagate_rebound_and_collisions(const t_param params, t_speed* cells, t_speed* tmp_cells, char* obstacles);
 int write_values(const t_param params, t_speed* cells, char* obstacles, float* av_vels);
 int collision(const t_param params, t_speed* cells, t_speed* tmp_cells, char* obstacles);
 
@@ -165,8 +165,8 @@ int main(int argc, char* argv[])
 
   for (int tt = 0; tt < params.maxIters; tt++)
   {
-    timestep(params, &cells, &tmp_cells, obstacles);
-    av_vels[tt] = av_velocity(params, cells, obstacles);
+    av_vels[tt] = timestep(params, &cells, &tmp_cells, obstacles);
+    // = av_velocity(params, cells, obstacles);
 #ifdef DEBUG
     printf("==timestep: %d==\n", tt);
     printf("av velocity: %.12E\n", av_vels[tt]);
@@ -194,13 +194,13 @@ int main(int argc, char* argv[])
   return EXIT_SUCCESS;
 }
 
-int timestep(const t_param params, t_speed** cells, t_speed** tmp_cells, char* obstacles)
+float timestep(const t_param params, t_speed** cells, t_speed** tmp_cells, char* obstacles)
 {
   accelerate_flow(params, *cells, obstacles);
-  propagate_rebound_and_collisions(params, *cells, *tmp_cells, obstacles);
+  float time_step_solution = propagate_rebound_and_collisions(params, *cells, *tmp_cells, obstacles);
   swap(cells, tmp_cells);
   // collision(params, cells, tmp_cells, obstacles);
-  return EXIT_SUCCESS;
+  return time_step_solution;
 }
 
 int accelerate_flow(const t_param params, t_speed* cells, char* obstacles)
@@ -235,7 +235,7 @@ int accelerate_flow(const t_param params, t_speed* cells, char* obstacles)
   return EXIT_SUCCESS;
 }
 
-int propagate_rebound_and_collisions(const t_param params, t_speed* cells, t_speed* tmp_cells, char* obstacles)
+float propagate_rebound_and_collisions(const t_param params, t_speed* cells, t_speed* tmp_cells, char* obstacles)
 {
 
   const float c_sq = 1.f / 3.f; /* square of speed of sound */
@@ -244,6 +244,9 @@ int propagate_rebound_and_collisions(const t_param params, t_speed* cells, t_spe
   const float w0 = 4.f / 9.f;  /* weighting factor */
   const float w1 = 1.f / 9.f;  /* weighting factor */
   const float w2 = 1.f / 36.f; /* weighting factor */
+  
+  int    tot_cells = 0;  /* no. of cells used in calculation */
+  float tot_u = 0.f;          /* accumulated magnitudes of velocity for each cell */
 
   /* loop over _all_ cells */
   for (int jj = 0; jj < params.ny; jj++)
@@ -344,27 +347,22 @@ int propagate_rebound_and_collisions(const t_param params, t_speed* cells, t_spe
         d_equ[7] = w2ld * (1.f + u[7] / c_sq + (u[7] * u[7]) / c_2cu - u_sqd2sq);
         d_equ[8] = w2ld * (1.f + u[8] / c_sq + (u[8] * u[8]) / c_2cu - u_sqd2sq);
 
-        tmp_cells[ii + jj*params.nx].speeds[0] = 
-            cells[ii + jj*params.nx].speeds[0] 
-          + params.omega
-          * (
-              (w0 * local_density * (1.f - u_sq / (c_2sq))) - cells[ii + jj*params.nx].speeds[0]
-            )
-          ;
-;
         /* relaxation step */
-        for (int kk = 1; kk < NSPEEDS; kk++)
+        for (int kk = 0; kk < NSPEEDS; kk++)
         {
           // Here is the problem we are going to change cells here!
           tmp_cells[ii + jj*params.nx].speeds[kk] = tmp_cells[ii + jj*params.nx].speeds[kk]
                                                   + params.omega
                                                   * (d_equ[kk] - tmp_cells[ii + jj*params.nx].speeds[kk]);
         }
+        
+        tot_u += sqrtf((u_x * u_x) + (u_y * u_y));
+        ++tot_cells;
       }
     }
   }
 
-  return EXIT_SUCCESS;
+  return tot_u / (float)tot_cells;
 }
 
 float av_velocity(const t_param params, t_speed* cells, char* obstacles)
