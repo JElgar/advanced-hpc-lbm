@@ -132,8 +132,8 @@ int main(int argc, char* argv[])
   char*    paramfile = NULL;    /* name of the input parameter file */
   char*    obstaclefile = NULL; /* name of a the input obstacle file */
   t_param  params;              /* struct to hold parameter values */
-  t_speed* cells __attribute__((aligned(64)))     = NULL;    /* grid containing fluid densities */
-  t_speed* tmp_cells __attribute__((aligned(64))) = NULL;    /* scratch space */
+  t_speed* cells  = NULL;    /* grid containing fluid densities */
+  t_speed* tmp_cells = NULL;    /* scratch space */
   char*     obstacles = NULL;    /* grid indicating which cells are blocked */
   float* av_vels   = NULL;     /* a record of the av. velocity computed for each timestep */
   struct timeval timstr;        /* structure to hold elapsed time */
@@ -249,7 +249,7 @@ float propagate_rebound_and_collisions(const t_param params, t_speed* restrict c
   /* loop over _all_ cells */
   {
     // #pragma omp parallel for simd collapse(2)
-    #pragma omp simd aligned(cells:64) collapse(2)
+    #pragma omp simd collapse(2)
     for (int jj = 0; jj < params.ny; jj++)
     {
       for (int ii = 0; ii < params.nx; ii++)
