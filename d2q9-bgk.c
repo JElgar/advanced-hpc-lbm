@@ -479,13 +479,11 @@ int initialise(const char* paramfile, const char* obstaclefile,
   */
 
   /* main grid */
-  cells_ptr = (t_speed*)malloc(sizeof(t_speed) * (params->ny * params->nx));
-
+  cells_ptr = malloc(sizeof(t_speed));
   if (cells_ptr == NULL) die("cannot allocate memory for cells", __LINE__, __FILE__);
 
   /* 'helper' grid, used as scratch space */
-  tmp_cells_ptr = (t_speed*)malloc(sizeof(t_speed) * (params->ny * params->nx));
-
+  tmp_cells_ptr = malloc(sizeof(t_speed));
   if (tmp_cells_ptr == NULL) die("cannot allocate memory for tmp_cells", __LINE__, __FILE__);
 
   /* the map of obstacles */
@@ -493,11 +491,13 @@ int initialise(const char* paramfile, const char* obstaclefile,
 
   if (*obstacles_ptr == NULL) die("cannot allocate column memory for obstacles", __LINE__, __FILE__);
 
+  printf("Inited cells");
   /* initialise densities */
   float w0 = params->density * 4.f / 9.f;
   float w1 = params->density      / 9.f;
   float w2 = params->density      / 36.f;
 
+  printf("Doing cells");
   for (int jj = 0; jj < params->ny; jj++)
   {
     for (int ii = 0; ii < params->nx; ii++)
