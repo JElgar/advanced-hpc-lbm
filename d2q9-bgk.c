@@ -116,7 +116,7 @@ int finalise(const t_param* params, t_speed** cells_ptr, t_speed** tmp_cells_ptr
 float total_density(const t_param params, t_speed* cells);
 
 /* calculate Reynolds number */
-float calc_reynolds(const t_param params, t_speed* cells, char* obstacles);
+float calc_reynolds(const t_param params, t_speed* cells, char* obstacles, float av_velocity);
 
 /* utility functions */
 void die(const char* message, const int line, const char* file);
@@ -159,10 +159,12 @@ int main(int argc, char* argv[])
   /* iterate for maxIters timesteps */
   gettimeofday(&timstr, NULL);
   tic = timstr.tv_sec + (timstr.tv_usec / 1000000.0);
+  float final_av_velocity;
 
   for (int tt = 0; tt < params.maxIters; tt++)
   {
-    av_vels[tt] = timestep(params, &cells, &tmp_cells, obstacles);
+    final_av_velocity = timestep(params, &cells, &tmp_cells, obstacles);
+    av_vels[tt] = final_av_velocity;
 #ifdef DEBUG
     printf("==timestep: %d==\n", tt);
     printf("av velocity: %.12E\n", av_vels[tt]);
@@ -180,7 +182,7 @@ int main(int argc, char* argv[])
 
   /* write final values and free memory */
   printf("==done==\n");
-  printf("Reynolds number:\t\t%.12E\n", calc_reynolds(params, cells, obstacles));
+  printf("Reynolds number:\t\t%.12E\n", calc_reynolds(params, cells, obstacles, final_av_velocity));
   printf("Elapsed time:\t\t\t%.6lf (s)\n", toc - tic);
   printf("Elapsed user CPU time:\t\t%.6lf (s)\n", usrtim);
   printf("Elapsed system CPU time:\t%.6lf (s)\n", systim);
@@ -231,7 +233,7 @@ int accelerate_flow(const t_param params, t_speed* cells, char* obstacles)
   return EXIT_SUCCESS;
 }
 
-float propagate_rebound_and_collisions(const t_param params, t_speed* cells, t_speed* tmp_cells, char* obstacles)
+float propagate_rebound_and_collisions(const t_param params, t_speed* restrict cells, t_speed* restrict tmp_cells, char* obstacles)
 {
 
   const float c_sq = 1.f / 3.f; /* square of speed of sound */
@@ -538,11 +540,11 @@ int finalise(const t_param* params, t_speed** cells_ptr, t_speed** tmp_cells_ptr
 }
 
 
-float calc_reynolds(const t_param params, t_speed* cells, char* obstacles)
+float calc_reynolds(const t_param params, t_speed* cells, char* obstacles, float av_velocity)
 {
   const float viscosity = 1.f / 6.f * (2.f / params.omega - 1.f);
 
-  return av_velocity(params, cells, obstacles) * params.reynolds_dim / viscosity;
+  return av_velocity * params.reynolds_dim / viscosity;
 }
 
 float total_density(const t_param params, t_speed* cells)
