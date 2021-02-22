@@ -247,7 +247,7 @@ float propagate_rebound_and_collisions(const t_param params, t_speed* restrict c
   float tot_u = 0.f;          /* accumulated magnitudes of velocity for each cell */
 
   /* loop over _all_ cells */
-  #pragma omp parallel
+  // #pragma omp parallel collapse(2)
   {
     #pragma omp for simd
     for (int jj = 0; jj < params.ny; jj++)
@@ -351,7 +351,6 @@ float propagate_rebound_and_collisions(const t_param params, t_speed* restrict c
           /* relaxation step */
           for (int kk = 0; kk < NSPEEDS; kk++)
           {
-            // Here is the problem we are going to change cells here!
             tmp_cells[ii + jj*params.nx].speeds[kk] = tmp_cells[ii + jj*params.nx].speeds[kk]
                                                     + params.omega
                                                     * (d_equ[kk] - tmp_cells[ii + jj*params.nx].speeds[kk]);
