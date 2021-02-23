@@ -89,12 +89,26 @@ int main_aop(int argc, char* argv[])
 void init_soa(t_speed_soa *cells) {
   cells->a = malloc(sizeof(float) * 10);
   cells->a[0] = 0.1f;
-  printf("Assertions complete, %.6f\n", cells->a[0]);
 }
 
+void swap_soa(t_speed_soa *a, t_speed_soa *b) {
+  t_speed_soa tmp = *a;
+  *a = *b;
+  *b = tmp;
+}
 
 int main(int argc, char* argv[]) {
   t_speed_soa *cells = malloc(sizeof(t_speed_soa));
+  t_speed_soa *cells2 = malloc(sizeof(t_speed_soa));
   init_soa(cells);
+  init_soa(cells2);
+  cells2->a[0] = 0.2f;
+
   printf("Assertions complete, %.6f\n", cells->a[0]);
+  printf("Assertions complete, %.6f\n", cells2->a[0]);
+
+  swap_soa(cells, cells2);
+  
+  printf("Assertions complete, %.6f\n", cells->a[0]);
+  printf("Assertions complete, %.6f\n", cells2->a[0]);
 }

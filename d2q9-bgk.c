@@ -751,9 +751,15 @@ void usage(const char* exe)
   exit(EXIT_FAILURE);
 }
 
-void swap(t_speed* cells, t_speed* cells2) {
-  /* Swaps pointers of cells */
-  t_speed *tmp = cells;
-  cells = cells2;
-  cells2 = tmp;
+// void swap(t_speed* cells, t_speed* cells2) {
+//   /* Swaps pointers of cells */
+//   t_speed* tmp = cells;
+//   cells = cells2;
+//   cells2 = tmp;
+// }
+
+void swap(t_speed *a, t_speed *b) {
+  t_speed tmp = *a;
+  *a = *b;
+  *b = tmp;
 }
