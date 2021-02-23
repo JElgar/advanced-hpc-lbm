@@ -241,7 +241,7 @@ int accelerate_flow(const t_param params, t_speed* cells, char* obstacles)
   return EXIT_SUCCESS;
 }
 
-float propagate_rebound_and_collisions(const t_param params, t_speed* restrict cells, t_speed* restrict tmp_cells, char* obstacles)
+float propagate_rebound_and_collisions(const t_param params, t_speed* cells, t_speed* tmp_cells, char* obstacles)
 {
 
   const float c_sq = 1.f / 3.f; /* square of speed of sound */
@@ -257,7 +257,7 @@ float propagate_rebound_and_collisions(const t_param params, t_speed* restrict c
   /* loop over _all_ cells */
   {
     // #pragma omp parallel for simd collapse(2)
-    #pragma omp simd collapse(2)
+    // #pragma omp simd collapse(2)
     for (int jj = 0; jj < params.ny; jj++)
     {
       for (int ii = 0; ii < params.nx; ii++)
