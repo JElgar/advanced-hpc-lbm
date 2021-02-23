@@ -13,6 +13,12 @@ typedef struct
 } t_speed;
 
 
+typedef struct
+{
+  float *a;
+} t_speed_soa;
+
+
 int init(t_speed** cells, t_speed** cells2) {
   for (int jj = 0; jj < 2; jj++)
   {
@@ -55,8 +61,9 @@ int do_some_things(t_speed** cells, t_speed** cells2) {
 }
 
 
-int main(int argc, char* argv[])
+int main_aop(int argc, char* argv[])
 {
+  printf("hello world");
   t_speed* cells = (t_speed*)malloc(sizeof(t_speed) * 4);
   t_speed* cells2 = (t_speed*)malloc(sizeof(t_speed) * 4);
   printf("hello world");
@@ -78,3 +85,16 @@ int main(int argc, char* argv[])
   return 0;
 }
 
+
+void init_soa(t_speed_soa *cells) {
+  cells->a = malloc(sizeof(float) * 10);
+  cells->a[0] = 0.1f;
+  printf("Assertions complete, %.6f\n", cells->a[0]);
+}
+
+
+int main(int argc, char* argv[]) {
+  t_speed_soa *cells = malloc(sizeof(t_speed_soa));
+  init_soa(cells);
+  printf("Assertions complete, %.6f\n", cells->a[0]);
+}

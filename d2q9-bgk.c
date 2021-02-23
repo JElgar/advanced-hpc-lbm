@@ -116,7 +116,7 @@ int write_values(const t_param params, t_speed* cells, char* obstacles, float* a
 int collision(const t_param params, t_speed* cells, t_speed* tmp_cells, char* obstacles);
 
 /* finalise, including freeing up allocated memory */
-int finalise(const t_param* params, t_speed** cells_ptr, t_speed** tmp_cells_ptr,
+int finalise(const t_param* params, t_speed* cells_ptr, t_speed* tmp_cells_ptr,
              char** obstacles_ptr, float** av_vels_ptr);
 
 /* Sum all the densities in the grid.
@@ -137,12 +137,13 @@ void swap(t_speed* cells, t_speed* cells2);
 */
 int main(int argc, char* argv[])
 {
+  printf("Here we go\n");
   char*    paramfile = NULL;    /* name of the input parameter file */
   char*    obstaclefile = NULL; /* name of a the input obstacle file */
   t_param  params;              /* struct to hold parameter values */
-  t_speed* cells  = NULL;    /* grid containing fluid densities */
-  t_speed* tmp_cells = NULL;    /* scratch space */
-  char*     obstacles = NULL;    /* grid indicating which cells are blocked */
+  t_speed *cells = malloc(sizeof(t_speed));  /* grid containing fluid densities */
+  t_speed *tmp_cells = malloc(sizeof(t_speed));  /* grid indicating which cells are blocked */
+  char*     obstacles = NULL;    
   float* av_vels   = NULL;     /* a record of the av. velocity computed for each timestep */
   struct timeval timstr;        /* structure to hold elapsed time */
   struct rusage ru;             /* structure to hold CPU time--system and user */
@@ -195,16 +196,20 @@ int main(int argc, char* argv[])
   printf("Elapsed user CPU time:\t\t%.6lf (s)\n", usrtim);
   printf("Elapsed system CPU time:\t%.6lf (s)\n", systim);
   write_values(params, cells, obstacles, av_vels);
-  finalise(&params, &cells, &tmp_cells, &obstacles, &av_vels);
+  finalise(&params, cells, tmp_cells, &obstacles, &av_vels);
 
   return EXIT_SUCCESS;
 }
 
 float timestep(const t_param params, t_speed* cells, t_speed* tmp_cells, char* obstacles)
 {
+  printf("Timestep\n");
   accelerate_flow(params, cells, obstacles);
+  printf("Accelerated flows\n");
   float time_step_solution = propagate_rebound_and_collisions(params, cells, tmp_cells, obstacles);
+  printf("Did a the maths\n");
   swap(cells, tmp_cells);
+  printf("Swapped\n");
   // collision(params, cells, tmp_cells, obstacles);
   return time_step_solution;
 }
@@ -418,6 +423,8 @@ int initialise(const char* paramfile, const char* obstaclefile,
   int    blocked;        /* indicates whether a cell is blocked by an obstacle */
   int    retval;         /* to hold return value for checking */
 
+  printf("In init\n");
+
   /* open the parameter file */
   fp = fopen(paramfile, "r");
 
@@ -477,13 +484,31 @@ int initialise(const char* paramfile, const char* obstaclefile,
   ** hold an array of 'speeds'.  We will allocate
   ** a 1D array of these structs.
   */
+  printf("Starting init\n");
 
   /* main grid */
-  cells_ptr = malloc(sizeof(t_speed));
+  cells_ptr->speed0 = malloc(params->nx * params->ny * sizeof(float));
+  cells_ptr->speed1 = malloc(params->nx * params->ny * sizeof(float));
+  cells_ptr->speed2 = malloc(params->nx * params->ny * sizeof(float));
+  cells_ptr->speed3 = malloc(params->nx * params->ny * sizeof(float));
+  cells_ptr->speed4 = malloc(params->nx * params->ny * sizeof(float));
+  cells_ptr->speed5 = malloc(params->nx * params->ny * sizeof(float));
+  cells_ptr->speed6 = malloc(params->nx * params->ny * sizeof(float));
+  cells_ptr->speed7 = malloc(params->nx * params->ny * sizeof(float));
+  cells_ptr->speed8 = malloc(params->nx * params->ny * sizeof(float));
+
   if (cells_ptr == NULL) die("cannot allocate memory for cells", __LINE__, __FILE__);
 
   /* 'helper' grid, used as scratch space */
-  tmp_cells_ptr = malloc(sizeof(t_speed));
+  tmp_cells_ptr->speed0 = malloc(params->nx * params->ny * sizeof(float));
+  tmp_cells_ptr->speed1 = malloc(params->nx * params->ny * sizeof(float));
+  tmp_cells_ptr->speed2 = malloc(params->nx * params->ny * sizeof(float));
+  tmp_cells_ptr->speed3 = malloc(params->nx * params->ny * sizeof(float));
+  tmp_cells_ptr->speed4 = malloc(params->nx * params->ny * sizeof(float));
+  tmp_cells_ptr->speed5 = malloc(params->nx * params->ny * sizeof(float));
+  tmp_cells_ptr->speed6 = malloc(params->nx * params->ny * sizeof(float));
+  tmp_cells_ptr->speed7 = malloc(params->nx * params->ny * sizeof(float));
+  tmp_cells_ptr->speed8 = malloc(params->nx * params->ny * sizeof(float));
   if (tmp_cells_ptr == NULL) die("cannot allocate memory for tmp_cells", __LINE__, __FILE__);
 
   /* the map of obstacles */
@@ -491,13 +516,13 @@ int initialise(const char* paramfile, const char* obstaclefile,
 
   if (*obstacles_ptr == NULL) die("cannot allocate column memory for obstacles", __LINE__, __FILE__);
 
-  printf("Inited cells");
+  printf("Inited cells\n");
   /* initialise densities */
   float w0 = params->density * 4.f / 9.f;
   float w1 = params->density      / 9.f;
   float w2 = params->density      / 36.f;
 
-  printf("Doing cells");
+  printf("Doing cells\n");
   for (int jj = 0; jj < params->ny; jj++)
   {
     for (int ii = 0; ii < params->nx; ii++)
@@ -516,6 +541,8 @@ int initialise(const char* paramfile, const char* obstaclefile,
       cells_ptr->speed8[ii + jj*params->nx] = w2;
     }
   }
+  printf("%.6f\n", cells_ptr->speed0[1 + 2*params->nx]);
+  printf("Done \n");
 
   /* first set all cells in obstacle array to zero */
   for (int jj = 0; jj < params->ny; jj++)
@@ -563,17 +590,35 @@ int initialise(const char* paramfile, const char* obstaclefile,
   return EXIT_SUCCESS;
 }
 
-int finalise(const t_param* params, t_speed** cells_ptr, t_speed** tmp_cells_ptr,
+int finalise(const t_param* params, t_speed* cells_ptr, t_speed* tmp_cells_ptr,
              char** obstacles_ptr, float** av_vels_ptr)
 {
   /*
   ** free up allocated memory
   */
-  free(*cells_ptr);
-  *cells_ptr = NULL;
+  free(cells_ptr->speed0);
+  free(cells_ptr->speed1);
+  free(cells_ptr->speed2);
+  free(cells_ptr->speed3);
+  free(cells_ptr->speed4);
+  free(cells_ptr->speed5);
+  free(cells_ptr->speed6);
+  free(cells_ptr->speed7);
+  free(cells_ptr->speed8);
+  free(cells_ptr);
+  cells_ptr = NULL;
 
-  free(*tmp_cells_ptr);
-  *tmp_cells_ptr = NULL;
+  free(tmp_cells_ptr->speed0);
+  free(tmp_cells_ptr->speed1);
+  free(tmp_cells_ptr->speed2);
+  free(tmp_cells_ptr->speed3);
+  free(tmp_cells_ptr->speed4);
+  free(tmp_cells_ptr->speed5);
+  free(tmp_cells_ptr->speed6);
+  free(tmp_cells_ptr->speed7);
+  free(tmp_cells_ptr->speed8);
+  free(tmp_cells_ptr);
+  tmp_cells_ptr = NULL;
 
   free(*obstacles_ptr);
   *obstacles_ptr = NULL;
