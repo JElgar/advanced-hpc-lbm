@@ -203,14 +203,9 @@ int main(int argc, char* argv[])
 
 float timestep(const t_param params, t_speed* cells, t_speed* tmp_cells, char* obstacles)
 {
-  printf("Timestep\n");
   accelerate_flow(params, cells, obstacles);
-  printf("Accelerated flows\n");
   float time_step_solution = propagate_rebound_and_collisions(params, cells, tmp_cells, obstacles);
-  printf("Did a the maths\n");
   swap(cells, tmp_cells);
-  printf("Swapped\n");
-  // collision(params, cells, tmp_cells, obstacles);
   return time_step_solution;
 }
 
@@ -423,8 +418,6 @@ int initialise(const char* paramfile, const char* obstaclefile,
   int    blocked;        /* indicates whether a cell is blocked by an obstacle */
   int    retval;         /* to hold return value for checking */
 
-  printf("In init\n");
-
   /* open the parameter file */
   fp = fopen(paramfile, "r");
 
@@ -484,7 +477,6 @@ int initialise(const char* paramfile, const char* obstaclefile,
   ** hold an array of 'speeds'.  We will allocate
   ** a 1D array of these structs.
   */
-  printf("Starting init\n");
 
   /* main grid */
   cells_ptr->speed0 = malloc(params->nx * params->ny * sizeof(float));
@@ -516,13 +508,11 @@ int initialise(const char* paramfile, const char* obstaclefile,
 
   if (*obstacles_ptr == NULL) die("cannot allocate column memory for obstacles", __LINE__, __FILE__);
 
-  printf("Inited cells\n");
   /* initialise densities */
   float w0 = params->density * 4.f / 9.f;
   float w1 = params->density      / 9.f;
   float w2 = params->density      / 36.f;
 
-  printf("Doing cells\n");
   for (int jj = 0; jj < params->ny; jj++)
   {
     for (int ii = 0; ii < params->nx; ii++)
@@ -541,8 +531,6 @@ int initialise(const char* paramfile, const char* obstaclefile,
       cells_ptr->speed8[ii + jj*params->nx] = w2;
     }
   }
-  printf("%.6f\n", cells_ptr->speed0[1 + 2*params->nx]);
-  printf("Done \n");
 
   /* first set all cells in obstacle array to zero */
   for (int jj = 0; jj < params->ny; jj++)
