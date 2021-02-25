@@ -174,15 +174,11 @@ int main(int argc, char* argv[])
   tic = timstr.tv_sec + (timstr.tv_usec / 1000000.0);
   float final_av_velocity;
 
-  // for (int tt = 0; tt < params.maxIters; tt++)
-  for (int tt = 0; tt < 1; tt++)
+  for (int tt = 0; tt < params.maxIters; tt++)
   {
     final_av_velocity = timestep(params, cells, tmp_cells, obstacles);
     av_vels[tt] = final_av_velocity;
 
-    printf("==timestep: %d==\n", tt);
-    printf("av velocity: %.12E\n", av_vels[tt]);
-    printf("tot density: %.12E\n", total_density(params, cells));
 #ifdef DEBUG
     printf("==timestep: %d==\n", tt);
     printf("av velocity: %.12E\n", av_vels[tt]);
@@ -214,7 +210,6 @@ float timestep(const t_param params, t_speed* cells, t_speed* tmp_cells, char* o
 {
   accelerate_flow(params, cells, obstacles);
   float time_step_solution = propagate_rebound_and_collisions(params, cells, tmp_cells, obstacles);
-  printf("Timestep solution: %.12f\n", time_step_solution);
   swap(cells, tmp_cells);
   return time_step_solution;
 }
@@ -414,12 +409,6 @@ float propagate_rebound_and_collisions(const t_param params, t_speed* cells, t_s
       }
     }
   }
-  printf("A thing: %.20f\n", tmp_cells->speed8[20]);
-  printf("A thing: %.20f\n", tmp_cells->speed2[40]);
-  
-  printf("tot_u: %.20f\n", tot_u);
-  printf("tot_cells: %.20f\n", tot_cells);
-
   return tot_u / (float)tot_cells;
 }
 
