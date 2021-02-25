@@ -1,0 +1,394 @@
+14 [46979204487040] TRACE perfrun.launcher <> - ENTER: int main(int, char **)
+16 [46979204487040] TRACE perfrun.launcher <> - ENTER: Start the collection
+16 [46979204487040] INFO perfrun.launcher <> - argc = 7; cmdline = /mnt/storage/software/languages/intel/intel-parallel_studio_xe_2018_u3/advisor_2018.3.0.558307/bin64/advixe-runss --ui-output-format xml --ui-output-fd 9 --option-file /mnt/storage/home/za18968/advanced-hpc-lbm/e000/hs005/config/runss.options 
+16 [46979204487040] TRACE perfrun.launcher <> - ENTER: Initialize the launcher
+17 [46979204487040] TRACE perfrun.launcher <> - ENTER: void runtool::CmdLineParser::declareOptions()
+23 [46979204487040] TRACE perfrun.launcher <> - EXIT:  void runtool::CmdLineParser::declareOptions()
+23 [46979204487040] TRACE perfrun.system <> - ENTER: static runtool::system::IController *runtool::system::IController::create()
+23 [46979204487040] TRACE perfrun.system <> - ENTER: runtool::system::Controller::Controller()
+23 [46979204487040] TRACE perfrun.system <> - EXIT:  runtool::system::Controller::Controller()
+23 [46979204487040] TRACE perfrun.system <> - EXIT:  static runtool::system::IController *runtool::system::IController::create()
+23 [46979204487040] INFO perfrun.launcher <> - plugin system has been added successfully
+23 [46979204487040] INFO perfrun.launcher <> - plugin  has been added successfully
+23 [46979204487040] INFO perfrun.launcher <> - plugin  has been added successfully
+23 [46979204487040] INFO perfrun.launcher <> - plugin  has been added successfully
+23 [46979204487040] INFO perfrun.launcher <> - plugin  has been added successfully
+23 [46979204487040] INFO perfrun.launcher <> - plugin  has been added successfully
+23 [46979204487040] INFO perfrun.launcher <> - plugin  has been added successfully
+23 [46979204487040] INFO perfrun.launcher <> - plugin mrte has been added successfully
+23 [46979204487040] INFO perfrun.launcher <> - plugin  has been added successfully
+23 [46979204487040] INFO perfrun.launcher <> - plugin  has been added successfully
+26 [46979204487040] INFO perfrun.launcher <> - plugin  has been added successfully
+26 [46979204487040] INFO perfrun.launcher <> - plugin  has been added successfully
+26 [46979204487040] INFO perfrun.launcher <> - plugin  has been added successfully
+26 [46979204487040] TRACE perfrun.tpss <> - ENTER: static runtool::sdk::IController *runtool::tpss::IController::create()
+26 [46979204487040] TRACE perfrun.tpss <> - ENTER: create tpss controller
+26 [46979204487040] TRACE perfrun.tpss <> - EXIT:  create tpss controller
+26 [46979204487040] TRACE perfrun.tpss <> - EXIT:  static runtool::sdk::IController *runtool::tpss::IController::create()
+26 [46979204487040] INFO perfrun.launcher <> - plugin tpss has been added successfully
+26 [46979204487040] INFO perfrun.launcher <> - plugin  has been added successfully
+26 [46979204487040] INFO perfrun.launcher <> - plugin  has been added successfully
+26 [46979204487040] INFO perfrun.launcher <> - plugin  has been added successfully
+26 [46979204487040] INFO perfrun.launcher <> - plugin  has been added successfully
+26 [46979204487040] INFO perfrun.launcher <> - plugin  has been added successfully
+26 [46979204487040] INFO perfrun.launcher <> - plugin  has been added successfully
+26 [46979204487040] INFO perfrun.launcher <> - the option was added --interval: Specify an interval of data collection (for example, sampling) in milliseconds.
+26 [46979204487040] INFO perfrun.launcher <> - the option was added --follow-child: Profile process with or without children.
+26 [46979204487040] INFO perfrun.launcher <> - the option was added --gelding: BADMSG: perfrun1.launcher.plugin_manager::gelding
+27 [46979204487040] INFO perfrun.launcher <> - the option was added --time-source: Specify time source for measurement. Possible values: sys - wall clock time; tsc - time stamp counter; ext - time from an external source; auto - auto select accurate time source.
+27 [46979204487040] INFO perfrun.launcher <> - the option was added --stack: Enable or disable collection of stacks.
+28 [46979204487040] INFO perfrun.launcher <> - the option was added --stack-stitching: Enable or disable the stack stitching algorithm for Intel TBB-based applications.
+28 [46979204487040] INFO perfrun.launcher <> - the option was added --type: Specify type of data to be collected. For example, --type cpu:counters,waiting:nostack,io.
+28 [46979204487040] INFO perfrun.launcher <> - the option was added --mrte-mode: Specify Java/.NET/other managed runtime collection mode. Possible values: native - collect information only for native code; managed - collect information only for managed code; mixed - collect information for both managed and native code; auto - choose the mode based on binary type.
+28 [46979204487040] INFO perfrun.launcher <> - the option was added --mrte-mode-list: List supported Java/.NET/other managed runtime collection modes.
+28 [46979204487040] INFO perfrun.launcher <> - the option was added --mrte-type: Specify which managed runtimes to collect. Possible values: java - collect information for Java; dotnet - collect information for .NET; python - collect information for CPython. You can specify several values separated by comma.
+29 [46979204487040] INFO perfrun.launcher <> - the option was added --mrte-type-list: List supported Java/.NET/other managed runtime types.
+29 [46979204487040] INFO perfrun.launcher <> - the option was added --trace-strategy: Specify how to profile a process tree. <string> can be "<process>:trace:notrace" - profile the process but do not profile its children. Shorthand parameters: t - trace, nt - notrace. For example, "vtunedemo.exe:t:t".
+29 [46979204487040] INFO perfrun.launcher <> - the option was added --collector: BADMSG: perfrun1.launcher.plugin_manager::collector
+29 [46979204487040] INFO perfrun.launcher <> - the option was added --system-wide: Enable system-wide profiling. This mode may require additional permissions.
+29 [46979204487040] INFO perfrun.launcher <> - the option was added --kvm-guest: Enable KVM guest OS profiling.
+29 [46979204487040] INFO perfrun.launcher <> - the option was added --kvm-guest-kallsyms: Specify a local path to the /proc/kallsyms file copied from the guest OS for proper symbol resolution.
+29 [46979204487040] INFO perfrun.launcher <> - the option was added --kvm-guest-modules: Specify a local path to the /proc/modules file copied from the guest OS for proper symbol resolution.
+29 [46979204487040] INFO perfrun.launcher <> - the option was added --target-system: BADMSG: perfrun1.launcher.plugin_manager::target-system
+29 [46979204487040] INFO perfrun.launcher <> - the option was added --dump-vdso: Dump [vdso] to result directory
+29 [46979204487040] INFO perfrun.launcher <> - the option was added --bandwidth-limits: Measure bandwidth limits
+29 [46979204487040] INFO perfrun.launcher <> - the option was added --bandwidth-strategy: Bandwidth limits determination specific properties (example: --bandwidth-strategy array-size=0,duration=500).
+29 [46979204487040] INFO perfrun.launcher <> - the option was added --bandwidth-config: List of benchmarks to run.
+29 [46979204487040] INFO perfrun.launcher <> - the option was added --benchmark-sync: Run synchronized bandwidth measurement.
+29 [46979204487040] INFO perfrun.launcher <> - the option was added --system-collector-config: Specify subcollectors. Possible values: all, vdso, container, device-info, none.
+29 [46979204487040] INFO perfrun.launcher <> - the option was added --stackwalk: Specify stack unwinding method. Possible values: online - unwind stacks during collection; offline - unwind stacks after collection is finished.
+29 [46979204487040] INFO perfrun.launcher <> - the option was added --filter-include: Filter data during collection. Possible values: contended=<on|off> - filter out uncontended events; contended_nostack=<time> - filter out stacks for contended events that take less than <time> microseconds; wait=<time> - ignore transitions and blocks with wait time less than <time> microseconds; wait_nostack=<time> - filter out stacks for waits that take less than <time> microseconds.
+29 [46979204487040] INFO perfrun.launcher <> - the option was added --debug-pin: Debug PIN tool and runtime.
+29 [46979204487040] INFO perfrun.launcher <> - the option was added --debug-exception: Disallow the application to set own abnormal termination handler.
+29 [46979204487040] INFO perfrun.launcher <> - the option was added --trace-type: Specify the trace file granularity. Possible values: per-thread - per-thread trace file generation; per-process - per-process trace file generation.
+29 [46979204487040] INFO perfrun.launcher <> - the option was added --instrumentation-type: Specify type of instrumentation.
+29 [46979204487040] INFO perfrun.launcher <> - the option was added --altstack: Enable or disable usage of altstacks for profiling signal handlers.
+29 [46979204487040] INFO perfrun.launcher <> - the option was added --profiling-signal: Alternate profiling signal.
+29 [46979204487040] INFO perfrun.launcher <> - the option was added --memory-strategy: Specify a minimal memory object size to be traced and a hash table size for faster objects search; for example: --memory-strategy obj-size-min=1024,hash-table-size=4096.
+29 [46979204487040] TRACE perfrun.launcher <> - Update configuration: tmp directory = /tmp/advixe-tmp-za18968
+29 [46979204487040] TRACE perfrun.launcher <> - EXIT:  Initialize the launcher
+30 [46979204487040] TRACE perfrun.launcher <> - ENTER: void runtool::CmdLineParser::parseOptionFile(const std::basic_string<char, std::char_traits<char>, std::allocator<char>> &)
+32 [46979204487040] TRACE perfrun.launcher <> - EXIT:  void runtool::CmdLineParser::parseOptionFile(const std::basic_string<char, std::char_traits<char>, std::allocator<char>> &)
+32 [46979204487040] INFO perfrun.launcher <> - create msngr2::ICliToolContext
+32 [46979204487040] TRACE perfrun.launcher <> - ENTER: void runtool::CmdLineParser::validateParseResult() const
+32 [46979204487040] TRACE perfrun.launcher <> - EXIT:  void runtool::CmdLineParser::validateParseResult() const
+32 [46979204487040] TRACE perfrun.launcher <> - ENTER: void runtool::CmdLineParser::populate(runtool::IConfiguration *) const
+32 [46979204487040] TRACE perfrun.launcher <> - Update configuration: action = start
+32 [46979204487040] TRACE perfrun.launcher <> - Update configuration: collection type = launcher
+32 [46979204487040] TRACE perfrun.launcher <> - Update configuration: quiet mode is enabled
+32 [46979204487040] TRACE perfrun.launcher <> - Update configuration: compression level = 2
+32 [46979204487040] TRACE perfrun.launcher <> - Update configuration: duration = 0 sec
+32 [46979204487040] TRACE perfrun.launcher <> - Update configuration: data limit = 524288000 bytes
+32 [46979204487040] TRACE perfrun.launcher <> - Update configuration: disc space limit = 0 bytes
+32 [46979204487040] TRACE perfrun.launcher <> - Update configuration: return-app-exitcode = false
+32 [46979204487040] TRACE perfrun.launcher <> - Update configuration: result directory = /mnt/storage/home/za18968/advanced-hpc-lbm/e000/hs005
+32 [46979204487040] TRACE perfrun.launcher <> - Update configuration: application = ./d2q9-bgk
+32 [46979204487040] TRACE perfrun.launcher <> - Update configuration: application argument = input_128x128.params
+32 [46979204487040] TRACE perfrun.launcher <> - Update configuration: application argument = obstacles_128x128.dat
+32 [46979204487040] TRACE perfrun.launcher <> - [IN] option = interval; value = 10 !u32_t
+32 [46979204487040] TRACE perfrun.launcher <> - [IN] option = follow-child; value = true !bool
+32 [46979204487040] TRACE perfrun.launcher <> - [IN] option = gelding; value = false !bool
+32 [46979204487040] TRACE perfrun.launcher <> - [IN] option = time-source; value = auto !ustring
+32 [46979204487040] TRACE perfrun.launcher <> - [IN] option = stack; value = true !bool
+32 [46979204487040] TRACE perfrun.launcher <> - [IN] option = stack-stitching; value = true !bool
+32 [46979204487040] TRACE perfrun.launcher <> - [IN] option = type; value = cpu:stack !ustring
+32 [46979204487040] TRACE perfrun.launcher <> - [IN] option = mrte-mode; value = auto !ustring
+32 [46979204487040] TRACE perfrun.launcher <> - [IN] option = mrte-type; value = java !ustring
+32 [46979204487040] TRACE perfrun.launcher <> - [IN] option = mrte-type; value = python !ustring
+32 [46979204487040] TRACE perfrun.launcher <> - [IN] option = trace-strategy; value = ld-linux.so.2:notrace:notrace !ustring
+32 [46979204487040] TRACE perfrun.launcher <> - [IN] option = trace-strategy; value = ld-linux-x86-64.so.2:notrace:notrace !ustring
+32 [46979204487040] TRACE perfrun.launcher <> - [IN] option = collector; value = sep !ustring
+32 [46979204487040] TRACE perfrun.launcher <> - [IN] option = system-wide; value = false !bool
+32 [46979204487040] TRACE perfrun.launcher <> - [IN] option = kvm-guest; value = false !bool
+32 [46979204487040] TRACE perfrun.launcher <> - [IN] option = bandwidth-limits; value = false !bool
+32 [46979204487040] TRACE perfrun.launcher <> - [IN] option = benchmark-sync; value = false !bool
+32 [46979204487040] TRACE perfrun.launcher <> - [IN] option = system-collector-config; value = all !ustring
+32 [46979204487040] TRACE perfrun.launcher <> - [IN] option = stackwalk; value = offline !ustring
+32 [46979204487040] TRACE perfrun.launcher <> - [IN] option = trace-type; value = per-thread !ustring
+32 [46979204487040] TRACE perfrun.launcher <> - [IN] option = instrumentation-type; value = pin !ustring
+32 [46979204487040] TRACE perfrun.launcher <> - [IN] option = altstack; value = true !bool
+32 [46979204487040] TRACE perfrun.launcher <> - EXIT:  void runtool::CmdLineParser::populate(runtool::IConfiguration *) const
+32 [46979320092416] TRACE perfrun.tpss <> - ENTER: void runtool::tpss::Controller::setMessageChannel(runtool::sdk::IMessageChannel *)
+32 [46979320092416] TRACE perfrun.tpss <> - EXIT:  void runtool::tpss::Controller::setMessageChannel(runtool::sdk::IMessageChannel *)
+32 [46979204487040] INFO perfrun.launcher <> - create file finder object
+32 [46979320092416] TRACE perfrun.tpss <> - ENTER: void runtool::tpss::Controller::setRequestHandler(runtool::sdk::IRequestHandler *)
+32 [46979320092416] TRACE perfrun.tpss <> - EXIT:  void runtool::tpss::Controller::setRequestHandler(runtool::sdk::IRequestHandler *)
+32 [46979204487040] TRACE perfrun.launcher <> - Handle the user request: action = 0
+32 [46979204487040] TRACE perfrun.launcher <> - ENTER: int runtool::Launcher::doStart()
+32 [46979204487040] TRACE perfrun.launcher <> - ENTER: void runtool::Launcher::prepareLaunch()
+32 [46979204487040] TRACE perfrun.launcher <> - ENTER: void runtool::Launcher::prepareResultDirectory()
+32 [46979204487040] INFO perfrun.launcher <> - create a result directory: pattern = /mnt/storage/home/za18968/advanced-hpc-lbm/e000/hs005 pid = 4294967295
+37 [46979204487040] TRACE perfrun.sdk <> - ENTER: bool runtool::sdk::DirectoryInfo::isLocal() const
+38 [46979204487040] INFO perfrun.sdk <> - checked that the directory /mnt/storage/home/za18968/advanced-hpc-lbm/e000/hs005 is a local directory
+38 [46979204487040] INFO perfrun.sdk <> - the directory /mnt/storage/home/za18968/advanced-hpc-lbm/e000/hs005 is located on a share or its FS ID is unknown 1196443219
+38 [46979204487040] TRACE perfrun.sdk <> - EXIT:  bool runtool::sdk::DirectoryInfo::isLocal() const
+38 [46979204487040] INFO perfrun.launcher <> - Create a local result directory /tmp/advixe-tmp-za18968/advixe-res-20054-6533459010684148 due to the user result path /mnt/storage/home/za18968/advanced-hpc-lbm/e000/hs005 is located on a share
+38 [46979204487040] TRACE perfrun.launcher <> - Update configuration: result directory = /tmp/advixe-tmp-za18968/advixe-res-20054-6533459010684148
+38 [46979204487040] INFO perfrun.launcher <> - create data directory = /tmp/advixe-tmp-za18968/advixe-res-20054-6533459010684148/data.0
+39 [46979204487040] INFO perfrun.launcher <> - create data directory = /mnt/storage/home/za18968/advanced-hpc-lbm/e000/hs005/data.0
+39 [46979204487040] TRACE perfrun.launcher <> - Update configuration: data directory = /tmp/advixe-tmp-za18968/advixe-res-20054-6533459010684148/data.0
+39 [46979204487040] TRACE perfrun.launcher <> - EXIT:  void runtool::Launcher::prepareResultDirectory()
+43 [46979204487040] TRACE perfrun.launcher <> - IMessenger: send collection state with state = 11
+44 [46979320092416] TRACE perfrun.launcher <> - Update configuration: follow child = 1
+46 [46979320092416] TRACE perfrun.launcher <> - Update configuration: time source = 0
+46 [46979320092416] TRACE perfrun.launcher <> - Update configuration: stack = 1
+46 [46979320092416] TRACE perfrun.launcher <> - Update configuration: gelding = 0
+46 [46979320092416] TRACE perfrun.launcher <> - Update configuration: stack stitching = 1
+46 [46979320092416] TRACE perfrun.system <> - ENTER: int runtool::system::Controller::initialize(runtool::sdk::IConfiguration *)
+46 [46979320092416] TRACE perfrun.system <> - ENTER: int runtool::system::TraceWriter::initialize(runtool::sdk::IConfiguration *, runtool::system::TraceWriter::Settings *)
+46 [46979320092416] TRACE perfrun.sdk <> - 0x7924a02
+50 [46979320092416] TRACE perfrun.sdk <> - ENTER: runtool::sdk::TraceFile::TraceFile(tpss_tmu_creator *, unsigned int, const std::basic_string<char, std::char_traits<char>, std::allocator<char>> &, bool)
+50 [46979320092416] INFO perfrun.sdk <> - Allocating TMU :/tmp/advixe-tmp-za18968/advixe-res-20054-6533459010684148/data.0/systemcollector-20054-compute086.bc4.acrc.priv.sc
+50 [46979320092416] TRACE perfrun.sdk <> - EXIT:  runtool::sdk::TraceFile::TraceFile(tpss_tmu_creator *, unsigned int, const std::basic_string<char, std::char_traits<char>, std::allocator<char>> &, bool)
+50 [46979320092416] TRACE perfrun.system <> - EXIT:  int runtool::system::TraceWriter::initialize(runtool::sdk::IConfiguration *, runtool::system::TraceWriter::Settings *)
+50 [46979320092416] TRACE perfrun.system <> - EXIT:  int runtool::system::Controller::initialize(runtool::sdk::IConfiguration *)
+50 [46979320092416] INFO perfrun.launcher <> - plugin [] was disabled because it doesn't support the given collection type.
+50 [46979320092416] INFO perfrun.launcher <> - plugin [] was disabled because it doesn't support the given collection type.
+50 [46979320092416] INFO perfrun.launcher <> - plugin [] was disabled because it doesn't support the given collection type.
+50 [46979320092416] INFO perfrun.launcher <> - plugin [] was disabled because it doesn't support the given collection type.
+50 [46979320092416] INFO perfrun.launcher <> - plugin [] was disabled because it doesn't support the given collection type.
+50 [46979320092416] INFO perfrun.launcher <> - plugin [] was disabled because it doesn't support the given collection type.
+50 [46979320092416] TRACE perfrun.mrte <> - ENTER: int runtool::mrte::Controller::initialize(runtool::sdk::IConfiguration *)
+50 [46979320092416] TRACE perfrun.mrte <> - EXIT:  int runtool::mrte::Controller::initialize(runtool::sdk::IConfiguration *)
+50 [46979320092416] INFO perfrun.launcher <> - plugin [mrte] was disabled because it doesn't support the given collection type.
+50 [46979320092416] INFO perfrun.launcher <> - plugin [] was disabled because it doesn't support the given collection type.
+50 [46979320092416] INFO perfrun.launcher <> - plugin [] was disabled because it doesn't support the given collection type.
+50 [46979320092416] INFO perfrun.launcher <> - plugin [] was disabled because it doesn't support the given collection type.
+50 [46979320092416] INFO perfrun.launcher <> - plugin [] was disabled because it doesn't support the given collection type.
+50 [46979320092416] INFO perfrun.launcher <> - plugin [] was disabled because it doesn't support the given collection type.
+50 [46979320092416] TRACE perfrun.tpss <> - ENTER: int runtool::tpss::Controller::initialize(runtool::sdk::IConfiguration *)
+50 [46979320092416] INFO perfrun.tpss <> - initialize tpss controller
+50 [46979320092416] TRACE perfrun.tpss <> - ENTER: bool runtool::tpss::Controller::configureCollectionMode(const std::basic_string<char, std::char_traits<char>, std::allocator<char>> &)
+50 [46979320092416] INFO perfrun.tpss <> - configure collection mode: value = cpu:stack
+50 [46979320092416] TRACE perfrun.tpss <> - EXIT:  bool runtool::tpss::Controller::configureCollectionMode(const std::basic_string<char, std::char_traits<char>, std::allocator<char>> &)
+50 [46979320092416] TRACE perfrun.tpss <> - ENTER: tpss::trace_file_t runtool::tpss::castTraceFileType(const gen_helpers2::variant_t &)
+50 [46979320092416] TRACE perfrun.tpss <> - EXIT:  tpss::trace_file_t runtool::tpss::castTraceFileType(const gen_helpers2::variant_t &)
+50 [46979320092416] INFO perfrun.tpss <> - default obj-size-min=1024
+50 [46979320092416] INFO perfrun.tpss <> - default hash-table-size=0
+50 [46979320092416] TRACE perfrun.tpss <> - EXIT:  int runtool::tpss::Controller::initialize(runtool::sdk::IConfiguration *)
+50 [46979320092416] INFO perfrun.launcher <> - plugin [] was disabled because it doesn't support the given collection type.
+50 [46979320092416] INFO perfrun.launcher <> - plugin [] was disabled because it doesn't support the given collection type.
+50 [46979320092416] INFO perfrun.launcher <> - plugin [] was disabled because it doesn't support the given collection type.
+50 [46979320092416] INFO perfrun.launcher <> - plugin [] was disabled because it doesn't support the given collection type.
+50 [46979320092416] INFO perfrun.launcher <> - plugin [] was disabled because it doesn't support the given collection type.
+50 [46979320092416] INFO perfrun.launcher <> - plugin [] was disabled because it doesn't support the given collection type.
+50 [46979204487040] TRACE perfrun.launcher <> - RpcServer was created for IPC filename = /mnt/storage/home/za18968/advanced-hpc-lbm/e000/hs005/runtool.20054.ipc
+51 [46979204487040] TRACE perfrun.launcher <> - RpcServer: setup all handlers at once
+51 [46979204487040] TRACE perfrun.launcher <> - RpcServer: setup a handler for ICancelRequest
+51 [46979204487040] TRACE perfrun.launcher <> - RpcServer: setup a handler for IPauseRequest
+51 [46979204487040] TRACE perfrun.launcher <> - RpcServer: setup a handler for IResumeRequest
+51 [46979204487040] TRACE perfrun.launcher <> - RpcServer: setup a handler for IStopRequest
+51 [46979204487040] TRACE perfrun.launcher <> - RpcServer: setup a handler for IStatusRequest
+51 [46979204487040] TRACE perfrun.launcher <> - RpcServer: setup a handler for IDetachRequest
+51 [46979204487040] TRACE perfrun.launcher <> - RpcServer: setup a handler for IMarkRequest
+51 [46979204487040] INFO perfrun.launcher <> - RpcServer: run RPC server to handle requests
+51 [46979204487040] DEBUG perfrun.launcher <> - RpcServer: wrote information about the RPC server into the IPC file
+51 [46979204487040] TRACE perfrun.launcher <> - EXIT:  void runtool::Launcher::prepareLaunch()
+52 [46979357751040] TRACE perfrun.launcher <> - ENTER: RpcServer: the main loop handles RPC requests  from clients
+52 [46979204487040] INFO perfrun.launcher <> - Launcher: command line to start before modification = ./d2q9-bgk input_128x128.params obstacles_128x128.dat
+52 [46979320092416] TRACE perfrun.tpss <> - ENTER: void runtool::tpss::Controller::modifyCommandLine(std::basic_string<char, std::char_traits<char>, std::allocator<char>> &) const
+55 [46979320092416] TRACE perfrun.tpss <> - EXIT:  void runtool::tpss::Controller::modifyCommandLine(std::basic_string<char, std::char_traits<char>, std::allocator<char>> &) const
+55 [46979204487040] INFO perfrun.launcher <> - Launcher: command line to start after modification = /mnt/storage/software/languages/intel/intel-parallel_studio_xe_2018_u3/advisor_2018.3.0.558307/bin64/pin -error_file /tmp/advixe-tmp-za18968/advixe-res-20054-6533459010684148/data.0/pinerr.tpsslog -detach_reattach -follow_execv -tool_load_option deepbind -t64 /mnt/storage/software/languages/intel/intel-parallel_studio_xe_2018_u3/advisor_2018.3.0.558307/lib64/libtpsstool.so -t /mnt/storage/software/languages/intel/intel-parallel_studio_xe_2018_u3/advisor_2018.3.0.558307/lib32/libtpsstool.so -server_name tpss_ipc.20054 -prd_dir /mnt/storage/software/languages/intel/intel-parallel_studio_xe_2018_u3/advisor_2018.3.0.558307 -- ./d2q9-bgk input_128x128.params obstacles_128x128.dat
+55 [46979204487040] INFO perfrun.launcher <> - ProcessCreator object was created
+55 [46979204487040] TRACE perfrun.launcher <> - ENTER: unsigned int runtool::ProcessCreator::start(bool)
+55 [46979204487040] TRACE perfrun.launcher <> - EXIT:  unsigned int runtool::ProcessCreator::start(bool)
+55 [46979204487040] INFO perfrun.launcher <> - Launcher: the process was started in suspend mode
+56 [46979320092416] TRACE perfrun.system <> - ENTER: void runtool::system::Controller::onEvent(runtool::sdk::collection_state_t)
+56 [46979320092416] TRACE perfrun.system <> - EXIT:  void runtool::system::Controller::onEvent(runtool::sdk::collection_state_t)
+56 [46979320092416] TRACE perfrun.system <> - ENTER: bool runtool::system::Controller::start(unsigned int)
+827 [46979320092416] INFO perfrun.system <> - Helper runtool '/mnt/storage/software/languages/intel/intel-parallel_studio_xe_2018_u3/advisor_2018.3.0.558307/bin32/advixe-runss -dump-vdso -r /tmp/advixe-tmp-za18968/advixe-res-20054-6533459010684148 --tmp-dir /tmp/advixe-tmp-za18968' returned 0
+888 [46979320092416] INFO perfrun.system <> - Helper runtool '/mnt/storage/software/languages/intel/intel-parallel_studio_xe_2018_u3/advisor_2018.3.0.558307/bin64/advixe-runss -dump-vdso -r /tmp/advixe-tmp-za18968/advixe-res-20054-6533459010684148 --tmp-dir /tmp/advixe-tmp-za18968' returned 0
+891 [46979320092416] TRACE perfrun.system <> - ENTER: bool runtool::system::getVideoAdapters(std::vector<runtool::system::gpu_adapter_t, std::allocator<runtool::system::gpu_adapter_t>> &)
+957 [46979320092416] TRACE perfrun.system <> - EXIT:  bool runtool::system::getVideoAdapters(std::vector<runtool::system::gpu_adapter_t, std::allocator<runtool::system::gpu_adapter_t>> &)
+958 [46979320092416] TRACE perfrun.sdk <> - ENTER: bool runtool::sdk::runSystemCmd(const std::basic_string<char, std::char_traits<char>, std::allocator<char>> &, std::basic_string<char, std::char_traits<char>, std::allocator<char>> *, bool, const std::basic_string<char, std::char_traits<char>, std::allocator<char>> &)
+958 [46979320092416] WARN perfrun.sdk <> - Failed to find xl binary on any of the system paths: /bin, /sbin, /usr/bin, /usr/sbin., at file: vcs/perfrun1/sdk/src/utils.cpp:433
+958 [46979320092416] TRACE perfrun.sdk <> - EXIT:  bool runtool::sdk::runSystemCmd(const std::basic_string<char, std::char_traits<char>, std::allocator<char>> &, std::basic_string<char, std::char_traits<char>, std::allocator<char>> *, bool, const std::basic_string<char, std::char_traits<char>, std::allocator<char>> &)
+959 [46979320092416] TRACE perfrun.system <> - EXIT:  bool runtool::system::Controller::start(unsigned int)
+959 [46979320092416] TRACE perfrun.tpss <> - ENTER: bool runtool::tpss::Controller::start(unsigned int)
+959 [46979320092416] INFO perfrun.tpss <> - start tpss controller for pid #20059
+1009 [46979320092416] TRACE perfrun.tpss <> - EXIT:  bool runtool::tpss::Controller::start(unsigned int)
+1009 [46979320092416] TRACE perfrun.system <> - ENTER: void runtool::system::Controller::onEvent(runtool::sdk::collection_state_t)
+1009 [46979320092416] TRACE perfrun.system <> - EXIT:  void runtool::system::Controller::onEvent(runtool::sdk::collection_state_t)
+1009 [46979204487040] INFO perfrun.launcher <> - Launcher: all plugins were started
+1010 [46979204487040] TRACE perfrun.launcher <> - IMessenger: send collection state with state = 1
+1010 [46979204487040] TRACE perfrun.launcher <> - ENTER: void runtool::Launcher::setupResumeAfterCallback()
+1010 [46979204487040] TRACE perfrun.launcher <> - EXIT:  void runtool::Launcher::setupResumeAfterCallback()
+1010 [46979204487040] TRACE perfrun.launcher <> - ENTER: void runtool::Launcher::setupHardStopCallbacks()
+1010 [46979204487040] INFO perfrun.launcher <> - DirectoryMonitor object was created
+1010 [46979204487040] INFO perfrun.launcher <> - DirectoryMonitor: a callback was added
+1010 [46979204487040] INFO perfrun.launcher <> - DirectoryMonitor was started with pingTime = 1000
+1010 [46979204487040] INFO perfrun.launcher <> - DeadlineTimer is going to be constructed
+1010 [46979204487040] INFO perfrun.launcher <> - DeadlineTimer: a callback was added
+1010 [46979204487040] TRACE perfrun.launcher <> - EXIT:  void runtool::Launcher::setupHardStopCallbacks()
+1010 [46979204487040] TRACE perfrun.launcher <> - ENTER: void runtool::Launcher::setupDurationCallback(bool)
+1010 [46979204487040] TRACE perfrun.launcher <> - EXIT:  void runtool::Launcher::setupDurationCallback(bool)
+1016 [46979204487040] TRACE perfrun.launcher <> - ENTER: void runtool::ProcessCreator::resume()
+1016 [46979204487040] DEBUG perfrun.launcher <> - ProcessCreator: the process with pid = 20059 is resumed
+1042 [46979204487040] TRACE perfrun.launcher <> - EXIT:  void runtool::ProcessCreator::resume()
+1042 [46979204487040] INFO perfrun.launcher <> - Launcher: resume the profiled application and  wait its termination or stop command
+1042 [46979204487040] TRACE perfrun.launcher <> - ENTER: int runtool::ProcessCreator::wait()
+1042 [46979204487040] TRACE perfrun.launcher <> - ENTER: int runtool::ProcessCreator::waitPid()
+2010 [46979497334528] TRACE perfrun.launcher <> - ENTER: void runtool::DeadlineTimer::notify(const boost::system::error_code &)
+2010 [46979497334528] TRACE perfrun.launcher <> - ENTER: void runtool::DirectoryMonitor::notifyAll()
+2010 [46979497334528] TRACE perfrun.sdk <> - ENTER: void runtool::sdk::getFilesFromDirectoryByExt(const std::basic_string<char, std::char_traits<char>, std::allocator<char>> &, const std::basic_string<char, std::char_traits<char>, std::allocator<char>> &, std::list<std::basic_string<char, std::char_traits<char>, std::allocator<char>>, std::allocator<std::basic_string<char, std::char_traits<char>, std::allocator<char>>>> &)
+2011 [46979497334528] TRACE perfrun.sdk <> - EXIT:  void runtool::sdk::getFilesFromDirectoryByExt(const std::basic_string<char, std::char_traits<char>, std::allocator<char>> &, const std::basic_string<char, std::char_traits<char>, std::allocator<char>> &, std::list<std::basic_string<char, std::char_traits<char>, std::allocator<char>>, std::allocator<std::basic_string<char, std::char_traits<char>, std::allocator<char>>>> &)
+2011 [46979497334528] DEBUG perfrun.launcher <> - DirectoryInfo: total size of monitored paths is 0 bytes
+2011 [46979497334528] TRACE perfrun.launcher <> - EXIT:  void runtool::DirectoryMonitor::notifyAll()
+2011 [46979497334528] TRACE perfrun.launcher <> - EXIT:  void runtool::DeadlineTimer::notify(const boost::system::error_code &)
+3011 [46979497334528] TRACE perfrun.launcher <> - ENTER: void runtool::DeadlineTimer::notify(const boost::system::error_code &)
+3011 [46979497334528] TRACE perfrun.launcher <> - ENTER: void runtool::DirectoryMonitor::notifyAll()
+3011 [46979497334528] TRACE perfrun.sdk <> - ENTER: void runtool::sdk::getFilesFromDirectoryByExt(const std::basic_string<char, std::char_traits<char>, std::allocator<char>> &, const std::basic_string<char, std::char_traits<char>, std::allocator<char>> &, std::list<std::basic_string<char, std::char_traits<char>, std::allocator<char>>, std::allocator<std::basic_string<char, std::char_traits<char>, std::allocator<char>>>> &)
+3011 [46979497334528] TRACE perfrun.sdk <> - EXIT:  void runtool::sdk::getFilesFromDirectoryByExt(const std::basic_string<char, std::char_traits<char>, std::allocator<char>> &, const std::basic_string<char, std::char_traits<char>, std::allocator<char>> &, std::list<std::basic_string<char, std::char_traits<char>, std::allocator<char>>, std::allocator<std::basic_string<char, std::char_traits<char>, std::allocator<char>>>> &)
+3011 [46979497334528] DEBUG perfrun.launcher <> - DirectoryInfo: total size of monitored paths is 0 bytes
+3011 [46979497334528] TRACE perfrun.launcher <> - EXIT:  void runtool::DirectoryMonitor::notifyAll()
+3012 [46979497334528] TRACE perfrun.launcher <> - EXIT:  void runtool::DeadlineTimer::notify(const boost::system::error_code &)
+4012 [46979497334528] TRACE perfrun.launcher <> - ENTER: void runtool::DeadlineTimer::notify(const boost::system::error_code &)
+4012 [46979497334528] TRACE perfrun.launcher <> - ENTER: void runtool::DirectoryMonitor::notifyAll()
+4012 [46979497334528] TRACE perfrun.sdk <> - ENTER: void runtool::sdk::getFilesFromDirectoryByExt(const std::basic_string<char, std::char_traits<char>, std::allocator<char>> &, const std::basic_string<char, std::char_traits<char>, std::allocator<char>> &, std::list<std::basic_string<char, std::char_traits<char>, std::allocator<char>>, std::allocator<std::basic_string<char, std::char_traits<char>, std::allocator<char>>>> &)
+4012 [46979497334528] TRACE perfrun.sdk <> - EXIT:  void runtool::sdk::getFilesFromDirectoryByExt(const std::basic_string<char, std::char_traits<char>, std::allocator<char>> &, const std::basic_string<char, std::char_traits<char>, std::allocator<char>> &, std::list<std::basic_string<char, std::char_traits<char>, std::allocator<char>>, std::allocator<std::basic_string<char, std::char_traits<char>, std::allocator<char>>>> &)
+4012 [46979497334528] DEBUG perfrun.launcher <> - DirectoryInfo: total size of monitored paths is 0 bytes
+4012 [46979497334528] TRACE perfrun.launcher <> - EXIT:  void runtool::DirectoryMonitor::notifyAll()
+4012 [46979497334528] TRACE perfrun.launcher <> - EXIT:  void runtool::DeadlineTimer::notify(const boost::system::error_code &)
+5013 [46979497334528] TRACE perfrun.launcher <> - ENTER: void runtool::DeadlineTimer::notify(const boost::system::error_code &)
+5013 [46979497334528] TRACE perfrun.launcher <> - ENTER: void runtool::DirectoryMonitor::notifyAll()
+5013 [46979497334528] TRACE perfrun.sdk <> - ENTER: void runtool::sdk::getFilesFromDirectoryByExt(const std::basic_string<char, std::char_traits<char>, std::allocator<char>> &, const std::basic_string<char, std::char_traits<char>, std::allocator<char>> &, std::list<std::basic_string<char, std::char_traits<char>, std::allocator<char>>, std::allocator<std::basic_string<char, std::char_traits<char>, std::allocator<char>>>> &)
+5014 [46979497334528] TRACE perfrun.sdk <> - EXIT:  void runtool::sdk::getFilesFromDirectoryByExt(const std::basic_string<char, std::char_traits<char>, std::allocator<char>> &, const std::basic_string<char, std::char_traits<char>, std::allocator<char>> &, std::list<std::basic_string<char, std::char_traits<char>, std::allocator<char>>, std::allocator<std::basic_string<char, std::char_traits<char>, std::allocator<char>>>> &)
+5014 [46979497334528] DEBUG perfrun.launcher <> - DirectoryInfo: total size of monitored paths is 0 bytes
+5014 [46979497334528] TRACE perfrun.launcher <> - EXIT:  void runtool::DirectoryMonitor::notifyAll()
+5014 [46979497334528] TRACE perfrun.launcher <> - EXIT:  void runtool::DeadlineTimer::notify(const boost::system::error_code &)
+6015 [46979497334528] TRACE perfrun.launcher <> - ENTER: void runtool::DeadlineTimer::notify(const boost::system::error_code &)
+6015 [46979497334528] TRACE perfrun.launcher <> - ENTER: void runtool::DirectoryMonitor::notifyAll()
+6015 [46979497334528] TRACE perfrun.sdk <> - ENTER: void runtool::sdk::getFilesFromDirectoryByExt(const std::basic_string<char, std::char_traits<char>, std::allocator<char>> &, const std::basic_string<char, std::char_traits<char>, std::allocator<char>> &, std::list<std::basic_string<char, std::char_traits<char>, std::allocator<char>>, std::allocator<std::basic_string<char, std::char_traits<char>, std::allocator<char>>>> &)
+6015 [46979497334528] TRACE perfrun.sdk <> - EXIT:  void runtool::sdk::getFilesFromDirectoryByExt(const std::basic_string<char, std::char_traits<char>, std::allocator<char>> &, const std::basic_string<char, std::char_traits<char>, std::allocator<char>> &, std::list<std::basic_string<char, std::char_traits<char>, std::allocator<char>>, std::allocator<std::basic_string<char, std::char_traits<char>, std::allocator<char>>>> &)
+6015 [46979497334528] DEBUG perfrun.launcher <> - DirectoryInfo: total size of monitored paths is 0 bytes
+6015 [46979497334528] TRACE perfrun.launcher <> - EXIT:  void runtool::DirectoryMonitor::notifyAll()
+6015 [46979497334528] TRACE perfrun.launcher <> - EXIT:  void runtool::DeadlineTimer::notify(const boost::system::error_code &)
+7017 [46979497334528] TRACE perfrun.launcher <> - ENTER: void runtool::DeadlineTimer::notify(const boost::system::error_code &)
+7017 [46979497334528] TRACE perfrun.launcher <> - ENTER: void runtool::DirectoryMonitor::notifyAll()
+7017 [46979497334528] TRACE perfrun.sdk <> - ENTER: void runtool::sdk::getFilesFromDirectoryByExt(const std::basic_string<char, std::char_traits<char>, std::allocator<char>> &, const std::basic_string<char, std::char_traits<char>, std::allocator<char>> &, std::list<std::basic_string<char, std::char_traits<char>, std::allocator<char>>, std::allocator<std::basic_string<char, std::char_traits<char>, std::allocator<char>>>> &)
+7017 [46979497334528] TRACE perfrun.sdk <> - EXIT:  void runtool::sdk::getFilesFromDirectoryByExt(const std::basic_string<char, std::char_traits<char>, std::allocator<char>> &, const std::basic_string<char, std::char_traits<char>, std::allocator<char>> &, std::list<std::basic_string<char, std::char_traits<char>, std::allocator<char>>, std::allocator<std::basic_string<char, std::char_traits<char>, std::allocator<char>>>> &)
+7017 [46979497334528] DEBUG perfrun.launcher <> - DirectoryInfo: total size of monitored paths is 0 bytes
+7017 [46979497334528] TRACE perfrun.launcher <> - EXIT:  void runtool::DirectoryMonitor::notifyAll()
+7017 [46979497334528] TRACE perfrun.launcher <> - EXIT:  void runtool::DeadlineTimer::notify(const boost::system::error_code &)
+8017 [46979497334528] TRACE perfrun.launcher <> - ENTER: void runtool::DeadlineTimer::notify(const boost::system::error_code &)
+8017 [46979497334528] TRACE perfrun.launcher <> - ENTER: void runtool::DirectoryMonitor::notifyAll()
+8017 [46979497334528] TRACE perfrun.sdk <> - ENTER: void runtool::sdk::getFilesFromDirectoryByExt(const std::basic_string<char, std::char_traits<char>, std::allocator<char>> &, const std::basic_string<char, std::char_traits<char>, std::allocator<char>> &, std::list<std::basic_string<char, std::char_traits<char>, std::allocator<char>>, std::allocator<std::basic_string<char, std::char_traits<char>, std::allocator<char>>>> &)
+8017 [46979497334528] TRACE perfrun.sdk <> - EXIT:  void runtool::sdk::getFilesFromDirectoryByExt(const std::basic_string<char, std::char_traits<char>, std::allocator<char>> &, const std::basic_string<char, std::char_traits<char>, std::allocator<char>> &, std::list<std::basic_string<char, std::char_traits<char>, std::allocator<char>>, std::allocator<std::basic_string<char, std::char_traits<char>, std::allocator<char>>>> &)
+8017 [46979497334528] DEBUG perfrun.launcher <> - DirectoryInfo: total size of monitored paths is 0 bytes
+8018 [46979497334528] TRACE perfrun.launcher <> - EXIT:  void runtool::DirectoryMonitor::notifyAll()
+8018 [46979497334528] TRACE perfrun.launcher <> - EXIT:  void runtool::DeadlineTimer::notify(const boost::system::error_code &)
+9019 [46979497334528] TRACE perfrun.launcher <> - ENTER: void runtool::DeadlineTimer::notify(const boost::system::error_code &)
+9019 [46979497334528] TRACE perfrun.launcher <> - ENTER: void runtool::DirectoryMonitor::notifyAll()
+9019 [46979497334528] TRACE perfrun.sdk <> - ENTER: void runtool::sdk::getFilesFromDirectoryByExt(const std::basic_string<char, std::char_traits<char>, std::allocator<char>> &, const std::basic_string<char, std::char_traits<char>, std::allocator<char>> &, std::list<std::basic_string<char, std::char_traits<char>, std::allocator<char>>, std::allocator<std::basic_string<char, std::char_traits<char>, std::allocator<char>>>> &)
+9019 [46979497334528] TRACE perfrun.sdk <> - EXIT:  void runtool::sdk::getFilesFromDirectoryByExt(const std::basic_string<char, std::char_traits<char>, std::allocator<char>> &, const std::basic_string<char, std::char_traits<char>, std::allocator<char>> &, std::list<std::basic_string<char, std::char_traits<char>, std::allocator<char>>, std::allocator<std::basic_string<char, std::char_traits<char>, std::allocator<char>>>> &)
+9019 [46979497334528] DEBUG perfrun.launcher <> - DirectoryInfo: total size of monitored paths is 0 bytes
+9019 [46979497334528] TRACE perfrun.launcher <> - EXIT:  void runtool::DirectoryMonitor::notifyAll()
+9019 [46979497334528] TRACE perfrun.launcher <> - EXIT:  void runtool::DeadlineTimer::notify(const boost::system::error_code &)
+10020 [46979497334528] TRACE perfrun.launcher <> - ENTER: void runtool::DeadlineTimer::notify(const boost::system::error_code &)
+10020 [46979497334528] TRACE perfrun.launcher <> - ENTER: void runtool::DirectoryMonitor::notifyAll()
+10020 [46979497334528] TRACE perfrun.sdk <> - ENTER: void runtool::sdk::getFilesFromDirectoryByExt(const std::basic_string<char, std::char_traits<char>, std::allocator<char>> &, const std::basic_string<char, std::char_traits<char>, std::allocator<char>> &, std::list<std::basic_string<char, std::char_traits<char>, std::allocator<char>>, std::allocator<std::basic_string<char, std::char_traits<char>, std::allocator<char>>>> &)
+10021 [46979497334528] TRACE perfrun.sdk <> - EXIT:  void runtool::sdk::getFilesFromDirectoryByExt(const std::basic_string<char, std::char_traits<char>, std::allocator<char>> &, const std::basic_string<char, std::char_traits<char>, std::allocator<char>> &, std::list<std::basic_string<char, std::char_traits<char>, std::allocator<char>>, std::allocator<std::basic_string<char, std::char_traits<char>, std::allocator<char>>>> &)
+10021 [46979497334528] DEBUG perfrun.launcher <> - DirectoryInfo: total size of monitored paths is 0 bytes
+10021 [46979497334528] TRACE perfrun.launcher <> - EXIT:  void runtool::DirectoryMonitor::notifyAll()
+10021 [46979497334528] TRACE perfrun.launcher <> - EXIT:  void runtool::DeadlineTimer::notify(const boost::system::error_code &)
+11022 [46979497334528] TRACE perfrun.launcher <> - ENTER: void runtool::DeadlineTimer::notify(const boost::system::error_code &)
+11022 [46979497334528] TRACE perfrun.launcher <> - ENTER: void runtool::DirectoryMonitor::notifyAll()
+11022 [46979497334528] TRACE perfrun.sdk <> - ENTER: void runtool::sdk::getFilesFromDirectoryByExt(const std::basic_string<char, std::char_traits<char>, std::allocator<char>> &, const std::basic_string<char, std::char_traits<char>, std::allocator<char>> &, std::list<std::basic_string<char, std::char_traits<char>, std::allocator<char>>, std::allocator<std::basic_string<char, std::char_traits<char>, std::allocator<char>>>> &)
+11022 [46979497334528] TRACE perfrun.sdk <> - EXIT:  void runtool::sdk::getFilesFromDirectoryByExt(const std::basic_string<char, std::char_traits<char>, std::allocator<char>> &, const std::basic_string<char, std::char_traits<char>, std::allocator<char>> &, std::list<std::basic_string<char, std::char_traits<char>, std::allocator<char>>, std::allocator<std::basic_string<char, std::char_traits<char>, std::allocator<char>>>> &)
+11022 [46979497334528] DEBUG perfrun.launcher <> - DirectoryInfo: total size of monitored paths is 0 bytes
+11022 [46979497334528] TRACE perfrun.launcher <> - EXIT:  void runtool::DirectoryMonitor::notifyAll()
+11022 [46979497334528] TRACE perfrun.launcher <> - EXIT:  void runtool::DeadlineTimer::notify(const boost::system::error_code &)
+12022 [46979497334528] TRACE perfrun.launcher <> - ENTER: void runtool::DeadlineTimer::notify(const boost::system::error_code &)
+12023 [46979497334528] TRACE perfrun.launcher <> - ENTER: void runtool::DirectoryMonitor::notifyAll()
+12023 [46979497334528] TRACE perfrun.sdk <> - ENTER: void runtool::sdk::getFilesFromDirectoryByExt(const std::basic_string<char, std::char_traits<char>, std::allocator<char>> &, const std::basic_string<char, std::char_traits<char>, std::allocator<char>> &, std::list<std::basic_string<char, std::char_traits<char>, std::allocator<char>>, std::allocator<std::basic_string<char, std::char_traits<char>, std::allocator<char>>>> &)
+12023 [46979497334528] TRACE perfrun.sdk <> - EXIT:  void runtool::sdk::getFilesFromDirectoryByExt(const std::basic_string<char, std::char_traits<char>, std::allocator<char>> &, const std::basic_string<char, std::char_traits<char>, std::allocator<char>> &, std::list<std::basic_string<char, std::char_traits<char>, std::allocator<char>>, std::allocator<std::basic_string<char, std::char_traits<char>, std::allocator<char>>>> &)
+12023 [46979497334528] DEBUG perfrun.launcher <> - DirectoryInfo: total size of monitored paths is 0 bytes
+12023 [46979497334528] TRACE perfrun.launcher <> - EXIT:  void runtool::DirectoryMonitor::notifyAll()
+12023 [46979497334528] TRACE perfrun.launcher <> - EXIT:  void runtool::DeadlineTimer::notify(const boost::system::error_code &)
+13023 [46979497334528] TRACE perfrun.launcher <> - ENTER: void runtool::DeadlineTimer::notify(const boost::system::error_code &)
+13023 [46979497334528] TRACE perfrun.launcher <> - ENTER: void runtool::DirectoryMonitor::notifyAll()
+13023 [46979497334528] TRACE perfrun.sdk <> - ENTER: void runtool::sdk::getFilesFromDirectoryByExt(const std::basic_string<char, std::char_traits<char>, std::allocator<char>> &, const std::basic_string<char, std::char_traits<char>, std::allocator<char>> &, std::list<std::basic_string<char, std::char_traits<char>, std::allocator<char>>, std::allocator<std::basic_string<char, std::char_traits<char>, std::allocator<char>>>> &)
+13024 [46979497334528] TRACE perfrun.sdk <> - EXIT:  void runtool::sdk::getFilesFromDirectoryByExt(const std::basic_string<char, std::char_traits<char>, std::allocator<char>> &, const std::basic_string<char, std::char_traits<char>, std::allocator<char>> &, std::list<std::basic_string<char, std::char_traits<char>, std::allocator<char>>, std::allocator<std::basic_string<char, std::char_traits<char>, std::allocator<char>>>> &)
+13024 [46979497334528] DEBUG perfrun.launcher <> - DirectoryInfo: total size of monitored paths is 0 bytes
+13024 [46979497334528] TRACE perfrun.launcher <> - EXIT:  void runtool::DirectoryMonitor::notifyAll()
+13024 [46979497334528] TRACE perfrun.launcher <> - EXIT:  void runtool::DeadlineTimer::notify(const boost::system::error_code &)
+14025 [46979497334528] TRACE perfrun.launcher <> - ENTER: void runtool::DeadlineTimer::notify(const boost::system::error_code &)
+14025 [46979497334528] TRACE perfrun.launcher <> - ENTER: void runtool::DirectoryMonitor::notifyAll()
+14025 [46979497334528] TRACE perfrun.sdk <> - ENTER: void runtool::sdk::getFilesFromDirectoryByExt(const std::basic_string<char, std::char_traits<char>, std::allocator<char>> &, const std::basic_string<char, std::char_traits<char>, std::allocator<char>> &, std::list<std::basic_string<char, std::char_traits<char>, std::allocator<char>>, std::allocator<std::basic_string<char, std::char_traits<char>, std::allocator<char>>>> &)
+14025 [46979497334528] TRACE perfrun.sdk <> - EXIT:  void runtool::sdk::getFilesFromDirectoryByExt(const std::basic_string<char, std::char_traits<char>, std::allocator<char>> &, const std::basic_string<char, std::char_traits<char>, std::allocator<char>> &, std::list<std::basic_string<char, std::char_traits<char>, std::allocator<char>>, std::allocator<std::basic_string<char, std::char_traits<char>, std::allocator<char>>>> &)
+14025 [46979497334528] DEBUG perfrun.launcher <> - DirectoryInfo: total size of monitored paths is 0 bytes
+14025 [46979497334528] TRACE perfrun.launcher <> - EXIT:  void runtool::DirectoryMonitor::notifyAll()
+14025 [46979497334528] TRACE perfrun.launcher <> - EXIT:  void runtool::DeadlineTimer::notify(const boost::system::error_code &)
+14119 [46979204487040] TRACE perfrun.launcher <> - EXIT:  int runtool::ProcessCreator::waitPid()
+14119 [46979204487040] TRACE perfrun.launcher <> - EXIT:  int runtool::ProcessCreator::wait()
+14119 [46979204487040] INFO perfrun.launcher <> - Launcher: the profiled application was terminated  with exit code = 0
+14119 [46979204487040] TRACE perfrun.launcher <> - ENTER: void runtool::Launcher::waitForSlaves(const std::basic_string<char, std::char_traits<char>, std::allocator<char>> &)
+14119 [46979204487040] TRACE perfrun.sdk <> - ENTER: void runtool::sdk::getFilesFromDirectoryByExt(const std::basic_string<char, std::char_traits<char>, std::allocator<char>> &, const std::basic_string<char, std::char_traits<char>, std::allocator<char>> &, std::list<std::basic_string<char, std::char_traits<char>, std::allocator<char>>, std::allocator<std::basic_string<char, std::char_traits<char>, std::allocator<char>>>> &)
+14120 [46979204487040] TRACE perfrun.sdk <> - EXIT:  void runtool::sdk::getFilesFromDirectoryByExt(const std::basic_string<char, std::char_traits<char>, std::allocator<char>> &, const std::basic_string<char, std::char_traits<char>, std::allocator<char>> &, std::list<std::basic_string<char, std::char_traits<char>, std::allocator<char>>, std::allocator<std::basic_string<char, std::char_traits<char>, std::allocator<char>>>> &)
+14120 [46979204487040] TRACE perfrun.launcher <> - EXIT:  void runtool::Launcher::waitForSlaves(const std::basic_string<char, std::char_traits<char>, std::allocator<char>> &)
+14120 [46979320092416] TRACE perfrun.system <> - ENTER: void runtool::system::Controller::onEvent(runtool::sdk::collection_state_t)
+14120 [46979320092416] TRACE perfrun.system <> - EXIT:  void runtool::system::Controller::onEvent(runtool::sdk::collection_state_t)
+14120 [46979320092416] TRACE perfrun.system <> - ENTER: bool runtool::system::Controller::stop()
+14122 [46979320092416] TRACE perfrun.system <> - EXIT:  bool runtool::system::Controller::stop()
+14122 [46979320092416] TRACE perfrun.tpss <> - ENTER: bool runtool::tpss::Controller::stop()
+14122 [46979320092416] INFO perfrun.tpss <> - stop tpss controller
+14122 [46979320092416] TRACE perfrun.tpss <> - EXIT:  bool runtool::tpss::Controller::stop()
+14122 [46979320092416] TRACE perfrun.system <> - ENTER: void runtool::system::Controller::onEvent(runtool::sdk::collection_state_t)
+14122 [46979320092416] TRACE perfrun.sdk <> - ENTER: void runtool::sdk::TraceFile::close(boost::system::error_code &)
+14123 [46979320092416] INFO perfrun.sdk <> - De-allocating TMU: /tmp/advixe-tmp-za18968/advixe-res-20054-6533459010684148/data.0/systemcollector-20054-compute086.bc4.acrc.priv.sc
+14123 [46979320092416] TRACE perfrun.sdk <> - EXIT:  void runtool::sdk::TraceFile::close(boost::system::error_code &)
+14123 [46979320092416] INFO perfrun.system <> - closed the system trace file: /tmp/advixe-tmp-za18968/advixe-res-20054-6533459010684148/data.0/systemcollector-20054-compute086.bc4.acrc.priv.sc
+14123 [46979320092416] TRACE perfrun.system <> - EXIT:  void runtool::system::Controller::onEvent(runtool::sdk::collection_state_t)
+14123 [46979204487040] TRACE perfrun.launcher <> - ENTER: void runtool::ProcessSetMonitor<T>::stop() [with T = unsigned int]
+14123 [46979204487040] TRACE perfrun.launcher <> - EXIT:  void runtool::ProcessSetMonitor<T>::stop() [with T = unsigned int]
+14123 [46979204487040] TRACE perfrun.launcher <> - ENTER: void runtool::ProcessCreator::stop()
+14123 [46979204487040] TRACE perfrun.launcher <> - EXIT:  void runtool::ProcessCreator::stop()
+14123 [46979204487040] INFO perfrun.launcher <> - Launcher: all plugins were stopped.
+14123 [46979204487040] TRACE perfrun.launcher <> - ENTER: void runtool::Launcher::resetDurationCallback()
+14123 [46979204487040] TRACE perfrun.launcher <> - EXIT:  void runtool::Launcher::resetDurationCallback()
+14123 [46979204487040] TRACE perfrun.launcher <> - ENTER: void runtool::Launcher::resetResumeAfterCallback()
+14123 [46979204487040] TRACE perfrun.launcher <> - EXIT:  void runtool::Launcher::resetResumeAfterCallback()
+14123 [46979204487040] TRACE perfrun.launcher <> - ENTER: void runtool::Launcher::resetHardStopCallbacks()
+14123 [46979204487040] INFO perfrun.launcher <> - DeadlineTimer is going to be destroyed
+14123 [46979204487040] INFO perfrun.launcher <> - DirectoryMonitor object was destroyed
+14123 [46979204487040] TRACE perfrun.launcher <> - EXIT:  void runtool::Launcher::resetHardStopCallbacks()
+14123 [46979204487040] WARN perfrun.launcher <> - Stop command is ignored because it is received when collection is already stopped, at file: vcs/perfrun1/launcher/src/command_handler.cpp:209
+14123 [46979204487040] TRACE perfrun.launcher <> - ENTER: void runtool::Launcher::shutdownLaunch()
+14123 [46979204487040] TRACE perfrun.launcher <> - ENTER: void runtool::Launcher::resetDurationCallback()
+14123 [46979204487040] TRACE perfrun.launcher <> - EXIT:  void runtool::Launcher::resetDurationCallback()
+14123 [46979204487040] TRACE perfrun.launcher <> - ENTER: void runtool::Launcher::resetResumeAfterCallback()
+14123 [46979204487040] TRACE perfrun.launcher <> - EXIT:  void runtool::Launcher::resetResumeAfterCallback()
+14123 [46979204487040] TRACE perfrun.launcher <> - ENTER: void runtool::Launcher::resetHardStopCallbacks()
+14123 [46979204487040] TRACE perfrun.launcher <> - EXIT:  void runtool::Launcher::resetHardStopCallbacks()
+14123 [46979204487040] TRACE perfrun.launcher <> - ENTER: void runtool::RpcServer::stop()
+14124 [46979204487040] TRACE perfrun.launcher <> - ENTER: Send RPC request
+14124 [46979357751040] TRACE perfrun.launcher <> - ENTER: Receive RPC request
+14124 [46979204487040] TRACE perfrun.launcher <> - header and body of the message was send: header = 22 serialization::archive 10 0 0 8 0 0 0 0; body = 22 serialization::archive 10 0 0 8 0 0 0 0
+14124 [46979357751040] TRACE perfrun.launcher <> - header of the message was received: size = 8; message =       2a
+14124 [46979204487040] TRACE perfrun.launcher <> - EXIT:  Send RPC request
+14124 [46979357751040] TRACE perfrun.launcher <> - body of the message was received: size = 42; message = 22 serialization::archive 10 0 0 8 0 0 0 0
+14124 [46979357751040] TRACE perfrun.launcher <> - EXIT:  Receive RPC request
+14124 [46979357751040] TRACE perfrun.launcher <> - EXIT:  RpcServer: the main loop handles RPC requests  from clients
+14124 [46979204487040] TRACE perfrun.launcher <> - EXIT:  void runtool::RpcServer::stop()
+14132 [46979204487040] TRACE perfrun.launcher <> - ENTER: void runtool::Launcher::waitForSlaves(const std::basic_string<char, std::char_traits<char>, std::allocator<char>> &)
+14132 [46979204487040] TRACE perfrun.sdk <> - ENTER: void runtool::sdk::getFilesFromDirectoryByExt(const std::basic_string<char, std::char_traits<char>, std::allocator<char>> &, const std::basic_string<char, std::char_traits<char>, std::allocator<char>> &, std::list<std::basic_string<char, std::char_traits<char>, std::allocator<char>>, std::allocator<std::basic_string<char, std::char_traits<char>, std::allocator<char>>>> &)
+14133 [46979204487040] TRACE perfrun.sdk <> - EXIT:  void runtool::sdk::getFilesFromDirectoryByExt(const std::basic_string<char, std::char_traits<char>, std::allocator<char>> &, const std::basic_string<char, std::char_traits<char>, std::allocator<char>> &, std::list<std::basic_string<char, std::char_traits<char>, std::allocator<char>>, std::allocator<std::basic_string<char, std::char_traits<char>, std::allocator<char>>>> &)
+14133 [46979204487040] TRACE perfrun.launcher <> - EXIT:  void runtool::Launcher::waitForSlaves(const std::basic_string<char, std::char_traits<char>, std::allocator<char>> &)
+14133 [46979204487040] TRACE perfrun.launcher <> - EXIT:  void runtool::Launcher::shutdownLaunch()
+14133 [46979204487040] TRACE perfrun.launcher <> - EXIT:  int runtool::Launcher::doStart()
+14133 [46979204487040] TRACE perfrun.launcher <> - IMessenger: send collection state with state = 3
+14133 [46979204487040] INFO perfrun.launcher <> - Application exit code: 0
+14133 [46979204487040] INFO perfrun.launcher <> - Exit code: 0
+14133 [46979204487040] TRACE perfrun.launcher <> - EXIT:  Start the collection
+14133 [46979204487040] TRACE perfrun.launcher <> - ENTER: Destroy the launcher...
+14133 [46979204487040] TRACE perfrun.launcher <> - EXIT:  Destroy the launcher...
+14133 [46979204487040] TRACE perfrun.launcher <> - ENTER: runtool::RpcServer::~RpcServer()
+14133 [46979204487040] TRACE perfrun.launcher <> - ENTER: void runtool::RpcServer::stop()
+14133 [46979204487040] TRACE perfrun.launcher <> - EXIT:  void runtool::RpcServer::stop()
+14133 [46979204487040] TRACE perfrun.launcher <> - EXIT:  runtool::RpcServer::~RpcServer()
+14133 [46979204487040] TRACE perfrun.launcher <> - ENTER: runtool::ProcessCreator::~ProcessCreator()
+14133 [46979204487040] TRACE perfrun.launcher <> - ENTER: void runtool::ProcessCreator::stop()
+14133 [46979204487040] TRACE perfrun.launcher <> - EXIT:  void runtool::ProcessCreator::stop()
+14133 [46979204487040] TRACE perfrun.launcher <> - EXIT:  runtool::ProcessCreator::~ProcessCreator()
+14133 [46979204487040] TRACE perfrun.launcher <> - PluginManagerProxy::doOperation thread was terminated.
+14135 [46979204487040] TRACE perfrun.launcher <> - EXIT:  int main(int, char **)

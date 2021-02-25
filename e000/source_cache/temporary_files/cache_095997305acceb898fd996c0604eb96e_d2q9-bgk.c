@@ -271,7 +271,6 @@ float propagate_rebound_and_collisions(const t_param params, t_speed* cells, t_s
 // #pragma omp parallel for
     for (int jj = 0; jj < params.ny; jj++)
     {
-      #pragma omp simd
       for (int ii = 0; ii < params.nx; ii++)
       {
         int y_n = (jj + 1) % params.ny;

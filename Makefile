@@ -2,9 +2,12 @@
 
 EXE=d2q9-bgk
 
-CC=gcc
+CC=icc
 # CFLAGS= -std=c99 -Wall -O3
+# omp 
 CFLAGS = -std=c99 -Wall -Ofast -mtune=native -fopenmp 
+# Debug
+# CFLAGS = -std=c99 -Wall -Ofast -mtune=native -fopenmp -g
 # CFLAGS = -std=c99 -Wall -Ofast -mtune=native -fopenmp -qopt-report=5 -qopt-report-phase=vec
 LIBS = -lm
 
