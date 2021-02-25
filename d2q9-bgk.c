@@ -163,9 +163,10 @@ int main(int argc, char* argv[])
 
   /* initialise our data structures and load values from file */
   initialise(paramfile, obstaclefile, &params, cells, tmp_cells, &obstacles, &av_vels);
-  printf("Initalized: %.02f\n", cells->speed0[20]);
-  printf("Initalized: %.02f\n", cells->speed0[30]);
-  printf("Initalized: %.02f\n", cells->speed0[80]);
+  printf("Inited: %0.10f\n", cells->speed0[20]);
+  printf("Inited: %0.10f\n", cells->speed0[30]);
+  printf("Inited: %0.10f\n", cells->speed1[80]);
+  printf("Inited: %0.10f\n", cells->speed5[200]);
 
 
   /* iterate for maxIters timesteps */
@@ -173,10 +174,15 @@ int main(int argc, char* argv[])
   tic = timstr.tv_sec + (timstr.tv_usec / 1000000.0);
   float final_av_velocity;
 
-  for (int tt = 0; tt < params.maxIters; tt++)
+  // for (int tt = 0; tt < params.maxIters; tt++)
+  for (int tt = 0; tt < 1; tt++)
   {
     final_av_velocity = timestep(params, cells, tmp_cells, obstacles);
     av_vels[tt] = final_av_velocity;
+
+    printf("==timestep: %d==\n", tt);
+    printf("av velocity: %.12E\n", av_vels[tt]);
+    printf("tot density: %.12E\n", total_density(params, cells));
 #ifdef DEBUG
     printf("==timestep: %d==\n", tt);
     printf("av velocity: %.12E\n", av_vels[tt]);
@@ -208,6 +214,7 @@ float timestep(const t_param params, t_speed* cells, t_speed* tmp_cells, char* o
 {
   accelerate_flow(params, cells, obstacles);
   float time_step_solution = propagate_rebound_and_collisions(params, cells, tmp_cells, obstacles);
+  printf("Timestep solution: %.12f\n", time_step_solution);
   swap(cells, tmp_cells);
   return time_step_solution;
 }
@@ -302,15 +309,15 @@ float propagate_rebound_and_collisions(const t_param params, t_speed* cells, t_s
 
           /* compute local density total */
           float local_density = 0.f;
-          local_density += cells->speed0[ii + jj*params.nx];
-          local_density += cells->speed1[ii + jj*params.nx];
-          local_density += cells->speed2[ii + jj*params.nx];
-          local_density += cells->speed3[ii + jj*params.nx];
-          local_density += cells->speed4[ii + jj*params.nx];
-          local_density += cells->speed5[ii + jj*params.nx];
-          local_density += cells->speed6[ii + jj*params.nx];
-          local_density += cells->speed7[ii + jj*params.nx];
-          local_density += cells->speed8[ii + jj*params.nx];
+          local_density += tmp_cells->speed0[ii + jj*params.nx];
+          local_density += tmp_cells->speed1[ii + jj*params.nx];
+          local_density += tmp_cells->speed2[ii + jj*params.nx];
+          local_density += tmp_cells->speed3[ii + jj*params.nx];
+          local_density += tmp_cells->speed4[ii + jj*params.nx];
+          local_density += tmp_cells->speed5[ii + jj*params.nx];
+          local_density += tmp_cells->speed6[ii + jj*params.nx];
+          local_density += tmp_cells->speed7[ii + jj*params.nx];
+          local_density += tmp_cells->speed8[ii + jj*params.nx];
 
           /* compute x velocity component */
           float u_x = (
@@ -407,6 +414,11 @@ float propagate_rebound_and_collisions(const t_param params, t_speed* cells, t_s
       }
     }
   }
+  printf("A thing: %.20f\n", tmp_cells->speed8[20]);
+  printf("A thing: %.20f\n", tmp_cells->speed2[40]);
+  
+  printf("tot_u: %.20f\n", tot_u);
+  printf("tot_cells: %.20f\n", tot_cells);
 
   return tot_u / (float)tot_cells;
 }
