@@ -163,6 +163,10 @@ int main(int argc, char* argv[])
 
   /* initialise our data structures and load values from file */
   initialise(paramfile, obstaclefile, &params, cells, tmp_cells, &obstacles, &av_vels);
+  printf("Initalized: %.02f\n", cells->speed0[20]);
+  printf("Initalized: %.02f\n", cells->speed0[30]);
+  printf("Initalized: %.02f\n", cells->speed0[80]);
+
 
   /* iterate for maxIters timesteps */
   gettimeofday(&timstr, NULL);
