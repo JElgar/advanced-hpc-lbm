@@ -83,15 +83,15 @@ typedef struct
 /* struct to hold the 'speed' arrays */
 typedef struct
 {
-  float* speed0;
-  float* speed1;
-  float* speed2;
-  float* speed3;
-  float* speed4;
-  float* speed5;
-  float* speed6;
-  float* speed7;
-  float* speed8;
+  float* restrict speed0;
+  float* restrict speed1;
+  float* restrict speed2;
+  float* restrict speed3;
+  float* restrict speed4;
+  float* restrict speed5;
+  float* restrict speed6;
+  float* restrict speed7;
+  float* restrict speed8;
 } t_speed;
 
 /*
