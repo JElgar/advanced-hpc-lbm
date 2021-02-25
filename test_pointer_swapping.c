@@ -61,7 +61,7 @@ int do_some_things(t_speed** cells, t_speed** cells2) {
 }
 
 
-int main_aop(int argc, char* argv[])
+int main_aos(int argc, char* argv[])
 {
   printf("hello world");
   t_speed* cells = (t_speed*)malloc(sizeof(t_speed) * 4);
@@ -85,10 +85,14 @@ int main_aop(int argc, char* argv[])
   return 0;
 }
 
+void do_some_things_aos(t_speed_soa* cells) {
+  cells->a[3] = 0.5f;
+}
 
 void init_soa(t_speed_soa *cells) {
   cells->a = malloc(sizeof(float) * 10);
   cells->a[0] = 0.1f;
+  do_some_things_aos(cells);
 }
 
 void swap_soa(t_speed_soa *a, t_speed_soa *b) {
@@ -111,4 +115,7 @@ int main(int argc, char* argv[]) {
   
   printf("Assertions complete, %.6f\n", cells->a[0]);
   printf("Assertions complete, %.6f\n", cells2->a[0]);
+  
+  printf("Assertions complete, %.6f\n", cells2->a[3]);
+  printf("Assertions complete, %.6f\n", cells->a[3]);
 }
