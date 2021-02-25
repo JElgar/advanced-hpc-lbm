@@ -163,11 +163,6 @@ int main(int argc, char* argv[])
 
   /* initialise our data structures and load values from file */
   initialise(paramfile, obstaclefile, &params, cells, tmp_cells, &obstacles, &av_vels);
-  printf("Inited: %0.10f\n", cells->speed0[20]);
-  printf("Inited: %0.10f\n", cells->speed0[30]);
-  printf("Inited: %0.10f\n", cells->speed1[80]);
-  printf("Inited: %0.10f\n", cells->speed5[200]);
-
 
   /* iterate for maxIters timesteps */
   gettimeofday(&timstr, NULL);
@@ -259,9 +254,21 @@ float propagate_rebound_and_collisions(const t_param params, t_speed* cells, t_s
   int    tot_cells = 0;  /* no. of cells used in calculation */
   float tot_u = 0.f;          /* accumulated magnitudes of velocity for each cell */
 
+  __assume_aligned(cells->speed0, 64);
+  __assume_aligned(cells->speed1, 64);
+  __assume_aligned(cells->speed2, 64);
+  __assume_aligned(cells->speed3, 64);
+  __assume_aligned(cells->speed4, 64);
+  __assume_aligned(cells->speed5, 64);
+  __assume_aligned(cells->speed6, 64);
+  __assume_aligned(cells->speed7, 64);
+  __assume_aligned(cells->speed8, 64);
+  __assume(params.nx%128==0);
+  __assume(params.ny%128==0);
+
   /* loop over _all_ cells */
   {
-    #pragma omp parallel for simd collapse(2)
+    // #pragma omp parallel for simd collapse(2)
     // #pragma omp simd
     for (int jj = 0; jj < params.ny; jj++)
     {
@@ -483,28 +490,28 @@ int initialise(const char* paramfile, const char* obstaclefile,
   */
 
   /* main grid */
-  cells_ptr->speed0 = malloc(params->nx * params->ny * sizeof(float));
-  cells_ptr->speed1 = malloc(params->nx * params->ny * sizeof(float));
-  cells_ptr->speed2 = malloc(params->nx * params->ny * sizeof(float));
-  cells_ptr->speed3 = malloc(params->nx * params->ny * sizeof(float));
-  cells_ptr->speed4 = malloc(params->nx * params->ny * sizeof(float));
-  cells_ptr->speed5 = malloc(params->nx * params->ny * sizeof(float));
-  cells_ptr->speed6 = malloc(params->nx * params->ny * sizeof(float));
-  cells_ptr->speed7 = malloc(params->nx * params->ny * sizeof(float));
-  cells_ptr->speed8 = malloc(params->nx * params->ny * sizeof(float));
+  cells_ptr->speed0 = _mm_malloc(params->nx * params->ny * sizeof(float), 64);
+  cells_ptr->speed1 = _mm_malloc(params->nx * params->ny * sizeof(float), 64);
+  cells_ptr->speed2 = _mm_malloc(params->nx * params->ny * sizeof(float), 64);
+  cells_ptr->speed3 = _mm_malloc(params->nx * params->ny * sizeof(float), 64);
+  cells_ptr->speed4 = _mm_malloc(params->nx * params->ny * sizeof(float), 64);
+  cells_ptr->speed5 = _mm_malloc(params->nx * params->ny * sizeof(float), 64);
+  cells_ptr->speed6 = _mm_malloc(params->nx * params->ny * sizeof(float), 64);
+  cells_ptr->speed7 = _mm_malloc(params->nx * params->ny * sizeof(float), 64);
+  cells_ptr->speed8 = _mm_malloc(params->nx * params->ny * sizeof(float), 64);
 
   if (cells_ptr == NULL) die("cannot allocate memory for cells", __LINE__, __FILE__);
 
   /* 'helper' grid, used as scratch space */
-  tmp_cells_ptr->speed0 = malloc(params->nx * params->ny * sizeof(float));
-  tmp_cells_ptr->speed1 = malloc(params->nx * params->ny * sizeof(float));
-  tmp_cells_ptr->speed2 = malloc(params->nx * params->ny * sizeof(float));
-  tmp_cells_ptr->speed3 = malloc(params->nx * params->ny * sizeof(float));
-  tmp_cells_ptr->speed4 = malloc(params->nx * params->ny * sizeof(float));
-  tmp_cells_ptr->speed5 = malloc(params->nx * params->ny * sizeof(float));
-  tmp_cells_ptr->speed6 = malloc(params->nx * params->ny * sizeof(float));
-  tmp_cells_ptr->speed7 = malloc(params->nx * params->ny * sizeof(float));
-  tmp_cells_ptr->speed8 = malloc(params->nx * params->ny * sizeof(float));
+  tmp_cells_ptr->speed0 = _mm_malloc(params->nx * params->ny * sizeof(float), 64);
+  tmp_cells_ptr->speed1 = _mm_malloc(params->nx * params->ny * sizeof(float), 64);
+  tmp_cells_ptr->speed2 = _mm_malloc(params->nx * params->ny * sizeof(float), 64);
+  tmp_cells_ptr->speed3 = _mm_malloc(params->nx * params->ny * sizeof(float), 64);
+  tmp_cells_ptr->speed4 = _mm_malloc(params->nx * params->ny * sizeof(float), 64);
+  tmp_cells_ptr->speed5 = _mm_malloc(params->nx * params->ny * sizeof(float), 64);
+  tmp_cells_ptr->speed6 = _mm_malloc(params->nx * params->ny * sizeof(float), 64);
+  tmp_cells_ptr->speed7 = _mm_malloc(params->nx * params->ny * sizeof(float), 64);
+  tmp_cells_ptr->speed8 = _mm_malloc(params->nx * params->ny * sizeof(float), 64);
   if (tmp_cells_ptr == NULL) die("cannot allocate memory for tmp_cells", __LINE__, __FILE__);
 
   /* the map of obstacles */
