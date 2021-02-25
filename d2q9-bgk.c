@@ -261,8 +261,8 @@ float propagate_rebound_and_collisions(const t_param params, t_speed* cells, t_s
 
   /* loop over _all_ cells */
   {
-    // #pragma omp parallel for simd collapse(2)
-    #pragma omp simd
+    #pragma omp parallel for simd collapse(2)
+    // #pragma omp simd
     for (int jj = 0; jj < params.ny; jj++)
     {
       for (int ii = 0; ii < params.nx; ii++)
