@@ -1,32 +1,32 @@
 <?xml version="1.0" encoding="utf-8"?>
 
 <IntelParallelAdvisorMetrics version="3.0">
-    <ElapsedTime>12.5028</ElapsedTime>
-    <ElapsedTimeMKL>2.95602e-316</ElapsedTimeMKL>
+    <ElapsedTime>12.5387</ElapsedTime>
+    <ElapsedTimeMKL>3.51084e-316</ElapsedTimeMKL>
     <PausedTime>0</PausedTime>
     <WasPausing>0</WasPausing>
     <CPUThreads>1</CPUThreads>
     <ISAUsed>AVX, SSE2, SSE</ISAUsed>
     <CompilerMajorVersion>18</CompilerMajorVersion>
-    <VectorizedLoopsCount>2</VectorizedLoopsCount>
+    <VectorizedLoopsCount>3</VectorizedLoopsCount>
     <FullyUnrolledCount>0</FullyUnrolledCount>
-    <TotalCPUTime>12.489</TotalCPUTime>
+    <TotalCPUTime>12.53</TotalCPUTime>
     <TotalCPUTimeMKL>0</TotalCPUTimeMKL>
-    <TimeInVectorizedLoops>12.079</TimeInVectorizedLoops>
+    <TimeInVectorizedLoops>11.41</TimeInVectorizedLoops>
     <TimeInVectorizedLoopsMKL>0</TimeInVectorizedLoopsMKL>
-    <TimeInScalarLoops>0.410008</TimeInScalarLoops>
+    <TimeInScalarLoops>1.12001</TimeInScalarLoops>
     <TimeInScalarLoopsMKL>0</TimeInScalarLoopsMKL>
     <TimeOutsideOfAnyLoop>0</TimeOutsideOfAnyLoop>
     <TimeOutsideOfAnyLoopMKL>0</TimeOutsideOfAnyLoopMKL>
     <VectorizationGain>1</VectorizationGain>
-    <ProgramGain>1.26114</ProgramGain>
-    <VectorizedLoopsGain>1.27</VectorizedLoopsGain>
+    <ProgramGain>1.21246</ProgramGain>
+    <VectorizedLoopsGain>1.23331</VectorizedLoopsGain>
     <ProgramSpeedUp>0</ProgramSpeedUp>
     <EfficiencyConfidence>1</EfficiencyConfidence>
-    <ProgramEfficiency>33.9906</ProgramEfficiency>
-    <VectorizedLoopsEfficiency>31.75</VectorizedLoopsEfficiency>
+    <ProgramEfficiency>37.0154</ProgramEfficiency>
+    <VectorizedLoopsEfficiency>30.8328</VectorizedLoopsEfficiency>
     <ReferenceEfficiency>25</ReferenceEfficiency>
-    <ReferenceProgramEfficiency>25.6311</ReferenceProgramEfficiency>
+    <ReferenceProgramEfficiency>26.7964</ReferenceProgramEfficiency>
     <TotalGFLOPcount>0</TotalGFLOPcount>
     <TotalGFLOPcountMKL>0</TotalGFLOPcountMKL>
     <TotalGFLOPS>0</TotalGFLOPS>

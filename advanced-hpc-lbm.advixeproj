@@ -2,8 +2,8 @@
 <root>
  <connectionOption type="string">localhost</connectionOption>
  <rdmgr>
-  <timestamp type="u64_t">1614288923</timestamp>
-  <hostname type="string">compute085.bc4.acrc.priv</hostname>
+  <timestamp type="u64_t">1614380426</timestamp>
+  <hostname type="string">compute084.bc4.acrc.priv</hostname>
   <os type="string">linux</os>
   <product type="string">Intel® Advisor 2018 Update 3</product>
   <buildNumber type="s32_t">558307</buildNumber>
@@ -24,9 +24,19 @@
   <searchDirs>
    <searchCategory>
     <category type="u8_t">1</category>
+    <searchDirectory>
+     <name type="string">/home/jelgar/Documents/uni/Year3/hpc/advanced-hpc-lbm</name>
+     <recursive type="bool">false</recursive>
+     <priority type="bool">true</priority>
+    </searchDirectory>
    </searchCategory>
    <searchCategory>
     <category type="u8_t">2</category>
+    <searchDirectory>
+     <name type="string">/home/jelgar/Documents/uni/Year3/hpc/advanced-hpc-lbm</name>
+     <recursive type="bool">false</recursive>
+     <priority type="bool">true</priority>
+    </searchDirectory>
    </searchCategory>
    <searchCategory>
     <category type="u8_t">3</category>
@@ -59,7 +69,14 @@
        <use_app_dir_as_work_dir type="bool">false</use_app_dir_as_work_dir>
        <attach.pid type="null"></attach.pid>
        <result_directory.path type="string">/home/jelgar/Documents/uni/Year3/hpc/advanced-hpc-lbm/r@@@{at}</result_directory.path>
-       <search_directories type="bag"/>
+       <search_directories>
+        <item>
+         <value type="string">sym:p=/home/jelgar/Documents/uni/Year3/hpc/advanced-hpc-lbm</value>
+        </item>
+        <item>
+         <value type="string">bin:p=/home/jelgar/Documents/uni/Year3/hpc/advanced-hpc-lbm</value>
+        </item>
+       </search_directories>
        <context>
         <contextValue>
          <id type="string">auto_finalize</id>
@@ -155,9 +172,21 @@
      <debug type="pointer" type_id="dasID_cctrl2::ApplicationWorkload" ptr_type="dasID_cctrl2::IWorkload">
       <workload>
        <targetName type="string">debug</targetName>
+       <launch.userapppath type="string"></launch.userapppath>
+       <launch.userappworkdir type="string"></launch.userappworkdir>
+       <launch_app.app_to_launch type="string"></launch_app.app_to_launch>
+       <launch_app.app_parameters type="string"></launch_app.app_parameters>
        <use_app_dir_as_work_dir type="bool">true</use_app_dir_as_work_dir>
+       <launch_app.working_folder type="string"></launch_app.working_folder>
        <result_directory.path type="string">/home/jelgar/Documents/uni/Year3/hpc/advanced-hpc-lbm/r@@@{at}</result_directory.path>
-       <search_directories type="bag"/>
+       <search_directories>
+        <item>
+         <value type="string">sym:p=/home/jelgar/Documents/uni/Year3/hpc/advanced-hpc-lbm</value>
+        </item>
+        <item>
+         <value type="string">bin:p=/home/jelgar/Documents/uni/Year3/hpc/advanced-hpc-lbm</value>
+        </item>
+       </search_directories>
        <context>
         <contextValue>
          <id type="string">analysis_mode</id>
@@ -217,9 +246,21 @@
      <map type="pointer" type_id="dasID_cctrl2::ApplicationWorkload" ptr_type="dasID_cctrl2::IWorkload">
       <workload>
        <targetName type="string">map</targetName>
+       <launch.userapppath type="string"></launch.userapppath>
+       <launch.userappworkdir type="string"></launch.userappworkdir>
+       <launch_app.app_to_launch type="string"></launch_app.app_to_launch>
+       <launch_app.app_parameters type="string"></launch_app.app_parameters>
        <use_app_dir_as_work_dir type="bool">true</use_app_dir_as_work_dir>
+       <launch_app.working_folder type="string"></launch_app.working_folder>
        <result_directory.path type="string">/home/jelgar/Documents/uni/Year3/hpc/advanced-hpc-lbm/r@@@{at}</result_directory.path>
-       <search_directories type="bag"/>
+       <search_directories>
+        <item>
+         <value type="string">sym:p=/home/jelgar/Documents/uni/Year3/hpc/advanced-hpc-lbm</value>
+        </item>
+        <item>
+         <value type="string">bin:p=/home/jelgar/Documents/uni/Year3/hpc/advanced-hpc-lbm</value>
+        </item>
+       </search_directories>
        <context>
         <contextValue>
          <id type="string">cachesimAssociativity</id>
@@ -289,7 +330,14 @@
        <targetName type="string">projection</targetName>
        <use_app_dir_as_work_dir type="bool">true</use_app_dir_as_work_dir>
        <result_directory.path type="string">/home/jelgar/Documents/uni/Year3/hpc/advanced-hpc-lbm/r@@@{at}</result_directory.path>
-       <search_directories type="bag"/>
+       <search_directories>
+        <item>
+         <value type="string">sym:p=/home/jelgar/Documents/uni/Year3/hpc/advanced-hpc-lbm</value>
+        </item>
+        <item>
+         <value type="string">bin:p=/home/jelgar/Documents/uni/Year3/hpc/advanced-hpc-lbm</value>
+        </item>
+       </search_directories>
        <context>
         <contextValue>
          <id type="string">assume_dependencies</id>
@@ -403,7 +451,14 @@
        <launch_app.working_folder type="string"></launch_app.working_folder>
        <launch.userappworkdir type="string"></launch.userappworkdir>
        <launch_app.mpi_max_rank type="null"></launch_app.mpi_max_rank>
-       <search_directories type="bag"/>
+       <search_directories>
+        <item>
+         <value type="string">sym:p=/home/jelgar/Documents/uni/Year3/hpc/advanced-hpc-lbm</value>
+        </item>
+        <item>
+         <value type="string">bin:p=/home/jelgar/Documents/uni/Year3/hpc/advanced-hpc-lbm</value>
+        </item>
+       </search_directories>
        <context>
         <contextValue>
          <id type="string">auto_finalize</id>
@@ -499,9 +554,21 @@
      <suitability type="pointer" type_id="dasID_cctrl2::ApplicationWorkload" ptr_type="dasID_cctrl2::IWorkload">
       <workload>
        <targetName type="string">suitability</targetName>
+       <launch.userapppath type="string"></launch.userapppath>
+       <launch.userappworkdir type="string"></launch.userappworkdir>
+       <launch_app.app_to_launch type="string"></launch_app.app_to_launch>
+       <launch_app.app_parameters type="string"></launch_app.app_parameters>
        <use_app_dir_as_work_dir type="bool">true</use_app_dir_as_work_dir>
+       <launch_app.working_folder type="string"></launch_app.working_folder>
        <result_directory.path type="string">/home/jelgar/Documents/uni/Year3/hpc/advanced-hpc-lbm/r@@@{at}</result_directory.path>
-       <search_directories type="bag"/>
+       <search_directories>
+        <item>
+         <value type="string">sym:p=/home/jelgar/Documents/uni/Year3/hpc/advanced-hpc-lbm</value>
+        </item>
+        <item>
+         <value type="string">bin:p=/home/jelgar/Documents/uni/Year3/hpc/advanced-hpc-lbm</value>
+        </item>
+       </search_directories>
        <context>
         <contextValue>
          <id type="string">dataLimit</id>

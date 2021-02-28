@@ -209,7 +209,7 @@ float timestep(const t_param params, t_speed* cells, t_speed* tmp_cells, char* o
   return time_step_solution;
 }
 
-int accelerate_flow(const t_param params, t_speed* cells, char* restrict obstacles)
+int accelerate_flow(const t_param params, t_speed* cells, char* obstacles)
 {
   /* compute weighting factors */
   float w1 = params.density * params.accel / 9.f;
@@ -227,10 +227,8 @@ int accelerate_flow(const t_param params, t_speed* cells, char* restrict obstacl
   __assume_aligned(cells->speed6, 64);
   __assume_aligned(cells->speed7, 64);
   __assume_aligned(cells->speed8, 64);
-  
-  __assume(params.nx%128==0);
 
-  // #pragma omp simd
+  #pragma omp simd
   for (int ii = 0; ii < params.nx; ii++)
   {
     /* if the cell is not occupied and
@@ -254,7 +252,7 @@ int accelerate_flow(const t_param params, t_speed* cells, char* restrict obstacl
   return EXIT_SUCCESS;
 }
 
-float propagate_rebound_and_collisions(const t_param params, t_speed* cells, t_speed* tmp_cells, char* restrict obstacles)
+float propagate_rebound_and_collisions(const t_param params, t_speed* cells, t_speed* tmp_cells, char* obstacles)
 {
 
   const float c_sq = 1.f / 3.f; /* square of speed of sound */

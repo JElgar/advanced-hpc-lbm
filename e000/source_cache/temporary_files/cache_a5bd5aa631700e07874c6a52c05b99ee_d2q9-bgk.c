@@ -142,7 +142,7 @@ int main(int argc, char* argv[])
   t_param  params;              /* struct to hold parameter values */
   t_speed *cells = malloc(sizeof(t_speed));  /* grid containing fluid densities */
   t_speed *tmp_cells = malloc(sizeof(t_speed));  /* grid indicating which cells are blocked */
-  char*     obstacles = NULL;    
+  char    *obstacles = NULL;    
   float* av_vels   = NULL;     /* a record of the av. velocity computed for each timestep */
   struct timeval timstr;        /* structure to hold elapsed time */
   struct rusage ru;             /* structure to hold CPU time--system and user */
@@ -263,14 +263,29 @@ float propagate_rebound_and_collisions(const t_param params, t_speed* cells, t_s
   __assume_aligned(cells->speed6, 64);
   __assume_aligned(cells->speed7, 64);
   __assume_aligned(cells->speed8, 64);
+  
+  __assume_aligned(tmp_cells->speed0, 64);
+  __assume_aligned(tmp_cells->speed1, 64);
+  __assume_aligned(tmp_cells->speed2, 64);
+  __assume_aligned(tmp_cells->speed3, 64);
+  __assume_aligned(tmp_cells->speed4, 64);
+  __assume_aligned(tmp_cells->speed5, 64);
+  __assume_aligned(tmp_cells->speed6, 64);
+  __assume_aligned(tmp_cells->speed7, 64);
+  __assume_aligned(tmp_cells->speed8, 64);
+  
+  __assume_aligned(obstacles, 64);
+
   __assume(params.nx%128==0);
   __assume(params.ny%128==0);
 
   /* loop over _all_ cells */
   {
 // #pragma omp parallel for
+
+    #pragma omp simd aligned(cells:64) aligned(tmp_cells:64) aligned(obstacles:64) reduction(+:tot_cells) reduction(+:tot_u)
     for (int jj = 0; jj < params.ny; jj++)
-    {
+    {    
       for (int ii = 0; ii < params.nx; ii++)
       {
         int y_n = (jj + 1) % params.ny;
@@ -418,6 +433,8 @@ float propagate_rebound_and_collisions(const t_param params, t_speed* cells, t_s
   return tot_u / (float)tot_cells;
 }
 
+
+
 int initialise(const char* paramfile, const char* obstaclefile,
                t_param* params, t_speed* cells_ptr, t_speed* tmp_cells_ptr,
                char** obstacles_ptr, float** av_vels_ptr)
@@ -514,7 +531,8 @@ int initialise(const char* paramfile, const char* obstaclefile,
   if (tmp_cells_ptr == NULL) die("cannot allocate memory for tmp_cells", __LINE__, __FILE__);
 
   /* the map of obstacles */
-  *obstacles_ptr = malloc(sizeof(int) * (params->ny * params->nx));
+  *obstacles_ptr = _mm_malloc(sizeof(int) * (params->ny * params->nx), 64);
+  // *obstacles_ptr = malloc(sizeof(int) * (params->ny * params->nx));
 
   if (*obstacles_ptr == NULL) die("cannot allocate column memory for obstacles", __LINE__, __FILE__);
 
@@ -618,7 +636,7 @@ int finalise(const t_param* params, t_speed* cells_ptr, t_speed* tmp_cells_ptr,
   free(tmp_cells_ptr);
   tmp_cells_ptr = NULL;
 
-  free(*obstacles_ptr);
+  _mm_free(*obstacles_ptr);
   *obstacles_ptr = NULL;
 
   free(*av_vels_ptr);
