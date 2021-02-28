@@ -231,6 +231,7 @@ int accelerate_flow(const t_param params, t_speed* cells, char* restrict obstacl
   __assume(params.nx%128==0);
 
   // #pragma omp simd
+  #pragma omp parallel for
   for (int ii = 0; ii < params.nx; ii++)
   {
     /* if the cell is not occupied and
@@ -295,7 +296,7 @@ float propagate_rebound_and_collisions(const t_param params, t_speed* cells, t_s
   // #pragma omp parallel
   {
     // #pragma omp for simd aligned(cells:64) aligned(tmp_cells:64) aligned(obstacles:64) reduction(+:tot_cells) reduction(+:tot_u)
-    #pragma omp parallel for collapse(2) schedule(static) reduction(+:tot_cells) reduction(+:tot_u)
+    #pragma omp parallel for simd collapse(2) schedule(static) reduction(+:tot_cells) reduction(+:tot_u) aligned(cells:64) aligned(tmp_cells:64) aligned(obstacles:64)
     for (int jj = 0; jj < params.ny; jj++)
     {    
       // #pragma omp simd aligned(cells:64) aligned(tmp_cells:64) aligned(obstacles:64) reduction(+:tot_cells) reduction(+:tot_u)
@@ -430,9 +431,6 @@ float propagate_rebound_and_collisions(const t_param params, t_speed* cells, t_s
       }
     }
   }
-
-  printf("Number of cells: %d\n", tot_cells);
-  printf("Tot_u: %.8f\n", tot_u);
   return tot_u / (float)tot_cells;
 }
 
