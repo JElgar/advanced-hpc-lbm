@@ -1,32 +1,32 @@
 <?xml version="1.0" encoding="utf-8"?>
 
 <IntelParallelAdvisorMetrics version="3.0">
-    <ElapsedTime>12.5387</ElapsedTime>
-    <ElapsedTimeMKL>3.51084e-316</ElapsedTimeMKL>
+    <ElapsedTime>28.4299</ElapsedTime>
+    <ElapsedTimeMKL>3.36068e-316</ElapsedTimeMKL>
     <PausedTime>0</PausedTime>
     <WasPausing>0</WasPausing>
     <CPUThreads>1</CPUThreads>
     <ISAUsed>AVX, SSE2, SSE</ISAUsed>
-    <CompilerMajorVersion>18</CompilerMajorVersion>
-    <VectorizedLoopsCount>3</VectorizedLoopsCount>
+    <CompilerMajorVersion>-1</CompilerMajorVersion>
+    <VectorizedLoopsCount>4</VectorizedLoopsCount>
     <FullyUnrolledCount>0</FullyUnrolledCount>
-    <TotalCPUTime>12.53</TotalCPUTime>
+    <TotalCPUTime>28.42</TotalCPUTime>
     <TotalCPUTimeMKL>0</TotalCPUTimeMKL>
-    <TimeInVectorizedLoops>11.41</TimeInVectorizedLoops>
+    <TimeInVectorizedLoops>28.14</TimeInVectorizedLoops>
     <TimeInVectorizedLoopsMKL>0</TimeInVectorizedLoopsMKL>
-    <TimeInScalarLoops>1.12001</TimeInScalarLoops>
+    <TimeInScalarLoops>0.280014</TimeInScalarLoops>
     <TimeInScalarLoopsMKL>0</TimeInScalarLoopsMKL>
     <TimeOutsideOfAnyLoop>0</TimeOutsideOfAnyLoop>
     <TimeOutsideOfAnyLoopMKL>0</TimeOutsideOfAnyLoopMKL>
-    <VectorizationGain>1</VectorizationGain>
-    <ProgramGain>1.21246</ProgramGain>
-    <VectorizedLoopsGain>1.23331</VectorizedLoopsGain>
+    <VectorizationGain>0</VectorizationGain>
+    <ProgramGain>0</ProgramGain>
+    <VectorizedLoopsGain>0</VectorizedLoopsGain>
     <ProgramSpeedUp>0</ProgramSpeedUp>
-    <EfficiencyConfidence>1</EfficiencyConfidence>
-    <ProgramEfficiency>37.0154</ProgramEfficiency>
-    <VectorizedLoopsEfficiency>30.8328</VectorizedLoopsEfficiency>
-    <ReferenceEfficiency>25</ReferenceEfficiency>
-    <ReferenceProgramEfficiency>26.7964</ReferenceProgramEfficiency>
+    <EfficiencyConfidence>0</EfficiencyConfidence>
+    <ProgramEfficiency>0</ProgramEfficiency>
+    <VectorizedLoopsEfficiency>0</VectorizedLoopsEfficiency>
+    <ReferenceEfficiency>0</ReferenceEfficiency>
+    <ReferenceProgramEfficiency>0</ReferenceProgramEfficiency>
     <TotalGFLOPcount>0</TotalGFLOPcount>
     <TotalGFLOPcountMKL>0</TotalGFLOPcountMKL>
     <TotalGFLOPS>0</TotalGFLOPS>
