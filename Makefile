@@ -7,7 +7,7 @@ CC=icc
 # omp 
 CFLAGS = -std=c99 -Wall -Ofast -mtune=native -fopenmp -no-prec-sqrt -xCORE-AVX2 -axCOMMON-AVX512
 # Debug
-# CFLAGS = -std=c99 -Wall -Ofast -mtune=native -fopenmp -g
+# CFLAGS = -std=c99 -Wall -Ofast -mtune=native -fopenmp -g -no-prec-sqrt -xCORE-AVX2 -axCOMMON-AVX512
 # CFLAGS = -std=c99 -Wall -Ofast -mtune=native -fopenmp -g -qopt-report=5 -qopt-report-phase=vec 
 LIBS = -lm
 

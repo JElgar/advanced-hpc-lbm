@@ -297,11 +297,11 @@ float propagate_rebound_and_collisions(const t_param params, t_speed* cells, t_s
   // #pragma omp parallel
   #pragma distribute_point
   {
-    // #pragma omp for simd aligned(cells:64) aligned(tmp_cells:64) aligned(obstacles:64) reduction(+:tot_cells) reduction(+:tot_u)
-    #pragma omp parallel for simd collapse(2) schedule(static) reduction(+:tot_cells) reduction(+:tot_u) aligned(cells:64) aligned(tmp_cells:64) aligned(obstacles:64)
+     #pragma omp parallel for reduction(+:tot_cells) reduction(+:tot_u)
+    // #pragma omp parallel for simd collapse(2) schedule(static) reduction(+:tot_cells) reduction(+:tot_u) aligned(cells:64) aligned(tmp_cells:64) aligned(obstacles:64)
     for (int jj = 0; jj < params.ny; jj++)
     {    
-      // #pragma omp simd aligned(cells:64) aligned(tmp_cells:64) aligned(obstacles:64) reduction(+:tot_cells) reduction(+:tot_u)
+      #pragma omp simd aligned(cells:64) aligned(tmp_cells:64) aligned(obstacles:64) reduction(+:tot_cells) reduction(+:tot_u)
       for (int ii = 0; ii < params.nx; ii++)
       {
         const int y_n = (jj + 1) % params.ny;
