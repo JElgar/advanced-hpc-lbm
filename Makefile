@@ -5,10 +5,10 @@ EXE=d2q9-bgk
 CC=icc
 # CFLAGS= -std=c99 -Wall -O3
 # omp 
-CFLAGS = -std=c99 -Wall -Ofast -mtune=native -fopenmp -no-prec-sqrt 
+CFLAGS = -std=c99 -Wall -Ofast -mtune=native -fopenmp -no-prec-sqrt -xCORE-AVX2 -axCOMMON-AVX512
 # Debug
 # CFLAGS = -std=c99 -Wall -Ofast -mtune=native -fopenmp -g
-# CFLAGS = -std=c99 -Wall -Ofast -mtune=native -fopenmp -g -qopt-report=5 -qopt-report-phase=vec
+# CFLAGS = -std=c99 -Wall -Ofast -mtune=native -fopenmp -g -qopt-report=5 -qopt-report-phase=vec 
 LIBS = -lm
 
 FINAL_STATE_FILE=./final_state.dat
