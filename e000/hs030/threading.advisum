@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<!-- <!DOCTYPE IntelParallelAdvisorSummaryCollection SYSTEM  "IntelParallelAdvisorSummaryCollection.dtd"> -->
+
+<IntelParallelAdvisorSummary version="" 
+                             kind="DATAKIND_SURVEY_EX" >
+  <hotspot filename="/mnt/storage/home/za18968/advanced-hpc-lbm/d2q9-bgk.c"
+           line_no="157"
+           routine="main"
+           is_vectorized="0"
+           self_time="0.000000E+00"
+           total_time="8.415404E+02"
+           trip_counts=""
+           func_instance="23"
+           priority="0"/>
+  <hotspot filename="/mnt/storage/home/za18968/advanced-hpc-lbm/d2q9-bgk.c"
+           line_no="300"
+           routine="propagate_rebound_and_collisions_A$omp$parallel_for@300"
+           is_vectorized="0"
+           self_time="2.999803E-02"
+           total_time="4.272594E+02"
+           trip_counts=""
+           func_instance="30"
+           priority="0"/>
+  <hotspot filename="/mnt/storage/home/za18968/advanced-hpc-lbm/d2q9-bgk.c"
+           line_no="300"
+           routine="propagate_rebound_and_collisions_A$omp$parallel_for@300"
+           is_vectorized="0"
+           self_time="5.939127E+00"
+           total_time="4.272294E+02"
+           trip_counts=""
+           func_instance="29"
+           priority="0"/>
+  <hotspot filename="/mnt/storage/home/za18968/advanced-hpc-lbm/d2q9-bgk.c"
+           line_no="305"
+           routine="propagate_rebound_and_collisions_A$omp$parallel_for@300"
+           is_vectorized="1"
+           self_time="4.212902E+02"
+           total_time="4.212902E+02"
+           trip_counts=""
+           func_instance="227"
+           confidence="0"
+           efficiency="4.012500E+01"
+           referenceEfficiency="1.250000E+01"
+           priority="0"/>
+  <hotspot filename="/mnt/storage/home/za18968/advanced-hpc-lbm/d2q9-bgk.c"
+           line_no="792"
+           routine="timestep"
+           is_vectorized="1"
+           self_time="2.290025E+00"
+           total_time="2.290025E+00"
+           trip_counts=""
+           func_instance="231"
+           confidence="0"
+           efficiency="6.343750E+00"
+           referenceEfficiency="3.125000E+00"
+           priority="0"/>
+</IntelParallelAdvisorSummary >

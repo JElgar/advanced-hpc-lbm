@@ -143,7 +143,7 @@ int main(int argc, char* argv[])
   t_param  params;              /* struct to hold parameter values */
   t_speed *cells = malloc(sizeof(t_speed));  /* grid containing fluid densities */
   t_speed *tmp_cells = malloc(sizeof(t_speed));  /* grid indicating which cells are blocked */
-  char    *obstacles = NULL;    
+  char    * restrict obstacles = NULL;    
   float* av_vels   = NULL;     /* a record of the av. velocity computed for each timestep */
   struct timeval timstr;        /* structure to hold elapsed time */
   struct rusage ru;             /* structure to hold CPU time--system and user */
@@ -295,17 +295,17 @@ float propagate_rebound_and_collisions(const t_param params, t_speed* cells, t_s
 
   /* loop over _all_ cells */
   // #pragma omp parallel
-  #pragma distribute_point
+  // #pragma distribute_point
   {
-     #pragma omp parallel for reduction(+:tot_cells) reduction(+:tot_u)
+     #pragma omp parallel for schedule(static) reduction(+:tot_cells) reduction(+:tot_u)
     // #pragma omp parallel for simd collapse(2) schedule(static) reduction(+:tot_cells) reduction(+:tot_u) aligned(cells:64) aligned(tmp_cells:64) aligned(obstacles:64)
     for (int jj = 0; jj < params.ny; jj++)
     {    
       #pragma omp simd aligned(cells:64) aligned(tmp_cells:64) aligned(obstacles:64) reduction(+:tot_cells) reduction(+:tot_u)
       for (int ii = 0; ii < params.nx; ii++)
       {
-        const int y_n = (jj + 1) % params.ny;
-        const int x_e = (ii + 1) % params.nx;
+        const int y_n = (jj + 1) & (params.ny - 1);
+        const int x_e = (ii + 1) & (params.nx - 1);
         const int y_s = (jj == 0) ? (jj + params.ny - 1) : (jj - 1);
         const int x_w = (ii == 0) ? (ii + params.nx - 1) : (ii - 1);
         
@@ -544,6 +544,7 @@ int initialise(const char* paramfile, const char* obstaclefile,
   float w1 = params->density      / 9.f;
   float w2 = params->density      / 36.f;
 
+  #pragma omp parallel for
   for (int jj = 0; jj < params->ny; jj++)
   {
     for (int ii = 0; ii < params->nx; ii++)
@@ -564,6 +565,7 @@ int initialise(const char* paramfile, const char* obstaclefile,
   }
 
   /* first set all cells in obstacle array to zero */
+  #pragma omp parallel for
   for (int jj = 0; jj < params->ny; jj++)
   {
     for (int ii = 0; ii < params->nx; ii++)

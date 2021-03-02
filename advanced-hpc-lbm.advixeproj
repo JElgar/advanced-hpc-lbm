@@ -445,12 +445,12 @@
        <launch_app.inherit_sys_environment type="bool">true</launch_app.inherit_sys_environment>
        <launch_app.mpi_run type="bool">false</launch_app.mpi_run>
        <result_directory.path type="string">/home/jelgar/Documents/uni/Year3/hpc/advanced-hpc-lbm/r@@@{at}</result_directory.path>
-       <launch.userapppath type="string"></launch.userapppath>
-       <launch_app.app_to_launch type="string"></launch_app.app_to_launch>
        <launch_app.app_parameters type="string"></launch_app.app_parameters>
-       <launch_app.working_folder type="string"></launch_app.working_folder>
        <launch.userappworkdir type="string"></launch.userappworkdir>
        <launch_app.mpi_max_rank type="null"></launch_app.mpi_max_rank>
+       <launch.userapppath type="string">/home/jelgar/Documents/uni/Year3/hpc/advanced-hpc-lbm/d2q9-bgk</launch.userapppath>
+       <launch_app.app_to_launch type="string">/home/jelgar/Documents/uni/Year3/hpc/advanced-hpc-lbm/d2q9-bgk</launch_app.app_to_launch>
+       <launch_app.working_folder type="string">/home/jelgar/Documents/uni/Year3/hpc/advanced-hpc-lbm</launch_app.working_folder>
        <search_directories>
         <item>
          <value type="string">sym:p=/home/jelgar/Documents/uni/Year3/hpc/advanced-hpc-lbm</value>

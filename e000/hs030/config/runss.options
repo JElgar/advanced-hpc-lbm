@@ -1,0 +1,17 @@
+-r
+/mnt/storage/home/za18968/advanced-hpc-lbm/e000/hs030
+-type
+cpu:stack
+-quiet
+--mrte-mode=auto
+--follow-child
+--strategy=ld-linux.so.2:notrace:notrace,ld-linux-x86-64.so.2:notrace:notrace
+--interval=10
+--data-limit-mb=500
+--stack-stitching
+--stackwalk=offline
+--mrte-type=java,python
+--
+./d2q9-bgk
+input_1024x1024.params
+obstacles_1024x1024.dat
