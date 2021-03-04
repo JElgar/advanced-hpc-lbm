@@ -1,6 +1,8 @@
 \BOOKMARK [1][-]{section.1}{Introduction}{}% 1
 \BOOKMARK [1][-]{section.2}{Serial Optimisation}{}% 2
 \BOOKMARK [2][-]{subsection.2.1}{Compiler options}{section.2}% 3
-\BOOKMARK [2][-]{subsection.2.2}{Reduce Memory Accesses}{section.2}% 4
-\BOOKMARK [2][-]{subsection.2.3}{Vecotrisation}{section.2}% 5
-\BOOKMARK [1][-]{section.3}{Parallel \(OpenMP\)}{}% 6
+\BOOKMARK [2][-]{subsection.2.2}{Arithmetic improvements}{section.2}% 4
+\BOOKMARK [2][-]{subsection.2.3}{Reduce Memory Accesses}{section.2}% 5
+\BOOKMARK [2][-]{subsection.2.4}{Vecotrisation}{section.2}% 6
+\BOOKMARK [1][-]{section.3}{Parallel \(OpenMP\)}{}% 7
+\BOOKMARK [1][-]{section.4}{Conclusion}{}% 8

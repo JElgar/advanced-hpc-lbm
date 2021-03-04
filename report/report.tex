@@ -110,6 +110,8 @@ critical section of the algorithm.
 \label{tab:compilerflags}
 \end{center}
 
+\subsection{Arithmetic improvements}
+
 \subsection{Reduce Memory Accesses}
 
 In the original implementation of the algorithm for each timestep the
@@ -213,6 +215,19 @@ required). Therefore switching the implementation to use a structure of arrays
 efficiently as each fetch for a speed only fetched a single float and therefore
 reduced the memory bandwidth required. 
 
+% TODO add a table of run times of all sizes, serial, vectorized and parallel
+When comparing the roofline results in \autoref{fig:rlserial} we can see a
+large improvement in the performance, from 2.49 GLOPs to 13.2 GLOPs, once the
+vectorization is introduced. Simiarly we also see a reduction in the run times
+as shown in Figure xx. This is as a result of fewer instructions being required
+to compute the result values as a single vector instruction can compute
+multiple values. Moreover we see the operational intensity increase, and
+therefore the problem become more compute bound. This is as a result of
+switching from an array of structures to a structure of arrays which reduces
+the memory bandwidth used as large section of the cache line are not wasted
+when fetching a whole structure which contains 9 speeds, when only 1 is
+required.
+
 \begin{tikzpicture}
 \begin{axis}[
   xmode = log,
@@ -230,21 +245,21 @@ reduced the memory bandwidth required.
 ]
 
 % Original implementation 
-\addplot coordinates {
-  (0.457, 4.911)
-} node[below right, ] (TextNode) {$(0.46, 4.91)$};
-\addlegendentry{Serial (Original Implementation)}
+% \addplot coordinates {
+%   (0.457, 4.911)
+% } node[left, ] (TextNode) {$(0.46, 4.91)$};
+% \addlegendentry{Serial (Original Implementation)}
 
 % Serial (No vectorizing)
 \addplot coordinates {
   (0.341, 2.492)
-} node[below right, ] (TextNode) {$(0.34, 2.49)$};
+} node[below left, ] (TextNode) {$(0.34, 2.49)$};
 \addlegendentry{Serial (No vectorization)}
 
 % Serial (No vectorizing)
 \addplot coordinates {
   (0.383, 13.206)
-} node[below right, ] (TextNode) {$(0.38, 13.2)$};
+} node[above left, ] (TextNode) {$(0.38, 13.2)$};
 \addlegendentry{Serial (With vectorization)}
 
 %DRAM
@@ -263,6 +278,8 @@ reduced the memory bandwidth required.
 
 \end{axis}
 \end{tikzpicture}
+\captionof{figure}{Roofline analysis for serial implementations}
+\label{fig:rlserial}
 
 \begin{tikzpicture}
 \begin{axis}[
@@ -302,49 +319,64 @@ reduced the memory bandwidth required.
 
 \end{axis}
 \end{tikzpicture}
+\captionof{figure}{Roofline analysis for parallel implementations}
+\label{fig:rlparallel}
 
 \section{Parallel (OpenMP)}
 
 Having optimized the inner loop in the above section the next optimization that
 can be used is parallelizing. In this implementation the outer loop was
 parallelized while the inner loop maintained the other optimizations. This was
-achieved using OpenMP. This is library provided a collection of compiler
+achieved using OpenMP. This library provides a collection of compiler
 directives which can be used to write parallel shared memory programs.
 
 The first step to making the outer loop run in parallel is to use the
 \verb|parallel| and \verb|for| constructs and turn on OpenMP for the compiler with the
 \verb|-fopenmp| flag. The \verb|parallel| directive tells the compiler to run
-the preceding for loop in parallel and \verb|for| tells it to distribute the
-work evenly across the threads.
+the preceding block in parallel and \verb|for| tells it to distribute the
+work of the following for loop evenly across the threads.
 
 It is then important to handle the memory sharing that takes place in the loop.
 Since the \verb|av_velocity| is also calucated in this loop each loop is
 required to calculate the total number of cells without obstacles and the sum
 of the magnitude of the velocity for these cells. This requies a shared sum
-across all the threads. Do efficiently calculate these shared sums a
+across all the threads. In order to efficiently calculate these shared sums a
 \verb|reduction| is required. The \verb|reduction| directive tells the compiler
-that the given varible is going to accumulated over the duration of the loop.
+that the given varible is going to be accumulated over the duration of the loop.
 This allows each thread to calulate is own sum without having to syncronise the
-global shared value on every write. Once the fork is complete and the threads
+global shared value on every write. Once the forked section is complete and the threads
 syncronise then all the sums can be combined to determine the final value of
-the accumulated varibles. 
+the accumulated variables. 
 
-Another cocnsideration when writing a parallel program is the number of cores
+Another consideration when writing a parallel program is the number of cores
 to use. In a bluecrystal node there are 2 sockets, which house 2 \emph{intel
 xeon e5-2680} CPUs. Each of these CPUs have 14 cores, giving a total of 28
 cores per node. \autoref{tab:parallelresults} and \autoref{fig:parallelresults}
-shows the run times of the parallel code on different numbers of cores. In the
+show the run times of the parallel code on different numbers of cores. In the
 larger problems (1024x1024) it is clear that as the number of cores increase
-the run time decreases. This is as a result of the work in the critical section
-being shared over a larger pool of cores and thus the forked time is decreased.
-However in the smaller probelms there is a reduction in run time around 14
-cores. This is observed as once the core count is above 14, memory sharing
-between the sockets is required. This is where a shared section of memory is in
-the cache of one the other socket so the request has to be routed through the
-other socket. This takes appoximately 2x as long as fetching from the socket's
-local cache. For this reason when running the alogirthm on the smallest cells
+the run time decreases. Initially, between 1 and 4 cores the rate of decrease
+is linear, meaning as the number of cores increases the run time is halved.
+This is as a result of the work in the critical section being shared over a
+larger pool of cores and thus the total time of the forked region is decreased.
+
+However this linear relationship becomes a sublinear plateaus as the number of
+cores increases. The reason for this can be observed in
+\autoref{fig:rlparallel} which shows the roofline analysis for the parallel
+alogirthm running on 28 cores. The results lie in the memory bound region,
+this is as a result of the memory bandwidth becoming saturated as the number of
+cores are increased and thus the computation rate increases at a faster rate
+than the memory bandwidth available. 
+
+However in the smaller problems there is a reduction in run time around 14
+cores. This is observed as once the core count is above 14, two sockets are in
+use (both CPUs) and therefore memory sharing between the sockets is required.
+This is where a shared section of memory is in the cache of one the other
+socket so in order to access that section of memory a request has to be routed
+through the other socket. This takes approximately two times as long as
+fetching from the socket's local cache. For this reason when running the
+algorithm on smaller grid sizes 
 % TODO Make this a real thing
-size (128x128) only 14 cores were used.
+(128x128) only 14 cores were used.
 
 In general this non-uniform memory access, NUMA, can be mitigated by pinning 
 the threads to a specific core. Setting \verb|OMP_PROC_BIND| to \verb|close|
@@ -359,9 +391,12 @@ cells array are assigned serially (on a single thread). This means all the
 values will in exist the same cache, linked to this single NUMA region. This
 can be prevented by ensuring the initialisation of the values is parallelised
 in the same way as the it is accessed in the critical region. In this case this
-means also using the \verb|#pragma omp parallel for| when assigning the initial
+means also using the \verb|#pragma omp parallel for| directive when assigning the initial
 values to the cells array. This will ensure the data is allocated in the same
-NUMA region to which it is going to be required in the critical loop.
+NUMA region to which it is going to be required in the critical loop. The
+combination of these factors should therefore reduce the number of
+socket-to-socket memory requests allowing for the average time for each memory
+access to be quicker.  
 
 \begin{lstlisting}[style=CStyle, label={lst:ompparallelloop}, caption={TODO},]
 #pragma omp parallel for schedule(static) reduction(+:tot_cells) reduction(+:tot_u)
@@ -374,6 +409,35 @@ NUMA region to which it is going to be required in the critical loop.
       }
     }
 \end{lstlisting}
+
+% \begin{tikzpicture}
+% \begin{axis}[
+%   axis lines = left,
+%   xlabel = Number of cores,
+%   ylabel = Run time (seconds),
+%   xmin = 0,
+%   ymin = 1,
+% ]
+% % 1028x1028
+% \addplot[color=red] table {
+%   1   11.17
+%   2   10.48
+%   4   14.45
+%   6   53
+%   8   43 
+%   10  42
+%   12  39.5
+%   14  39.1
+%   16  37.1
+%   18  32.6
+%   20  26.6
+%   22  26.3
+%   24  22.8
+%   26  21.0
+%   28  85.91
+% };
+% \end{axis}
+% \end{tikzpicture}
 
 \begin{tikzpicture}
 \begin{axis}[
@@ -472,6 +536,42 @@ NUMA region to which it is going to be required in the critical loop.
 \label{tab:parallelresults}
 \end{center}
 
+\begin{center}
+  \begin{tabular}{ |p{1.5cm}||p{1.5cm}|p{1.5cm}|p{1.5cm}| }
+ \hline
+ \multicolumn{4}{|c|}{Results} \\
+ \hline
+ Grid size & Serial & Vectorised & Parallel \\
+ \hline
+ 128x128    & 27.0  &    &  1.15(14 cores)   \\
+ 128x256    &       &    &  1.85(14 cores)   \\
+ 256x256    &       &    &  5.68(28 cores)   \\
+ 1024x1024  &       &    &  20.8(28 cores)    \\ 
+ \hline
+\end{tabular}
+\captionof{table}{Parallel scaling results for 1-28 cores}
+\label{tab:parallelresults}
+\end{center}
+
+\section{Conclusion}
+
+Modern compilers offer many powerful options to assist in code optimisation.
+Often the most efficient approach to optimising a code can be to assist the
+compiler in its own optimisations. Simple changes such as using compiler
+optimisation flags can have a profound impact on the runtime of the algorithm.
+Similarly with the correct hints and memory aligned compilers are able to
+automatically vertorize a given code. This can dramatically reduce the run time
+by allowing a single instruction to compute multiple values and thus reduce the
+overall number of instructions. In this implementation, the vectorized code ran
+over 2.5 times faster than the optimised serial version. Once a code is well
+optimised in serial further improvements can be gained by making sections of
+the program run in parallel. This can dramatically increase the performance of
+the code as the work is shared across multiple cores. With moder processors
+often having high core counts, this can also result in large performance gains.
+Similarly to vectorization, using OpenMP directives and environment variables
+parallelized code can be achieved with little changed to the implementation. In
+this running the critical sections in parallel resulted in a 13 times reduction
+in overall run time on the largest problem size.
+
 \end{multicols}
 \end{document}
-
