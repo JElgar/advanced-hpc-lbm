@@ -1,0 +1,12 @@
+-r
+/home/jelgar/Documents/uni/Year3/hpc/advanced-hpc-lbm/e000/mp000
+--tool=map
+--record-stack-frame
+--sample-size=300000
+--record-mem-allocations
+--search-dir
+sym:p=/home/jelgar/Documents/uni/Year3/hpc/advanced-hpc-lbm
+--search-dir
+bin:p=/home/jelgar/Documents/uni/Year3/hpc/advanced-hpc-lbm
+--
+/home/jelgar/Documents/uni/Year3/hpc/advanced-hpc-lbm/d2q9-bgk

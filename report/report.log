@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.14159265-2.6-1.40.21 (TeX Live 2020) (preloaded format=pdflatex 2020.12.6)  2 MAR 2021 23:32
+This is pdfTeX, Version 3.14159265-2.6-1.40.21 (TeX Live 2020) (preloaded format=pdflatex 2020.12.6)  3 MAR 2021 19:43
 entering extended mode
  restricted \write18 enabled.
  file:line:error style messages enabled.
@@ -368,26 +368,45 @@ Package pdftexcmds Info: \pdfdraftmode found.
 ) (/usr/local/texlive/2020/texmf-dist/tex/latex/base/atveryend-ltx.sty
 Package: atveryend-ltx 2020/08/19 v1.0a Emulation of the original atvery package
 with kernel methods
-) (/usr/local/texlive/2020/texmf-dist/tex/generic/pgf/frontendlayer/tikz/libraries/tikzexternalshared.code.tex))) (/usr/local/texlive/2020/texmf-dist/tex/latex/geometry/geometry.sty
+) (/usr/local/texlive/2020/texmf-dist/tex/generic/pgf/frontendlayer/tikz/libraries/tikzexternalshared.code.tex))) (/usr/local/texlive/2020/texmf-dist/tex/generic/babel/babel.sty
+Package: babel 2020/10/27 3.51 The Babel package
+ (/usr/local/texlive/2020/texmf-dist/tex/generic/babel/babel.def
+File: babel.def 2020/10/27 3.51 Babel common definitions
+\babel@savecnt=\count290
+\U@D=\dimen270
+\l@babelnohyphens=\language86
+ (/usr/local/texlive/2020/texmf-dist/tex/generic/babel/txtbabel.def)
+\bbl@readstream=\read3
+)
+\bbl@dirlevel=\count291
+ (/usr/local/texlive/2020/texmf-dist/tex/generic/babel-english/english.ldf
+Language: english 2017/06/06 v3.3r English support from the babel system
+Package babel Info: \l@canadian = using hyphenrules for english
+(babel)             (\language0) on input line 102.
+Package babel Info: \l@australian = using hyphenrules for ukenglish
+(babel)             (\language21) on input line 105.
+Package babel Info: \l@newzealand = using hyphenrules for ukenglish
+(babel)             (\language21) on input line 108.
+)) (/usr/local/texlive/2020/texmf-dist/tex/latex/geometry/geometry.sty
 Package: geometry 2020/01/02 v5.9 Page Geometry
  (/usr/local/texlive/2020/texmf-dist/tex/generic/iftex/ifvtex.sty
 Package: ifvtex 2019/10/25 v1.7 ifvtex legacy package. Use iftex instead.
 )
-\Gm@cnth=\count290
-\Gm@cntv=\count291
-\c@Gm@tempcnt=\count292
-\Gm@bindingoffset=\dimen270
-\Gm@wd@mp=\dimen271
-\Gm@odd@mp=\dimen272
-\Gm@even@mp=\dimen273
-\Gm@layoutwidth=\dimen274
-\Gm@layoutheight=\dimen275
-\Gm@layouthoffset=\dimen276
-\Gm@layoutvoffset=\dimen277
+\Gm@cnth=\count292
+\Gm@cntv=\count293
+\c@Gm@tempcnt=\count294
+\Gm@bindingoffset=\dimen271
+\Gm@wd@mp=\dimen272
+\Gm@odd@mp=\dimen273
+\Gm@even@mp=\dimen274
+\Gm@layoutwidth=\dimen275
+\Gm@layoutheight=\dimen276
+\Gm@layouthoffset=\dimen277
+\Gm@layoutvoffset=\dimen278
 \Gm@dimlist=\toks34
 ) (/usr/local/texlive/2020/texmf-dist/tex/latex/l3backend/l3backend-pdftex.def
 File: l3backend-pdftex.def 2020-09-24 L3 backend support: PDF output (pdfTeX)
-\l__kernel_color_stack_int=\count293
+\l__kernel_color_stack_int=\count295
 \l__pdf_internal_box=\box107
 ) (./report.aux)
 \openout1 = `report.aux'.
@@ -408,16 +427,16 @@ LaTeX Font Info:    Checking defaults for U/cmr/m/n on input line 30.
 LaTeX Font Info:    ... okay on input line 30.
  (/usr/local/texlive/2020/texmf-dist/tex/context/base/mkii/supp-pdf.mkii
 [Loading MPS to PDF converter (version 2006.09.02).]
-\scratchcounter=\count294
-\scratchdimen=\dimen278
+\scratchcounter=\count296
+\scratchdimen=\dimen279
 \scratchbox=\box108
-\nofMPsegments=\count295
-\nofMParguments=\count296
+\nofMPsegments=\count297
+\nofMParguments=\count298
 \everyMPshowfont=\toks35
-\MPscratchCnt=\count297
-\MPscratchDim=\dimen279
-\MPnumerator=\count298
-\makeMPintoPDFobject=\count299
+\MPscratchCnt=\count299
+\MPscratchDim=\dimen280
+\MPnumerator=\count300
+\makeMPintoPDFobject=\count301
 \everyMPtoPDFconversion=\toks36
 ) (/usr/local/texlive/2020/texmf-dist/tex/latex/epstopdf-pkg/epstopdf-base.sty
 Package: epstopdf-base 2020-01-24 v2.11 Base part for package epstopdf
@@ -464,22 +483,41 @@ Package pgfplots Warning: running in backwards compatibility mode (unsuitable ti
 * (1in=72.27pt=25.4mm, 1cm=28.453pt)
 
 LaTeX Font Info:    External font `cmex10' loaded for size
-(Font)              <7> on input line 64.
+(Font)              <7> on input line 83.
 LaTeX Font Info:    External font `cmex10' loaded for size
-(Font)              <5> on input line 64.
+(Font)              <5> on input line 83.
+
+Underfull \hbox (badness 10000) in paragraph at lines 160--160
+[]\OT1/cmr/m/n/10 Number
+ []
+
+
+Overfull \hbox (2.5988pt too wide) in paragraph at lines 160--161
+[]\OT1/cmr/m/n/10 1024x1024| 
+ []
+
+./report.tex:179: Undefined control sequence.
+l.179 \captionof
+                {table}{Parallel scaling results from 1-28 cores}
+The control sequence at the end of the top line
+of your error message was never \def'ed. If you have
+misspelled it (e.g., `\hobx'), type `I' and the correct
+spelling (e.g., `I\hbox'). Otherwise just continue,
+and I'll forget about whatever was undefined.
+
 [1
 
 {/usr/local/texlive/2020/texmf-var/fonts/map/pdftex/updmap/pdftex.map}] (./report.aux) ) 
 Here is how much of TeX's memory you used:
- 23035 strings out of 479383
- 612260 string characters out of 5869373
- 996301 words of memory out of 5000000
- 39805 multiletter control sequences out of 15000+600000
- 404203 words of font info for 30 fonts, out of 8000000 for 9000
+ 23811 strings out of 479383
+ 623585 string characters out of 5869373
+ 1054706 words of memory out of 5000000
+ 40567 multiletter control sequences out of 15000+600000
+ 404808 words of font info for 32 fonts, out of 8000000 for 9000
  1141 hyphenation exceptions out of 8191
  108i,9n,111p,731b,2235s stack positions out of 5000i,500n,10000p,200000b,80000s
 </usr/local/texlive/2020/texmf-dist/fonts/type1/public/amsfonts/cm/cmbx12.pfb></usr/local/texlive/2020/texmf-dist/fonts/type1/public/amsfonts/cm/cmmi10.pfb></usr/local/texlive/2020/texmf-dist/fonts/type1/public/amsfonts/cm/cmr10.pfb></usr/local/texlive/2020/texmf-dist/fonts/type1/public/amsfonts/cm/cmtt10.pfb>
-Output written on report.pdf (1 page, 48301 bytes).
+Output written on report.pdf (1 page, 57204 bytes).
 PDF statistics:
  27 PDF objects out of 1000 (max. 8388607)
  19 compressed objects within 1 object stream

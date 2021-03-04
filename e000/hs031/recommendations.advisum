@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<!-- <!DOCTYPE IntelParallelAdvisorSummaryCollection SYSTEM  "IntelParallelAdvisorSummaryCollection.dtd"> -->
+
+<IntelParallelAdvisorSummary version="" 
+                             kind="DATAKIND_SURVEY_EX" >
+  <hotspot filename="/mnt/storage/home/za18968/advanced-hpc-lbm/d2q9-bgk.c"
+           line_no="305"
+           routine="propagate_rebound_and_collisions_A$omp$parallel_for@300"
+           is_vectorized="1"
+           self_time="5.269897E+02"
+           total_time="0.000000E+00"
+           trip_counts=""
+           func_instance="230"
+           priority="0">
+           <recommendation id="rec_registers_pressure_split_loop_c" title="Split loop into smaller loops" confidence="3" gain="-1"/>
+  </hotspot>
+  <hotspot filename="/mnt/storage/home/za18968/advanced-hpc-lbm/d2q9-bgk.c"
+           line_no="794"
+           routine="timestep"
+           is_vectorized="1"
+           self_time="1.519187E+00"
+           total_time="0.000000E+00"
+           trip_counts=""
+           func_instance="233"
+           priority="0">
+           <recommendation id="rec_peel_remainder_loop_count_c" title="Specify the expected loop trip count" confidence="2" gain="-1"/>
+  </hotspot>
+  <hotspot filename="/mnt/storage/home/za18968/advanced-hpc-lbm/d2q9-bgk.c"
+           line_no="794"
+           routine="timestep"
+           is_vectorized="1"
+           self_time="1.519187E+00"
+           total_time="0.000000E+00"
+           trip_counts=""
+           func_instance="233"
+           priority="0">
+           <recommendation id="rec_peel_remainder_vectorlength_c" title="Use a smaller vector length" confidence="1" gain="-1"/>
+  </hotspot>
+  <hotspot filename="/mnt/storage/home/za18968/advanced-hpc-lbm/d2q9-bgk.c"
+           line_no="794"
+           routine="timestep"
+           is_vectorized="1"
+           self_time="1.519187E+00"
+           total_time="0.000000E+00"
+           trip_counts=""
+           func_instance="233"
+           priority="0">
+           <recommendation id="rec_peel_remainder_auto_simd_modifier_c" title="Parallelize the loop with both threads and SIMD instructions" confidence="1" gain="-1"/>
+  </hotspot>
+  <hotspot filename="/mnt/storage/home/za18968/advanced-hpc-lbm/d2q9-bgk.c"
+           line_no="794"
+           routine="timestep"
+           is_vectorized="1"
+           self_time="1.519187E+00"
+           total_time="0.000000E+00"
+           trip_counts=""
+           func_instance="233"
+           priority="0">
+           <recommendation id="rec_peel_remainder_align_c" title="Align data" confidence="1" gain="-1"/>
+  </hotspot>
+</IntelParallelAdvisorSummary >

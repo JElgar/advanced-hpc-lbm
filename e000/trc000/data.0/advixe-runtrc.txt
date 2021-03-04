@@ -1,0 +1,10 @@
+
+=== Start: [2021/03/02 21:42:43] === 
+Peak bandwidth measurement started...
+Peak bandwidth measurement finished.
+Analysis started...
+Result file: /mnt/storage/home/za18968/advanced-hpc-lbm/e000/trc000/trc000.advixe 
+Application exit code: 0 
+Result file: /mnt/storage/home/za18968/advanced-hpc-lbm/e000/trc000/trc000.advixe 
+Analysis completed
+=== End: [2021/03/02 21:43:50] === 

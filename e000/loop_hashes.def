@@ -1,26 +1,21 @@
 # hash file version: 3
-1	16	/mnt/storage/home/za18968/advanced-hpc-lbm/d2q9-bgk	56246	58871	/mnt/storage/home/za18968/advanced-hpc-lbm/d2q9-bgk.c	771	3002	7e479e1bf828546a52e56e214e4e0126	0	1	0	0	0
-2	19	/mnt/storage/home/za18968/advanced-hpc-lbm/d2q9-bgk	58069	58133	/mnt/storage/home/za18968/advanced-hpc-lbm/d2q9-bgk.c	771	64	7e479e1bf828546a52e56e214e4e0126	1	1	0	0	0
-3	20	/mnt/storage/home/za18968/advanced-hpc-lbm/d2q9-bgk	57470	58315	/mnt/storage/home/za18968/advanced-hpc-lbm/d2q9-bgk.c	771	953	7e479e1bf828546a52e56e214e4e0126	0	1	0	0	0
-4	23	/mnt/storage/home/za18968/advanced-hpc-lbm/d2q9-bgk	8493	9097	/mnt/storage/home/za18968/advanced-hpc-lbm/d2q9-bgk.c	157	604	7e479e1bf828546a52e56e214e4e0126	0	1	0	0	0
-5	26	/mnt/storage/home/za18968/advanced-hpc-lbm/d2q9-bgk	34026	35517	/mnt/storage/home/za18968/advanced-hpc-lbm/d2q9-bgk.c	305	1491	7e479e1bf828546a52e56e214e4e0126	1	1	0	0	0
-6	29	/mnt/storage/home/za18968/advanced-hpc-lbm/d2q9-bgk	25898	37018	/mnt/storage/home/za18968/advanced-hpc-lbm/d2q9-bgk.c	300	11505	7e479e1bf828546a52e56e214e4e0126	0	1	0	0	0
-7	30	/mnt/storage/home/za18968/advanced-hpc-lbm/d2q9-bgk	25285	25375	/mnt/storage/home/za18968/advanced-hpc-lbm/d2q9-bgk.c	300	11896	7e479e1bf828546a52e56e214e4e0126	0	1	0	0	0
-8	36	/mnt/storage/home/za18968/advanced-hpc-lbm/d2q9-bgk	29121	30612	/mnt/storage/home/za18968/advanced-hpc-lbm/d2q9-bgk.c	305	1491	7e479e1bf828546a52e56e214e4e0126	1	1	0	0	0
-9	37	/mnt/storage/home/za18968/advanced-hpc-lbm/d2q9-bgk	32692	33546	/mnt/storage/home/za18968/advanced-hpc-lbm/d2q9-bgk.c	305	854	7e479e1bf828546a52e56e214e4e0126	0	1	0	0	0
-10	39	/mnt/storage/home/za18968/advanced-hpc-lbm/d2q9-bgk	10692	11439	/mnt/storage/home/za18968/advanced-hpc-lbm/d2q9-bgk.c	792	747	7e479e1bf828546a52e56e214e4e0126	1	1	0	0	0
-11	41	/mnt/storage/home/za18968/advanced-hpc-lbm/d2q9-bgk	11869	11979	/mnt/storage/home/za18968/advanced-hpc-lbm/d2q9-bgk.c	792	110	7e479e1bf828546a52e56e214e4e0126	0	1	0	0	0
-12	49	/mnt/storage/home/za18968/advanced-hpc-lbm/d2q9-bgk	27861	28694	/mnt/storage/home/za18968/advanced-hpc-lbm/d2q9-bgk.c	305	833	7e479e1bf828546a52e56e214e4e0126	0	1	0	0	0
-13	55	/mnt/storage/home/za18968/advanced-hpc-lbm/d2q9-bgk	37567	37921	/mnt/storage/home/za18968/advanced-hpc-lbm/d2q9-bgk.c	702	354	7e479e1bf828546a52e56e214e4e0126	0	1	0	0	0
-14	59	/mnt/storage/home/za18968/advanced-hpc-lbm/d2q9-bgk	37530	37954	/mnt/storage/home/za18968/advanced-hpc-lbm/d2q9-bgk.c	700	424	7e479e1bf828546a52e56e214e4e0126	0	1	0	0	0
-15	60	/mnt/storage/home/za18968/advanced-hpc-lbm/d2q9-bgk	38013	38055	/mnt/storage/home/za18968/advanced-hpc-lbm/d2q9-bgk.c	761	42	7e479e1bf828546a52e56e214e4e0126	0	1	0	0	0
-16	61	/mnt/storage/home/za18968/advanced-hpc-lbm/d2q9-bgk	10460	10579	/mnt/storage/home/za18968/advanced-hpc-lbm/d2q9-bgk.c	792	119	7e479e1bf828546a52e56e214e4e0126	0	1	0	0	0
-17	103	/mnt/storage/home/za18968/advanced-hpc-lbm/d2q9-bgk	11528		/mnt/storage/home/za18968/advanced-hpc-lbm/d2q9-bgk.c	792	192	7e479e1bf828546a52e56e214e4e0126	1	1	0	0	0
-18	106	/mnt/storage/home/za18968/advanced-hpc-lbm/d2q9-bgk	31142		/mnt/storage/home/za18968/advanced-hpc-lbm/d2q9-bgk.c	305	901	7e479e1bf828546a52e56e214e4e0126	0	1	0	0	0
-19	108	/mnt/storage/home/za18968/advanced-hpc-lbm/d2q9-bgk	36109		/mnt/storage/home/za18968/advanced-hpc-lbm/d2q9-bgk.c	305	865	7e479e1bf828546a52e56e214e4e0126	0	1	0	0	0
-20	110	/mnt/storage/home/za18968/advanced-hpc-lbm/d2q9-bgk	57851		/mnt/storage/home/za18968/advanced-hpc-lbm/d2q9-bgk.c	771	62	7e479e1bf828546a52e56e214e4e0126	0	1	0	0	0
-21	111	/mnt/storage/home/za18968/advanced-hpc-lbm/d2q9-bgk	58220		/mnt/storage/home/za18968/advanced-hpc-lbm/d2q9-bgk.c	771	63	7e479e1bf828546a52e56e214e4e0126	0	1	0	0	0
-22	227	/mnt/storage/home/za18968/advanced-hpc-lbm/d2q9-bgk	27861	28694,30612,32043,33546,35517,36974	/mnt/storage/home/za18968/advanced-hpc-lbm/d2q9-bgk.c	305	6435	7e479e1bf828546a52e56e214e4e0126	1	1	0	0	0
-23	228	/mnt/storage/home/za18968/advanced-hpc-lbm/d2q9-bgk	57470	58315,58564,58649,58980,58922,58759,58871	/mnt/storage/home/za18968/advanced-hpc-lbm/d2q9-bgk.c	771	1284	7e479e1bf828546a52e56e214e4e0126	0	1	0	0	0
-24	229	/mnt/storage/home/za18968/advanced-hpc-lbm/d2q9-bgk	57851	57913,58133,58283	/mnt/storage/home/za18968/advanced-hpc-lbm/d2q9-bgk.c	771	189	7e479e1bf828546a52e56e214e4e0126	1	1	0	0	0
-25	231	/mnt/storage/home/za18968/advanced-hpc-lbm/d2q9-bgk	10460	10579,11439,11720,11979	/mnt/storage/home/za18968/advanced-hpc-lbm/d2q9-bgk.c	792	1168	7e479e1bf828546a52e56e214e4e0126	1	1	0	0	0
+1	15	/mnt/storage/home/za18968/advanced-hpc-lbm/d2q9-bgk	56547	60737,60679,60603,58537	/mnt/storage/home/za18968/advanced-hpc-lbm/d2q9-bgk.c	773	2106	734dc7787e9b961082aae9193c8b5c67	0	1	0	0	0
+2	19	/mnt/storage/home/za18968/advanced-hpc-lbm/d2q9-bgk	58297	58302,58674,58616,58417,58537	/mnt/storage/home/za18968/advanced-hpc-lbm/d2q9-bgk.c	773	124	734dc7787e9b961082aae9193c8b5c67	0	1	0	0	0
+3	20	/mnt/storage/home/za18968/advanced-hpc-lbm/d2q9-bgk	8365	8969	/mnt/storage/home/za18968/advanced-hpc-lbm/d2q9-bgk.c	781	604	734dc7787e9b961082aae9193c8b5c67	0	1	0	0	0
+4	23	/mnt/storage/home/za18968/advanced-hpc-lbm/d2q9-bgk	32796	34287	/mnt/storage/home/za18968/advanced-hpc-lbm/d2q9-bgk.c	305	1491	734dc7787e9b961082aae9193c8b5c67	1	1	0	0	0
+5	25	/mnt/storage/home/za18968/advanced-hpc-lbm/d2q9-bgk	24799	35797	/mnt/storage/home/za18968/advanced-hpc-lbm/d2q9-bgk.c	306	11383	734dc7787e9b961082aae9193c8b5c67	0	1	0	0	0
+6	30	/mnt/storage/home/za18968/advanced-hpc-lbm/d2q9-bgk	27943	29434	/mnt/storage/home/za18968/advanced-hpc-lbm/d2q9-bgk.c	305	1491	734dc7787e9b961082aae9193c8b5c67	1	1	0	0	0
+7	32	/mnt/storage/home/za18968/advanced-hpc-lbm/d2q9-bgk	31509	32357	/mnt/storage/home/za18968/advanced-hpc-lbm/d2q9-bgk.c	305	848	734dc7787e9b961082aae9193c8b5c67	0	1	0	0	0
+8	33	/mnt/storage/home/za18968/advanced-hpc-lbm/d2q9-bgk	10564	11311	/mnt/storage/home/za18968/advanced-hpc-lbm/d2q9-bgk.c	794	747	734dc7787e9b961082aae9193c8b5c67	1	1	0	0	0
+9	39	/mnt/storage/home/za18968/advanced-hpc-lbm/d2q9-bgk	11947	11962,11980	/mnt/storage/home/za18968/advanced-hpc-lbm/d2q9-bgk.c	260	32	734dc7787e9b961082aae9193c8b5c67	0	1	0	0	0
+10	47	/mnt/storage/home/za18968/advanced-hpc-lbm/d2q9-bgk	36575	36929	/mnt/storage/home/za18968/advanced-hpc-lbm/d2q9-bgk.c	704	354	734dc7787e9b961082aae9193c8b5c67	0	1	0	0	0
+11	50	/mnt/storage/home/za18968/advanced-hpc-lbm/d2q9-bgk	36538	36962	/mnt/storage/home/za18968/advanced-hpc-lbm/d2q9-bgk.c	702	424	734dc7787e9b961082aae9193c8b5c67	0	1	0	0	0
+12	52	/mnt/storage/home/za18968/advanced-hpc-lbm/d2q9-bgk	37021	37063	/mnt/storage/home/za18968/advanced-hpc-lbm/d2q9-bgk.c	763	42	734dc7787e9b961082aae9193c8b5c67	0	1	0	0	0
+13	54	/mnt/storage/home/za18968/advanced-hpc-lbm/d2q9-bgk	10332	10451	/mnt/storage/home/za18968/advanced-hpc-lbm/d2q9-bgk.c	794	119	734dc7787e9b961082aae9193c8b5c67	0	1	0	0	0
+14	55	/mnt/storage/home/za18968/advanced-hpc-lbm/d2q9-bgk	11741	11851	/mnt/storage/home/za18968/advanced-hpc-lbm/d2q9-bgk.c	794	110	734dc7787e9b961082aae9193c8b5c67	0	1	0	0	0
+15	71	/mnt/storage/home/za18968/advanced-hpc-lbm/d2q9-bgk	11400		/mnt/storage/home/za18968/advanced-hpc-lbm/d2q9-bgk.c	794	192	734dc7787e9b961082aae9193c8b5c67	1	1	0	0	0
+16	72	/mnt/storage/home/za18968/advanced-hpc-lbm/d2q9-bgk	26719		/mnt/storage/home/za18968/advanced-hpc-lbm/d2q9-bgk.c	305	833	734dc7787e9b961082aae9193c8b5c67	0	1	0	0	0
+17	73	/mnt/storage/home/za18968/advanced-hpc-lbm/d2q9-bgk	29952		/mnt/storage/home/za18968/advanced-hpc-lbm/d2q9-bgk.c	305	900	734dc7787e9b961082aae9193c8b5c67	0	1	0	0	0
+18	74	/mnt/storage/home/za18968/advanced-hpc-lbm/d2q9-bgk	34888		/mnt/storage/home/za18968/advanced-hpc-lbm/d2q9-bgk.c	305	865	734dc7787e9b961082aae9193c8b5c67	0	1	0	0	0
+19	230	/mnt/storage/home/za18968/advanced-hpc-lbm/d2q9-bgk	26719	27552,29434,30852,32357,34287,35753	/mnt/storage/home/za18968/advanced-hpc-lbm/d2q9-bgk.c	305	6428	734dc7787e9b961082aae9193c8b5c67	1	1	0	0	0
+20	233	/mnt/storage/home/za18968/advanced-hpc-lbm/d2q9-bgk	10332	10451,11311,11592,11851	/mnt/storage/home/za18968/advanced-hpc-lbm/d2q9-bgk.c	794	1168	734dc7787e9b961082aae9193c8b5c67	1	1	0	0	0

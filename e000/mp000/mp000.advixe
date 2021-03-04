@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<root>
+ <rdmgr>
+  <timestamp type="u64_t">1614785865</timestamp>
+  <hostname type="string">UbuntuPC</hostname>
+  <os type="string">linux</os>
+  <product type="string">Intel® Advisor 2021.1</product>
+  <buildNumber type="s32_t">607872</buildNumber>
+  <logicalCPUCount type="s32_t">8</logicalCPUCount>
+  <physicalCoreCount type="s32_t">4</physicalCoreCount>
+  <processorPackageCount type="s32_t">1</processorPackageCount>
+  <CPUFrequency type="s64_t">4000000000</CPUFrequency>
+  <CPUFamily type="s32_t">6</CPUFamily>
+  <CPUModel type="s32_t">60</CPUModel>
+  <CPUStepping type="s32_t">3</CPUStepping>
+  <CPUBrandName type="string">Intel(R) Core(TM) i7-4790K CPU @ 4.00GHz</CPUBrandName>
+  <isa type="string">avx2</isa>
+  <collectionTimeBegin type="u64_t">1614785868</collectionTimeBegin>
+  <finalizationTimeBegin type="u64_t">1614785873</finalizationTimeBegin>
+  <collectionTimeEnd type="u64_t">1614785879</collectionTimeEnd>
+  <finalizationTimeEnd type="u64_t">1614785879</finalizationTimeEnd>
+ </rdmgr>
+</root>

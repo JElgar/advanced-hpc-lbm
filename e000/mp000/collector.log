@@ -1,0 +1,29 @@
+Analysis started...
+Collection has been started.
+Result file: /home/jelgar/Documents/uni/Year3/hpc/advanced-hpc-lbm/e000/mp000/mp000.advixe 
+Found target process /home/jelgar/Documents/uni/Year3/hpc/advanced-hpc-lbm/d2q9-bgk (PID = 416632). Analysis started... 
+Loaded module: /home/jelgar/Documents/uni/Year3/hpc/advanced-hpc-lbm/d2q9-bgk. 
+Loaded module: /lib64/ld-linux-x86-64.so.2. 
+Loaded module: [vdso]. 
+Loaded module: /lib/x86_64-linux-gnu/libm.so.6. 
+Loaded module: /lib/x86_64-linux-gnu/libiomp5.so. 
+Loaded module: /lib/x86_64-linux-gnu/libgcc_s.so.1. 
+Loaded module: /lib/x86_64-linux-gnu/libpthread.so.0. 
+Loaded module: /lib/x86_64-linux-gnu/libc.so.6. 
+Loaded module: /lib/x86_64-linux-gnu/libdl.so.2. 
+Loaded module: /opt/intel/oneapi/advisor/2021.1.1/lib64/runtime/libittnotify.so. 
+Unloaded module: /home/jelgar/Documents/uni/Year3/hpc/advanced-hpc-lbm/d2q9-bgk. 
+Unloaded module: /lib64/ld-linux-x86-64.so.2. 
+Unloaded module: [vdso]. 
+Unloaded module: /lib/x86_64-linux-gnu/libm.so.6. 
+Unloaded module: /lib/x86_64-linux-gnu/libiomp5.so. 
+Unloaded module: /lib/x86_64-linux-gnu/libgcc_s.so.1. 
+Unloaded module: /lib/x86_64-linux-gnu/libpthread.so.0. 
+Unloaded module: /lib/x86_64-linux-gnu/libc.so.6. 
+Unloaded module: /lib/x86_64-linux-gnu/libdl.so.2. 
+Unloaded module: /opt/intel/oneapi/advisor/2021.1.1/lib64/runtime/libittnotify.so. 
+Process /home/jelgar/Documents/uni/Year3/hpc/advanced-hpc-lbm/d2q9-bgk (PID = 416632) has terminated. 
+Warning: No SITE annotations were encountered, so no stride/alignment data can be reported. 
+Application exit code: 1 
+Result file: /home/jelgar/Documents/uni/Year3/hpc/advanced-hpc-lbm/e000/mp000/mp000.advixe 
+Analysis completed
