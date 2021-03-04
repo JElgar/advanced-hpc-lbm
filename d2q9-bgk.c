@@ -143,7 +143,7 @@ int main(int argc, char* argv[])
   t_param  params;              /* struct to hold parameter values */
   t_speed *cells = malloc(sizeof(t_speed));  /* grid containing fluid densities */
   t_speed *tmp_cells = malloc(sizeof(t_speed));  /* grid indicating which cells are blocked */
-  char    * restrict obstacles = NULL;    
+  char    *obstacles = NULL;    
   float* av_vels   = NULL;     /* a record of the av. velocity computed for each timestep */
   struct timeval timstr;        /* structure to hold elapsed time */
   struct rusage ru;             /* structure to hold CPU time--system and user */
@@ -202,7 +202,7 @@ int main(int argc, char* argv[])
   return EXIT_SUCCESS;
 }
 
-float timestep(const t_param params, t_speed* cells, t_speed* tmp_cells, char* obstacles)
+float timestep(const t_param params, t_speed* cells, t_speed* tmp_cells, char* restrict obstacles)
 {
   accelerate_flow(params, cells, obstacles);
   float time_step_solution = propagate_rebound_and_collisions(params, cells, tmp_cells, obstacles);
@@ -210,7 +210,7 @@ float timestep(const t_param params, t_speed* cells, t_speed* tmp_cells, char* o
   return time_step_solution;
 }
 
-int accelerate_flow(const t_param params, t_speed* cells, char* restrict obstacles)
+int accelerate_flow(const t_param params, t_speed* restrict cells, char* restrict obstacles)
 {
   /* compute weighting factors */
   float w1 = params.density * params.accel / 9.f;
@@ -256,7 +256,7 @@ int accelerate_flow(const t_param params, t_speed* cells, char* restrict obstacl
   return EXIT_SUCCESS;
 }
 
-float propagate_rebound_and_collisions(const t_param params, t_speed* cells, t_speed* tmp_cells, char* restrict obstacles)
+float propagate_rebound_and_collisions(const t_param params, t_speed* restrict cells, t_speed* restrict tmp_cells, char* restrict obstacles)
 {
   const float c_sq = 1.f / 3.f; /* square of speed of sound */
   const float params1 = 1.f - params.omega;
@@ -366,8 +366,8 @@ float propagate_rebound_and_collisions(const t_param params, t_speed* cells, t_s
 
           /* relaxation step */
           tmp_cells->speed0[ii + jj*params.nx] = cells->speed0[ii + jj*params.nx] * params1
-                                                + (params.omega * local_density * 2.f/9.f)
-                                                * (2.f - 3.f*(u_sq));
+                                                + 2.f * pl3
+                                                * (2.f/3.f - (u_sq));
           
           tmp_cells->speed1[ii + jj*params.nx] = cells->speed1[x_w + jj*params.nx] * params1
                                                 + pl3
@@ -400,7 +400,7 @@ float propagate_rebound_and_collisions(const t_param params, t_speed* cells, t_s
           tmp_cells->speed8[ii + jj*params.nx] = cells->speed8[x_w + y_n*params.nx] * params1
                                                 + pl12
                                                 * (c_sq + ( u_x - u_y + u_x_sq + u_y_sq - u_x_u_y3));
-         
+        
           tot_u += sqrtf(u_sq);
           ++tot_cells;
         }

@@ -17,6 +17,35 @@
 % 
 \usepackage[english]{babel}
 
+% code block
+\usepackage{xcolor}
+\usepackage{listings}
+
+\definecolor{mGreen}{rgb}{0,0.6,0}
+\definecolor{mGray}{rgb}{0.5,0.5,0.5}
+\definecolor{mPurple}{rgb}{0.58,0,0.82}
+\definecolor{backgroundColour}{rgb}{0.95,0.95,0.92}
+
+\lstdefinestyle{CStyle}{
+    backgroundcolor=\color{backgroundColour},   
+    commentstyle=\color{mGreen},
+    keywordstyle=\color{magenta},
+    numberstyle=\tiny\color{mGray},
+    stringstyle=\color{mPurple},
+    basicstyle=\footnotesize,
+    breakatwhitespace=false,         
+    breaklines=true,                 
+    captionpos=b,                    
+    keepspaces=true,                 
+    numbers=left,                    
+    numbersep=2pt,                  
+    showspaces=false,                
+    showstringspaces=false,
+    showtabs=false,                  
+    tabsize=2,
+    language=C
+}
+
 \usepackage{geometry}
 \geometry{margin=1.2cm}
 
@@ -31,6 +60,12 @@
 \begin{multicols}{2}
 
 \section{Introduction}
+
+This report will the explore the optimizations applied to the implementation of
+the d2q9-bgk lattice boltzmann scheme. It will initally look at the serial
+omtimizations and how they affected the performance of the alogirthm It will
+then look at the parallel implementation and how this affect the performance
+with different number of cores and problem sizes.
 
 \section{Serial Optimisation}
 
@@ -56,11 +91,50 @@ the array.
 
 \subsection{Vecotrisation}
 
-The first step to vectorizing the code is to ensure all the arrays used in
-timestep are aligned. This can be achieved by using \verb|__mm_malloc| and then
-adding compiler directives which covey this alignment.
+Having improved the implementation of the serial code, there is now a clear
+critical section of the code, inside the single pass of the cell. This is where
+the majority of the computation takes places and thus is where most of the time
+of the program is used. Since this section performs multiple mathematical
+computation on the input array, there is an additional approach to optimization
+other than parallelizing it. This is approach makes use of SIMD,
+(single-instruction multiple data). This is where compilers are able to use
+vector registers and instructions to make multiple computations on a chuck of
+data (a vector) with a single instruction. This has the potential for large
+performance gains as fewer instructions are required for the cells array.
 
-In the original implementation the speeds for each cell were stored in a structure (\verb|t_speed|) and the whole grid of cells was an array of these structures. This implementation does not lend it self to vertorization as 
+In many cases the compiler is able to automatically vectorize code blocks.
+However if the data is not aligned then the compiler will have to complete a prior
+step, called the "prologue" step to process this unaligned data, or
+alternatively use unaligned instructions (which are less efficient). The
+compiler is also not able to assume that an array of floats, such as the arrays
+of speeds in the new \verb|t_speed| struct are aligned. Therefore it will have
+to complete this prior step regardless. To prevent this the arrays can be
+aligned when they are created using the \verb|__mm_malloc| function. This
+ensure the created array is aligned on the request boundry. In this case 64
+bytes was used to match the size of the cache line in an \emph{intel xeon
+e5-2680}. Compiler directives can then be use to tell the compiler the arrays
+are aligned. This allows the compiler to skip the "proluge" step and use the
+aligned instructions.
+
+In the original implementation the speeds for each cell were stored in a
+structure (\verb|t_speed|) and the whole grid of cells was an array of these
+structures. This implementation does not lend it self to vertorization as it
+can result in unnecissary fetches from memory. This is because when a single
+speed value is fetch an entire cache line (64 bits) will be used to fetch the
+strucutre. This results in a waste of memoery bandwidth as the rest of the
+cache line is not used. Therefore swithcing the implementation to use a
+strucutre of array (where each speed is a separate array) allowed the code to
+be vectorized and reduced the memory bandwidth required. 
+
+To further reduce to overhead of vectorizing \verb|restrict| was used through
+the code. This tells the compiler that the pointers cannot be aliased and
+therefore it has to reload the values fewer times as it can be sure the value
+will not have changed.
+
+\begin{lstlisting}[style=CStyle]
+  cells_ptr->speed0 = _mm_malloc(params->nx * params->ny * sizeof(float), 64);
+  __assume_aligned(cells->speed0, 64);
+\end{lstlisting}
 
 \begin{tikzpicture}
 \begin{axis}[
@@ -83,7 +157,10 @@ In the original implementation the speeds for each cell were stored in a structu
 \end{axis}
 \end{tikzpicture}
 
-\section{Parallel}
+\section{Parallel (OpenMP)}
+
+For this implementation the inner loop of the combined parse was vectorized and
+this allowed for the outer loop to then be parallelized.
 
 \begin{tikzpicture}
 \begin{axis}[
@@ -179,7 +256,6 @@ In the original implementation the speeds for each cell were stored in a structu
 \captionof{table}{Parallel scaling results from 1-28 cores}
 \label{tab:parallelresults}
 \end{center}
-
 
 \end{multicols}
 \end{document}
