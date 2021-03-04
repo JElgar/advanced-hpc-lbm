@@ -285,6 +285,18 @@ float propagate_rebound_and_collisions(const t_param params, t_speed* restrict c
   
   __assume_aligned(obstacles, 64);
 
+  __assume(params.nx%2==0);
+  __assume(params.ny%2==0);
+  __assume(params.nx%4==0);
+  __assume(params.ny%4==0);
+  __assume(params.nx%8==0);
+  __assume(params.ny%8==0);
+  __assume(params.nx%16==0);
+  __assume(params.ny%16==0);
+  __assume(params.nx%32==0);
+  __assume(params.ny%32==0);
+  __assume(params.nx%64==0);
+  __assume(params.ny%64==0);
   __assume(params.nx%128==0);
   __assume(params.ny%128==0);
 

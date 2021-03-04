@@ -16,6 +16,8 @@
 % \usetikzlibrary{shapes.geometric, arrows}
 % 
 \usepackage[english]{babel}
+\usepackage{hyperref} % 1 -> Figure 1
+\usepackage{caption}
 
 % code block
 \usepackage{xcolor}
@@ -69,7 +71,10 @@ with different number of cores and problem sizes.
 
 \section{Serial Optimisation}
 
+\subsection{Compiler options}
+
 \subsection{Reduce Memory Accesses}
+
 In the original implementation of the algorithm for each timestep the
 \verb|cells| array was looped over the 4 times, in \verb|propagate|,
 \verb|rebound|, \verb|collision| and \verb|av_velocity|. This resulted in
@@ -102,6 +107,14 @@ vector registers and instructions to make multiple computations on a chuck of
 data (a vector) with a single instruction. This has the potential for large
 performance gains as fewer instructions are required for the cells array.
 
+\begin{lstlisting}[style=CStyle, label={lst:cellsdataalign}, caption={Example of memory allignment for a cells array.},]
+  // Allocate aligned data
+  cells_ptr->speed0 = _mm_malloc(params->nx * params->ny * sizeof(float), 64);
+  // When using the array allow the compiler to assume alignment
+  __assume_aligned(cells->speed0, 64);
+\end{lstlisting}
+
+% TODO should I reference the proluge step
 In many cases the compiler is able to automatically vectorize code blocks.
 However if the data is not aligned then the compiler will have to complete a prior
 step, called the "prologue" step to process this unaligned data, or
@@ -109,32 +122,59 @@ alternatively use unaligned instructions (which are less efficient). The
 compiler is also not able to assume that an array of floats, such as the arrays
 of speeds in the new \verb|t_speed| struct are aligned. Therefore it will have
 to complete this prior step regardless. To prevent this the arrays can be
-aligned when they are created using the \verb|__mm_malloc| function. This
-ensure the created array is aligned on the request boundry. In this case 64
+aligned when they are created using the \verb|__mm_malloc| function, as shown in \autoref{lst:cellsdataalign}. This
+ensure the created array is aligned on the request boundry, in this case 64
 bytes was used to match the size of the cache line in an \emph{intel xeon
 e5-2680}. Compiler directives can then be use to tell the compiler the arrays
 are aligned. This allows the compiler to skip the "proluge" step and use the
 aligned instructions.
 
+
+% TODO Reference wiki or find anther definition of write own definition
+Another useful hint to assist the compiler in its optimizations is to use the
+\verb|restrict| keyword. This tells the compiler "that for the lifetime of the
+pointer, only the pointer itself or a value directly derived from it (such as
+pointer + 1) will be used to access the object to which it points". In
+practical terms this reduces the number of times the pointer value has to be
+fetched from memory as the cached value can be used repeatedly. In a memory
+bound problem this can therefore be an important step in reducing the memory
+bandwidth used.
+
+\begin{lstlisting}[style=CStyle, label={lst:assumecellssize}, caption={Additional compiler hints},]
+  __assume(params.nx%128==0);
+  __assume(params.ny%128==0);
+\end{lstlisting}
+
+The intel compiler also allows for other hints to be provided. In this
+implementation hints were porivded to inform the compiler about the size of the
+cells array (and therefore the size of the loops). As show in the example in
+\autoref{lst:assumecellssize}, the \verb|__assume| directive was used, to tell
+compiler that the size of the cells array was divisible by a given power of 2.
+In the implementation all powers of 2, up to a maximum of 128 were provided (as
+this was the maximum input size). This should further assist the compiler in
+its optimizations, especially when vectorizing the inner loop.
+
+The final step to ensuring the code was vectorized was to add the compiler
+directive \verb|#pragma omp simd| to the inner for loop. This explicitly tells
+the compiler that this section of the code should be vectorized. 
+
+% TODO get some results for this
+Having completed the above steps only a minor improvement in performance were
+observed, as seen in Figure xx, despite the inner loop being successfully
+vectorized. From the roofline graph in Figure xx, it is clear that the code was
+memory bandwidth bound. In this case the problem arose from the data layout used for the cells.
+
 In the original implementation the speeds for each cell were stored in a
 structure (\verb|t_speed|) and the whole grid of cells was an array of these
-structures. This implementation does not lend it self to vertorization as it
-can result in unnecissary fetches from memory. This is because when a single
+structures. This implementation does not lend it self to vetorization as it
+can result in unnecessary fetches from memory. This is because when a single
 speed value is fetch an entire cache line (64 bits) will be used to fetch the
-strucutre. This results in a waste of memoery bandwidth as the rest of the
-cache line is not used. Therefore swithcing the implementation to use a
-strucutre of array (where each speed is a separate array) allowed the code to
-be vectorized and reduced the memory bandwidth required. 
-
-To further reduce to overhead of vectorizing \verb|restrict| was used through
-the code. This tells the compiler that the pointers cannot be aliased and
-therefore it has to reload the values fewer times as it can be sure the value
-will not have changed.
-
-\begin{lstlisting}[style=CStyle]
-  cells_ptr->speed0 = _mm_malloc(params->nx * params->ny * sizeof(float), 64);
-  __assume_aligned(cells->speed0, 64);
-\end{lstlisting}
+structure. This results in a waste of memory bandwidth as the rest of the
+cache line is not used (only the single float value for that speed is actually
+required). Therefore switching the implementation to use a structure of arrays
+(where each speed is a separate array) allowed the code to be vectorized more
+efficiently as each fetch for a speed only fetched a single float and therefore
+reduced the memory bandwidth required. 
 
 \begin{tikzpicture}
 \begin{axis}[
@@ -150,7 +190,7 @@ will not have changed.
   log ticks with fixed point,
 ]
 \addplot[color=blue] coordinates {
-  (0.1, 0.2)
+  (0.1, 0.1)
   (0.7, 10)
   (100, 10)
 };
@@ -159,8 +199,27 @@ will not have changed.
 
 \section{Parallel (OpenMP)}
 
-For this implementation the inner loop of the combined parse was vectorized and
-this allowed for the outer loop to then be parallelized.
+Having optimized the inner loop in the above section the next optimization that
+can be used is parallelizing. In this implementation the outer loop was
+parallelized while the inner loop maintained the other optimizations. This was
+achieved using OpenMP. This is library provided a collection of compiler
+directives which can be used to write parallel shared memory programs.
+
+The first step to making the outer loop run in parallel is to use the
+\verb|parallel| construct and turn on OpenMP for the compiler with the
+\verb|-fopenmp| option.
+
+\begin{lstlisting}[style=CStyle, label={lst:ompparallelloop}, caption={TODO},]
+#pragma omp parallel for schedule(static) reduction(+:tot_cells) reduction(+:tot_u)
+    for (int jj = 0; jj < params.ny; jj++)
+    {    
+#pragma omp simd aligned(cells:64) aligned(tmp_cells:64) aligned(obstacles:64) reduction(+:tot_cells) reduction(+:tot_u)
+      for (int ii = 0; ii < params.nx; ii++)
+      {
+        ...
+      }
+    }
+\end{lstlisting}
 
 \begin{tikzpicture}
 \begin{axis}[
@@ -236,13 +295,13 @@ this allowed for the outer loop to then be parallelized.
  \hline
  Number of cores & 128x128 & 256x256 & 1024x1024 \\
  \hline
- 1  & 6.4 &  52.5  &  255     \\
- 2  & 3.4 &  26.1  &  126     \\
- 4  & 1.7 &  13.5  &  66      \\ 
- 6  & 1.4 &  9.2   &  53      \\ 
- 8  & 1.3 &  7.1   &  43      \\ 
- 10 & 1.0 &  6.2   &  42      \\
- 12 & 0.9 &  6.0   &  39.5    \\
+ 1  & 6.4 &  52.5  &  255.4   \\
+ 2  & 3.4 &  26.1  &  126.2   \\
+ 4  & 1.7 &  13.5  &  66.1    \\ 
+ 6  & 1.4 &  9.2   &  53.3    \\ 
+ 8  & 1.3 &  7.1   &  43.4    \\ 
+ 10 & 1.0 &  6.2   &  42.4    \\
+ 12 & 0.9 &  6.0   &  39.7    \\
  14 & 1.0 &  5.6   &  39.1    \\ 
  16 & 1.4 &  5.8   &  37.1    \\ 
  18 & 1.3 &  6.2   &  32.6    \\
@@ -253,7 +312,7 @@ this allowed for the outer loop to then be parallelized.
  28 & 1.4 &  5.5   &  20.8    \\
  \hline
 \end{tabular}
-\captionof{table}{Parallel scaling results from 1-28 cores}
+\captionof{table}{Parallel scaling results for 1-28 cores}
 \label{tab:parallelresults}
 \end{center}
 
