@@ -48,6 +48,13 @@
     language=C
 }
 
+\pgfplotscreateplotcyclelist{mylist}{%
+red,every mark/.append style={fill=red!80!black},mark=*,mark size=3pt\\%
+brown!60!black,every mark/.append style={fill=brown!80!black},mark=*, mark size=3pt\\%
+black,every mark/.append style={fill=black!80!black},mark=*, mark size = 3pt\\%
+}
+
+
 \usepackage{geometry}
 \geometry{margin=1.2cm}
 
@@ -75,8 +82,14 @@ with different number of cores and problem sizes.
 
 Many modern compilers provide various options to optimize the given code. 
 
-As shown in \autoref{} simply using these provided options with the compiler
-can have a profound impact on the resulting program's speed. 
+\autoref{tab:compilerflags} shows the run time of the serial optimized code
+(without vectorization) with different compiler flags. This shows that by
+simply using the \verb|-Ofast| flag there can be a 4x decrease in run time. The
+\verb|-mtune=native| option can further imporve the performance by telling the
+compiler to optimize the code for the specific local machine and its
+instruction set. The compiler flag \verb|-no-prec-sqrt| was also used, which
+reduces the required precision of the square root funciton which is used in the
+critical section of the algorithm.
 
 \begin{center}
   \begin{tabular}{ |p{5cm}||p{1.5cm}| }
@@ -85,16 +98,16 @@ can have a profound impact on the resulting program's speed.
  \hline
  Compiler flag & Run time \\
  \hline
- -O0                  & 6.4   \\
- -O1                  & 3.4   \\
- -O2                  & 1.7   \\ 
- -O3                  & 1.4   \\ 
- -Ofast               & 1.3   \\ 
- -Ofast -mtune=native & 1.0   \\
+ -O0                  & 111.7   \\
+ -O1                  & 34.5   \\
+ -O2                  & 34.2   \\ 
+ -O3                  & 31.9   \\ 
+ -Ofast               & 26.8   \\ 
+ -Ofast -mtune=native & 26.5   \\
  \hline
 \end{tabular}
 \captionof{table}{Serial run time with different compiler flags}
-\label{tab:parallelresults}
+\label{tab:compilerflags}
 \end{center}
 
 \subsection{Reduce Memory Accesses}
@@ -207,17 +220,86 @@ reduced the memory bandwidth required.
   axis lines = left,
   xlabel = Operational Intensity (FLOPS/byte),
   ylabel = Double precision GFLOPS/s (Scalar),
-  ymin = 0.1,
-  xmin = 0.1,
-  ymax = 11,
-  xmax = 101,
-  log ticks with fixed point,
+  ymin = 1e-2,
+  xmin = 0.0029,
+  ymax = 1000,
+  xmax = 1,
+  scaled ticks=true,
+  legend pos=south east,
+  cycle list name=mylist
 ]
+
+% Original implementation 
+\addplot coordinates {
+  (0.457, 4.911)
+} node[below right, ] (TextNode) {$(0.46, 4.91)$};
+\addlegendentry{Serial (Original Implementation)}
+
+% Serial (No vectorizing)
+\addplot coordinates {
+  (0.341, 2.492)
+} node[below right, ] (TextNode) {$(0.34, 2.49)$};
+\addlegendentry{Serial (No vectorization)}
+
+% Serial (No vectorizing)
+\addplot coordinates {
+  (0.383, 13.206)
+} node[below right, ] (TextNode) {$(0.38, 13.2)$};
+\addlegendentry{Serial (With vectorization)}
+
+%DRAM
 \addplot[color=blue] coordinates {
-  (0.1, 0.1)
-  (0.7, 10)
-  (100, 10)
-};
+  (0.0029, 0.21)
+  (0.77, 57.29)
+  (100, 57.29)
+} node[near start, above, sloped] (TextNode) {DRAM, 75GB/s};
+
+%L1
+\addplot[color=blue] coordinates {
+  (0.0029, 25.07)
+  (0.0065, 57.29)
+  (100, 57.29)
+} node[near start, above, sloped] (TextNode) {L1, 8830/s};
+
+\end{axis}
+\end{tikzpicture}
+
+\begin{tikzpicture}
+\begin{axis}[
+  xmode = log,
+  ymode = log,
+  axis lines = left,
+  xlabel = Operational Intensity (FLOPS/byte),
+  ylabel = Double precision GFLOPS/s (Scalar),
+  ymin = 0.5e-6,
+  xmin = 0.5e-6,
+  ymax = 10000,
+  xmax = 100,
+  scaled ticks=true,
+  legend pos=south east,
+  cycle list name=mylist
+]
+
+% Critical section
+\addplot coordinates {
+  (0.382, 119)
+} node[below right, ] (TextNode) {$(0.382, 119)$};
+\addlegendentry{28 cores parallel}
+
+%DRAM
+\addplot[color=blue] coordinates {
+  (4.25e-7, 3.18e-5)
+  (22.2, 1656)
+  (100, 1656)
+} node[midway, above, sloped] (TextNode) {DRAM, 75GB/s};
+%
+%L1
+\addplot[color=blue] coordinates {
+  (4.25e-7, 0.0032)
+  (0.19, 1656)
+  (100, 1656)
+} node[midway, above, sloped] (TextNode) {L1, 8830GB/s};
+
 \end{axis}
 \end{tikzpicture}
 
@@ -231,9 +313,55 @@ directives which can be used to write parallel shared memory programs.
 
 The first step to making the outer loop run in parallel is to use the
 \verb|parallel| and \verb|for| constructs and turn on OpenMP for the compiler with the
-\verb|-fopenmp| option. The \verb|parallel| directive tells the compiler to run
+\verb|-fopenmp| flag. The \verb|parallel| directive tells the compiler to run
 the preceding for loop in parallel and \verb|for| tells it to distribute the
 work evenly across the threads.
+
+It is then important to handle the memory sharing that takes place in the loop.
+Since the \verb|av_velocity| is also calucated in this loop each loop is
+required to calculate the total number of cells without obstacles and the sum
+of the magnitude of the velocity for these cells. This requies a shared sum
+across all the threads. Do efficiently calculate these shared sums a
+\verb|reduction| is required. The \verb|reduction| directive tells the compiler
+that the given varible is going to accumulated over the duration of the loop.
+This allows each thread to calulate is own sum without having to syncronise the
+global shared value on every write. Once the fork is complete and the threads
+syncronise then all the sums can be combined to determine the final value of
+the accumulated varibles. 
+
+Another cocnsideration when writing a parallel program is the number of cores
+to use. In a bluecrystal node there are 2 sockets, which house 2 \emph{intel
+xeon e5-2680} CPUs. Each of these CPUs have 14 cores, giving a total of 28
+cores per node. \autoref{tab:parallelresults} and \autoref{fig:parallelresults}
+shows the run times of the parallel code on different numbers of cores. In the
+larger problems (1024x1024) it is clear that as the number of cores increase
+the run time decreases. This is as a result of the work in the critical section
+being shared over a larger pool of cores and thus the forked time is decreased.
+However in the smaller probelms there is a reduction in run time around 14
+cores. This is observed as once the core count is above 14, memory sharing
+between the sockets is required. This is where a shared section of memory is in
+the cache of one the other socket so the request has to be routed through the
+other socket. This takes appoximately 2x as long as fetching from the socket's
+local cache. For this reason when running the alogirthm on the smallest cells
+% TODO Make this a real thing
+size (128x128) only 14 cores were used.
+
+In general this non-uniform memory access, NUMA, can be mitigated by pinning 
+the threads to a specific core. Setting \verb|OMP_PROC_BIND| to \verb|close|
+tells OpenMP to bind the threads to specific cores and also as the threads are
+assigned, ensure they are assigned to the threads closest to the master (main)
+thread. Also assigning \verb|OMP_PLACES| to \verb|cores| ensures that each
+thread is used as a single place (and no thread sharing occurs such as
+hyper-threading). Although the threads are now pinned to individual cores this
+does not mean that the NUMA problem is reduced. This is because during the
+memory assignment, in the \verb|initialise| function, the initial values for the
+cells array are assigned serially (on a single thread). This means all the
+values will in exist the same cache, linked to this single NUMA region. This
+can be prevented by ensuring the initialisation of the values is parallelised
+in the same way as the it is accessed in the critical region. In this case this
+means also using the \verb|#pragma omp parallel for| when assigning the initial
+values to the cells array. This will ensure the data is allocated in the same
+NUMA region to which it is going to be required in the critical loop.
 
 \begin{lstlisting}[style=CStyle, label={lst:ompparallelloop}, caption={TODO},]
 #pragma omp parallel for schedule(static) reduction(+:tot_cells) reduction(+:tot_u)
@@ -313,6 +441,8 @@ work evenly across the threads.
 };
 \end{axis}
 \end{tikzpicture}
+\captionof{figure}{Parallel scaling results for 1-28 cores}
+\label{fig:parallelresults}
 
 \begin{center}
   \begin{tabular}{ |p{1.5cm}||p{1.5cm}|p{1.5cm}|p{1.5cm}| }
