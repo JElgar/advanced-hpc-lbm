@@ -58,6 +58,10 @@ black,every mark/.append style={fill=black!80!black},mark=*, mark size = 3pt\\%
 \usepackage{geometry}
 \geometry{margin=1.2cm}
 
+\title{Optimisation of d2q9-bgk Lattice Boltzmann Scheme}
+\author{James Elgar, za18968}
+\date{\today}
+
 % ---
 
 % \graphicspath{ {assets/} }
@@ -68,10 +72,12 @@ black,every mark/.append style={fill=black!80!black},mark=*, mark size = 3pt\\%
 \begin{document}
 \begin{multicols}{2}
 
+\maketitle
+
 \section{Introduction}
 
 This report will explore the optimizations applied to the implementation of
-a given algorithm to solve a d2q9-bgk lattice boltzmann scheme.  Starting with
+a given algorithm to solve a d2q9-bgk Lattice Boltzmann scheme.  Starting with
 an unoptimized serial implementation, it will apply three stages of optimisation
 and compare the results. The first stage will be serial optimisations which
 make the general alogirthm more efficient mainly by reducing the number of
