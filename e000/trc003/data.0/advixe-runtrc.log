@@ -1,0 +1,199 @@
+<?xml version="1.0" encoding="utf-8"?>
+<log version="1.0" tool="runtool">
+
+<msg id="1" tool="runtool">
+  <type>log-start</type>
+  <arg>2021/03/04 22:18:08</arg>
+</msg>
+<msg id="2" tool="runtool">
+  <type>bandwidth-measurement-starts</type>
+</msg>
+<msg id="3" tool="runtool">
+  <type>bandwidth-measurement-done</type>
+</msg>
+<msg id="4" tool="runtool">
+  <type>collector-starts</type>
+</msg>
+<msg id="5" tool="runtool">
+  <type>marker-file</type>
+  <arg>/mnt/storage/home/za18968/advanced-hpc-lbm/e000/trc003/trc003.advixe</arg>
+</msg>
+<msg id="6" tool="trc">
+  <type>PROCESS_START</type>
+  <arg>/mnt/storage/home/za18968/advanced-hpc-lbm/d2q9-bgk</arg>
+  <arg>24760</arg>
+  <severity>INFO</severity>
+  <timestamp>Thu Mar  4 22:18:18 2021</timestamp>
+</msg>
+<msg id="7" tool="trc">
+  <type>PROCESS_ANALYSIS_MODE</type>
+  <arg>full</arg>
+  <severity>INFO</severity>
+  <timestamp>Thu Mar  4 22:18:19 2021</timestamp>
+</msg>
+<msg id="8" tool="trc">
+  <type>LOAD_MODULE</type>
+  <arg>/mnt/storage/home/za18968/advanced-hpc-lbm/d2q9-bgk</arg>
+  <arg>0x400000</arg>
+  <arg>0x61c4ff</arg>
+  <severity>INFO</severity>
+  <timestamp>Thu Mar  4 22:18:19 2021</timestamp>
+</msg>
+<msg id="9" tool="trc">
+  <type>LOAD_MODULE</type>
+  <arg>/lib64/ld-linux-x86-64.so.2</arg>
+  <arg>0x2b92ccffb000</arg>
+  <arg>0x2b92cd21c147</arg>
+  <severity>INFO</severity>
+  <timestamp>Thu Mar  4 22:18:19 2021</timestamp>
+</msg>
+<msg id="10" tool="trc">
+  <type>LOAD_MODULE</type>
+  <arg>[vdso]</arg>
+  <arg>0x7ffe4fbf6000</arg>
+  <arg>0x7ffe4fbf6fdc</arg>
+  <severity>INFO</severity>
+  <timestamp>Thu Mar  4 22:18:19 2021</timestamp>
+</msg>
+<msg id="11" tool="trc">
+  <type>LOAD_MODULE</type>
+  <arg>/usr/lib64/libm.so.6</arg>
+  <arg>0x2b92e1b8e000</arg>
+  <arg>0x2b92e1e8f147</arg>
+  <severity>INFO</severity>
+  <timestamp>Thu Mar  4 22:18:20 2021</timestamp>
+</msg>
+<msg id="12" tool="trc">
+  <type>LOAD_MODULE</type>
+  <arg>/mnt/storage/software/languages/intel/intel-parallel_studio_xe_2018_u3/compilers_and_libraries_2018.3.222/linux/compiler/lib/intel64/libiomp5.so</arg>
+  <arg>0x2b92e1eb8000</arg>
+  <arg>0x2b92e229203f</arg>
+  <severity>INFO</severity>
+  <timestamp>Thu Mar  4 22:18:20 2021</timestamp>
+</msg>
+<msg id="13" tool="trc">
+  <type>LOAD_MODULE</type>
+  <arg>/usr/lib64/libgcc_s.so.1</arg>
+  <arg>0x2b92e22a5000</arg>
+  <arg>0x2b92e24ba3ff</arg>
+  <severity>INFO</severity>
+  <timestamp>Thu Mar  4 22:18:20 2021</timestamp>
+</msg>
+<msg id="14" tool="trc">
+  <type>LOAD_MODULE</type>
+  <arg>/usr/lib64/libpthread.so.0</arg>
+  <arg>0x2b92e24bb000</arg>
+  <arg>0x2b92e26d645f</arg>
+  <severity>INFO</severity>
+  <timestamp>Thu Mar  4 22:18:20 2021</timestamp>
+</msg>
+<msg id="15" tool="trc">
+  <type>LOAD_MODULE</type>
+  <arg>/usr/lib64/libc.so.6</arg>
+  <arg>0x2b92e26d7000</arg>
+  <arg>0x2b92e2a971ff</arg>
+  <severity>INFO</severity>
+  <timestamp>Thu Mar  4 22:18:20 2021</timestamp>
+</msg>
+<msg id="16" tool="trc">
+  <type>LOAD_MODULE</type>
+  <arg>/usr/lib64/libdl.so.2</arg>
+  <arg>0x2b92e2a98000</arg>
+  <arg>0x2b92e2c9b12f</arg>
+  <severity>INFO</severity>
+  <timestamp>Thu Mar  4 22:18:20 2021</timestamp>
+</msg>
+<msg id="17" tool="trc">
+  <type>LOAD_MODULE</type>
+  <arg>/mnt/storage/software/languages/intel/intel-parallel_studio_xe_2018_u3/advisor_2018.3.0.558307/lib64/runtime/libittnotify.so</arg>
+  <arg>0x2b92e38a0000</arg>
+  <arg>0x2b92e3aab63f</arg>
+  <severity>INFO</severity>
+  <timestamp>Thu Mar  4 22:18:20 2021</timestamp>
+</msg>
+<msg id="18" tool="trc">
+  <type>UNLOAD_MODULE</type>
+  <arg>/mnt/storage/home/za18968/advanced-hpc-lbm/d2q9-bgk</arg>
+  <severity>INFO</severity>
+  <timestamp>Thu Mar  4 22:18:23 2021</timestamp>
+</msg>
+<msg id="19" tool="trc">
+  <type>UNLOAD_MODULE</type>
+  <arg>/lib64/ld-linux-x86-64.so.2</arg>
+  <severity>INFO</severity>
+  <timestamp>Thu Mar  4 22:18:23 2021</timestamp>
+</msg>
+<msg id="20" tool="trc">
+  <type>UNLOAD_MODULE</type>
+  <arg>[vdso]</arg>
+  <severity>INFO</severity>
+  <timestamp>Thu Mar  4 22:18:23 2021</timestamp>
+</msg>
+<msg id="21" tool="trc">
+  <type>UNLOAD_MODULE</type>
+  <arg>/usr/lib64/libm.so.6</arg>
+  <severity>INFO</severity>
+  <timestamp>Thu Mar  4 22:18:23 2021</timestamp>
+</msg>
+<msg id="22" tool="trc">
+  <type>UNLOAD_MODULE</type>
+  <arg>/mnt/storage/software/languages/intel/intel-parallel_studio_xe_2018_u3/compilers_and_libraries_2018.3.222/linux/compiler/lib/intel64/libiomp5.so</arg>
+  <severity>INFO</severity>
+  <timestamp>Thu Mar  4 22:18:23 2021</timestamp>
+</msg>
+<msg id="23" tool="trc">
+  <type>UNLOAD_MODULE</type>
+  <arg>/usr/lib64/libgcc_s.so.1</arg>
+  <severity>INFO</severity>
+  <timestamp>Thu Mar  4 22:18:23 2021</timestamp>
+</msg>
+<msg id="24" tool="trc">
+  <type>UNLOAD_MODULE</type>
+  <arg>/usr/lib64/libpthread.so.0</arg>
+  <severity>INFO</severity>
+  <timestamp>Thu Mar  4 22:18:23 2021</timestamp>
+</msg>
+<msg id="25" tool="trc">
+  <type>UNLOAD_MODULE</type>
+  <arg>/usr/lib64/libc.so.6</arg>
+  <severity>INFO</severity>
+  <timestamp>Thu Mar  4 22:18:23 2021</timestamp>
+</msg>
+<msg id="26" tool="trc">
+  <type>UNLOAD_MODULE</type>
+  <arg>/usr/lib64/libdl.so.2</arg>
+  <severity>INFO</severity>
+  <timestamp>Thu Mar  4 22:18:23 2021</timestamp>
+</msg>
+<msg id="27" tool="trc">
+  <type>UNLOAD_MODULE</type>
+  <arg>/mnt/storage/software/languages/intel/intel-parallel_studio_xe_2018_u3/advisor_2018.3.0.558307/lib64/runtime/libittnotify.so</arg>
+  <severity>INFO</severity>
+  <timestamp>Thu Mar  4 22:18:23 2021</timestamp>
+</msg>
+<msg id="28" tool="trc">
+  <type>PROCESS_FINISH</type>
+  <arg>/mnt/storage/home/za18968/advanced-hpc-lbm/d2q9-bgk</arg>
+  <arg>24760</arg>
+  <arg>0x0</arg>
+  <severity>INFO</severity>
+  <timestamp>Thu Mar  4 22:18:23 2021</timestamp>
+</msg>
+<msg id="29" tool="runtool">
+  <type>app-exit-code</type>
+  <arg>0</arg>
+</msg>
+<msg id="30" tool="runtool">
+  <type>marker-file</type>
+  <arg>/mnt/storage/home/za18968/advanced-hpc-lbm/e000/trc003/trc003.advixe</arg>
+</msg>
+<msg id="31" tool="runtool">
+  <type>collector-done</type>
+</msg>
+<msg id="32" tool="runtool">
+  <type>log-end</type>
+  <arg>2021/03/04 22:18:27</arg>
+</msg>
+
+</log>
+

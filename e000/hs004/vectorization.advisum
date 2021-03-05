@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<!-- <!DOCTYPE IntelParallelAdvisorSummaryCollection SYSTEM  "IntelParallelAdvisorSummaryCollection.dtd"> -->
+
+<IntelParallelAdvisorSummary version="" 
+                             kind="DATAKIND_SURVEY_EX" >
+  <hotspot filename="/mnt/storage/home/za18968/advanced-hpc-lbm/d2q9-bgk.c"
+           line_no="749"
+           routine="write_values"
+           is_vectorized="0"
+           self_time="0.000000E+00"
+           total_time="3.000000E-02"
+           trip_counts=""
+           func_instance="46"
+           priority="0"/>
+  <hotspot filename="/mnt/storage/home/za18968/advanced-hpc-lbm/d2q9-bgk.c"
+           line_no="313"
+           routine="propagate_rebound_and_collisions_A$omp$parallel_for@307"
+           is_vectorized="0"
+           self_time="1.674004E+00"
+           total_time="8.736910E+00"
+           trip_counts=""
+           func_instance="20"
+           priority="0"/>
+  <hotspot filename="/mnt/storage/home/za18968/advanced-hpc-lbm/d2q9-bgk.c"
+           line_no="780"
+           routine="timestep"
+           is_vectorized="1"
+           self_time="1.997670E-02"
+           total_time="1.997670E-02"
+           trip_counts=""
+           func_instance="296"
+           priority="0"/>
+  <hotspot filename="/mnt/storage/home/za18968/advanced-hpc-lbm/d2q9-bgk.c"
+           line_no="312"
+           routine="propagate_rebound_and_collisions_A$omp$parallel_for@307"
+           is_vectorized="1"
+           self_time="7.062905E+00"
+           total_time="7.062905E+00"
+           trip_counts=""
+           func_instance="293"
+           priority="0"/>
+  <hotspot filename="/mnt/storage/home/za18968/advanced-hpc-lbm/d2q9-bgk.c"
+           line_no="688"
+           routine="write_values"
+           is_vectorized="0"
+           self_time="0.000000E+00"
+           total_time="3.000000E-02"
+           trip_counts=""
+           func_instance="45"
+           priority="0"/>
+</IntelParallelAdvisorSummary >
