@@ -70,29 +70,51 @@ black,every mark/.append style={fill=black!80!black},mark=*, mark size = 3pt\\%
 
 \section{Introduction}
 
-This report will the explore the optimizations applied to the implementation of
-the d2q9-bgk lattice boltzmann scheme. It will initally look at the serial
-omtimizations and how they affected the performance of the alogirthm It will
-then look at the parallel implementation and how this affect the performance
-with different number of cores and problem sizes.
+This report will explore the optimizations applied to the implementation of
+a given algorithm to solve a d2q9-bgk lattice boltzmann scheme.  Starting with
+an unoptimized serial implementation, it will apply three stages of optimisation
+and compare the results. The first stage will be serial optimisations which
+make the general alogirthm more efficient mainly by reducing the number of
+parses over the cells array to one, reducing the memory bandwidth required. The
+second stage will make use of SIMD, single instruction multiple data, where the
+compiler can vectorize certain sections of the algorithm allowing it to compute
+multiple data values with single instructions by making use of vector registers
+and instructions. The final stage will explore using OpenMP to run section of
+the algorithm in parallel and convey the large benifits of being able to spread
+out the required computation over multiple cores. However it will also look at
+the limitation of this approach as memory bandwidth and sharing can continue to
+limit performance. Throughout the stages few changes will be made to the
+underlying implementation of the algorithm and the majority of the optimisation
+will come from assisting the compiler and the OpenMP library with the
+optimisations they are able to achieve.
 
 \section{Serial Optimisation}
 
 \subsection{Compiler options}
 
-Many modern compilers provide various options to optimize the given code. 
+Many modern compilers provide various options to optimize the given code,
+simply by adding compiler flag options. The "O" flags offer various levels of
+optimisation with \verb|-O3| being the highest.
 
 \autoref{tab:compilerflags} shows the run time of the serial optimized code
 (without vectorization) with different compiler flags. This shows that by
-simply using the \verb|-Ofast| flag there can be a 4x decrease in run time. The
-\verb|-mtune=native| option can further imporve the performance by telling the
-compiler to optimize the code for the specific local machine and its
-instruction set. The compiler flag \verb|-no-prec-sqrt| was also used, which
-reduces the required precision of the square root funciton which is used in the
-critical section of the algorithm.
+simply using the \verb|-Ofast| flag, when compared to no optimisations
+(\verb|-O0|), there can be a 4x decrease in run time. In later sections
+additional compiler flags were added to optimize the other stages (such as
+vectorization). The compiler flags used in the final implementation were 
+
+\begin{itemize}
+  \item \verb|-fast| - icc specific flag which includes -Ofast and a few other
+    optimisations
+  \item \verb|-mtune=native| and \verb|-xAVX| allow for the compiled binary to
+    be specific to the current environment. \verb|xAVX| explicitly specific the 
+    type of SIMD instructions to target (based on the architecture).
+  \item \verb|-no-prec-sqrt| reduces the required precision of the square root
+    function.
+\end{itemize}
 
 \begin{center}
-  \begin{tabular}{ |p{5cm}||p{1.5cm}| }
+ \begin{tabular}{ |p{5cm}||p{1.5cm}| }
  \hline
  \multicolumn{2}{|c|}{Results} \\
  \hline
@@ -110,41 +132,48 @@ critical section of the algorithm.
 \label{tab:compilerflags}
 \end{center}
 
-\subsection{Arithmetic improvements}
-
 \subsection{Reduce Memory Accesses}
 
-In the original implementation of the algorithm for each timestep the
-\verb|cells| array was looped over the 4 times, in \verb|propagate|,
+In the original implementation of the algorithm, for each timestep the
+\verb|cells| array was looped over 4 times, in \verb|propagate|,
 \verb|rebound|, \verb|collision| and \verb|av_velocity|. This resulted in
 repeated stores and loads of the same sections of memory. To prevent this the
 first 3 separate functions (those in the \verb|timestep| function) were fuzed
 into a single loop. This meant the same sections of memory were used closer
-together making it is more likely for them to still be in cache. The function
-\verb|av_velocity| was then repeating calculations that already took place in
-collision and requiring an additional loop over cells. The result was therefore
-calculated in the single parse over the cells and returned from the timestep
-function. Similarly in propagate and collisions the values were switched
-between \verb|tmp_cells| and \verb|cells| multiple times. In the new
-implementation the \verb|tmp_cells| array was used as the "answer" space and
-stored only the next timesteps cell values. This then only required a single
-write to \verb|tmp_cells| each timestep. At the end of the timestep the
-\verb|tmp_cells| and \verb|cells| array's pointers were then swapped which set
-the \verb|cells| array to the correct value without having to write directly to
-the array.
+together making it is more likely for them to still be in cache. This therefore
+reduces the memory bandwidth used and since this implementation is memory bound
+results in a increase in performance. The function \verb|av_velocity| was also 
+repeating calculations that already took place in collision and requiring an
+additional loop over cells. The result was therefore calculated in the single
+parse over the cells, reducing the need for this additional loop. 
+
+Another issue with the original implementation was in  propagate and collisions
+where the values were switched between \verb|tmp_cells| and \verb|cells| multiple
+times which results in a waste of memory bandwidth as unnecessary loads and
+stores take place. In the new implementation the \verb|tmp_cells| array was
+used as the "answer" space and stores only the next timestep's cell values.
+This then only required a single write to \verb|tmp_cells| each timestep. At
+the end of the timestep the \verb|tmp_cells| and \verb|cells| array's pointers
+were then swapped which set the \verb|cells| array to the correct value without
+having to write directly to the array. Overall these optimisations reduced the 
+runtime of the serial implementation from 38.5 seconds to 26.4.
 
 \subsection{Vecotrisation}
 
 Having improved the implementation of the serial code, there is now a clear
-critical section of the code, inside the single pass of the cell. This is where
-the majority of the computation takes places and thus is where most of the time
-of the program is used. Since this section performs multiple mathematical
-computation on the input array, there is an additional approach to optimization
-other than parallelizing it. This is approach makes use of SIMD,
-(single-instruction multiple data). This is where compilers are able to use
-vector registers and instructions to make multiple computations on a chuck of
-data (a vector) with a single instruction. This has the potential for large
-performance gains as fewer instructions are required for the cells array.
+critical section (the section which takes the most time), inside the single
+pass of the cell's grid. This is where the majority of the computation takes places
+and thus is where most of the time of the program is used. Since this section
+preform repeat operations on the input array, there is an additional serial
+approach to optimization.
+
+Modern CPU architectures include vector registers and instructions. This allows
+for computation to take place on a vector of values whilst only using a single
+instruction. This approach is known as SIMD, (single-instruction multiple
+data). When enabled, compilers are able to automatically make use of these
+vector instructions. For this algorithm, this has the potential for large
+performance gains as fewer instructions are required for the cells array in the
+critical section.
 
 \begin{lstlisting}[style=CStyle, label={lst:cellsdataalign}, caption={Example of memory allignment for a cells array.},]
   // Allocate aligned data
@@ -153,10 +182,9 @@ performance gains as fewer instructions are required for the cells array.
   __assume_aligned(cells->speed0, 64);
 \end{lstlisting}
 
-% TODO should I reference the proluge step
 In many cases the compiler is able to automatically vectorize code blocks.
 However if the data is not aligned then the compiler will have to complete a prior
-step, called the "prologue" step to process this unaligned data, or
+step, called the "prologue"\cite{vsaac} step, to process this unaligned data, or
 alternatively use unaligned instructions (which are less efficient). The
 compiler is also not able to assume that an array of floats, such as the arrays
 of speeds in the new \verb|t_speed| struct are aligned. Therefore it will have
@@ -164,20 +192,21 @@ to complete this prior step regardless. To prevent this the arrays can be
 aligned when they are created using the \verb|__mm_malloc| function, as shown in \autoref{lst:cellsdataalign}. This
 ensure the created array is aligned on the request boundry, in this case 64
 bytes was used to match the size of the cache line in an \emph{intel xeon
-e5-2680}. Compiler directives can then be use to tell the compiler the arrays
+e5-2680}. Compiler directives can then be use to tell the compiler that the arrays
 are aligned. This allows the compiler to skip the "proluge" step and use the
-aligned instructions.
+aligned instructions. This significantly reduces the overhead of vectorizing as
+well as making it more likely for the compiler to automatically vectorize the
+given section.
 
-
-% TODO Reference wiki or find anther definition of write own definition
 Another useful hint to assist the compiler in its optimizations is to use the
-\verb|restrict| keyword. This tells the compiler "that for the lifetime of the
-pointer, only the pointer itself or a value directly derived from it (such as
-pointer + 1) will be used to access the object to which it points". In
-practical terms this reduces the number of times the pointer value has to be
-fetched from memory as the cached value can be used repeatedly. In a memory
-bound problem this can therefore be an important step in reducing the memory
-bandwidth used.
+\verb|restrict| keyword. This tells the compiler to prevent pointer aliasing,
+which ensures the target value will only be accessed through the restricted
+pointer (not another aliased pointer). In practical terms this reduces the
+number of times the pointer value has to be fetched from memory as the cached
+value can be used repeatedly without the risk of it having changed as a result
+of an overlap between pointer (in this case there would be a risk of overlap
+with \verb|cells| and \verb|tmp_cells|). In a memory bound problem this can
+therefore be an important step in reducing the memory bandwidth used.
 
 \begin{lstlisting}[style=CStyle, label={lst:assumecellssize}, caption={Additional compiler hints},]
   __assume(params.nx%128==0);
@@ -185,10 +214,10 @@ bandwidth used.
 \end{lstlisting}
 
 The intel compiler also allows for other hints to be provided. In this
-implementation hints were porivded to inform the compiler about the size of the
+implementation hints were added to inform the compiler about the size of the
 cells array (and therefore the size of the loops). As show in the example in
 \autoref{lst:assumecellssize}, the \verb|__assume| directive was used, to tell
-compiler that the size of the cells array was divisible by a given power of 2.
+compiler that the size of the cells array was divisible by various given powers of 2.
 In the implementation all powers of 2, up to a maximum of 128 were provided (as
 this was the maximum input size). This should further assist the compiler in
 its optimizations, especially when vectorizing the inner loop.
@@ -197,11 +226,10 @@ The final step to ensuring the code was vectorized was to add the compiler
 directive \verb|#pragma omp simd| to the inner for loop. This explicitly tells
 the compiler that this section of the code should be vectorized. 
 
-% TODO get some results for this
-Having completed the above steps only a minor improvement in performance were
-observed, as seen in Figure xx, despite the inner loop being successfully
-vectorized. From the roofline graph in Figure xx, it is clear that the code was
-memory bandwidth bound. In this case the problem arose from the data layout used for the cells.
+This alone, although successfully vectorizing the loop, did not result in a
+significant performance gain. Observing the roofline graph showed that this
+version of the vectorized code was very heavily memory bandwidth bound. This
+was as a result of the data layout of the cells array. 
 
 In the original implementation the speeds for each cell were stored in a
 structure (\verb|t_speed|) and the whole grid of cells was an array of these
@@ -209,24 +237,30 @@ structures. This implementation does not lend it self to vetorization as it
 can result in unnecessary fetches from memory. This is because when a single
 speed value is fetch an entire cache line (64 bits) will be used to fetch the
 structure. This results in a waste of memory bandwidth as the rest of the
-cache line is not used (only the single float value for that speed is actually
-required). Therefore switching the implementation to use a structure of arrays
+cache line is not used and only the single float value for that speed is actually
+required. Therefore switching the implementation to use a structure of arrays
 (where each speed is a separate array) allowed the code to be vectorized more
 efficiently as each fetch for a speed only fetched a single float and therefore
-reduced the memory bandwidth required. 
+reduced the overall memory bandwidth required. 
 
-% TODO add a table of run times of all sizes, serial, vectorized and parallel
 When comparing the roofline results in \autoref{fig:rlserial} we can see a
 large improvement in the performance, from 2.49 GLOPs to 13.2 GLOPs, once the
-vectorization is introduced. Simiarly we also see a reduction in the run times
-as shown in Figure xx. This is as a result of fewer instructions being required
-to compute the result values as a single vector instruction can compute
-multiple values. Moreover we see the operational intensity increase, and
-therefore the problem become more compute bound. This is as a result of
-switching from an array of structures to a structure of arrays which reduces
-the memory bandwidth used as large section of the cache line are not wasted
-when fetching a whole structure which contains 9 speeds, when only 1 is
-required.
+vectorization is introduced. Similarly we also see a reduction in the run times
+as shown in \autoref{tab:stageruntimes}. These improvements are as a direct
+result of vectorization and the update to the data layout which reduces the
+memory bandwidth requirements. The intel compiler also provides a vectorized
+implementation for the \verb|sqrt| function which allows for the majority of
+the computation in the critical section to be vectorized.
+
+Despite the large improvements, it may have been expected to see a larger
+improvement when the majority of instructions are now vectorized, which in the
+critical section could reduce the number of required instruction by a
+significant factor since the vector length is 32 bits. However such a large
+improvement is not observed as the problem remains memory bandwidth bound
+meaning as the number of instruction reduces and the size of the vectors
+increase, the memory bandwidth required increase as more data is required at
+the same time. Moreover there is some additional overhead to vectorizing the
+code and thus this will impact the overall run time.
 
 \begin{tikzpicture}
 \begin{axis}[
@@ -325,36 +359,46 @@ required.
 \section{Parallel (OpenMP)}
 
 Having optimized the inner loop in the above section the next optimization that
-can be used is parallelizing. In this implementation the outer loop was
-parallelized while the inner loop maintained the other optimizations. This was
-achieved using OpenMP. This library provides a collection of compiler
-directives which can be used to write parallel shared memory programs.
+can be used is to run the loops in parallel. In this implementation the outer
+loop was run in parallel while the inner loop maintained the other
+optimizations. This parallelism was achieved by using the OpenMP
+library. This library provides a collection of compiler directives which can be
+used to write parallel shared memory programs.
 
-The first step to making the outer loop run in parallel is to use the
-\verb|parallel| and \verb|for| constructs and turn on OpenMP for the compiler with the
-\verb|-fopenmp| flag. The \verb|parallel| directive tells the compiler to run
-the preceding block in parallel and \verb|for| tells it to distribute the
-work of the following for loop evenly across the threads.
+The first step in order to run the loop in parallel is to turn on OpenMP for the
+compiler with the \verb|-qopenmp| flag. With this the OpenMP library is available to use.
+At a basic level adding the \verb|parallel| and \verb|for| constructs should
+allow the loop to run in parallel. The \verb|parallel| directive tells the
+compiler to run the preceding block in parallel and \verb|for| tells it to
+distribute the work of the following for loop evenly across the threads.
 
 It is then important to handle the memory sharing that takes place in the loop.
-Since the \verb|av_velocity| is also calucated in this loop each loop is
+Since the \verb|av_velocity| is also calculated in this loop each loop is
 required to calculate the total number of cells without obstacles and the sum
-of the magnitude of the velocity for these cells. This requies a shared sum
-across all the threads. In order to efficiently calculate these shared sums a
-\verb|reduction| is required. The \verb|reduction| directive tells the compiler
-that the given varible is going to be accumulated over the duration of the loop.
-This allows each thread to calulate is own sum without having to syncronise the
-global shared value on every write. Once the forked section is complete and the threads
-syncronise then all the sums can be combined to determine the final value of
-the accumulated variables. 
+of the magnitude of the velocity for these cells. When running the code with
+just the \verb|#pragma omp parallel for| directive, the wrong answer is
+obtained. This is because the values required to calculate \verb|av_velocity|
+are in shared memory and thus every thread is competing to set the shared
+values rather than accumulating the values across all the threads.
+
+In order to efficiently calculate these shared sums a \verb|reduction| is
+required. The \verb|reduction| directive tells the compiler that the given
+variable is going to be accumulated over the duration of the parallel region. This allows
+each thread to calculate its own sum without having to syncronise the global
+shared value on every write. Once the forked section is complete and the
+threads syncronise then all the sums can be combined to determine the final
+value of the accumulated variables. This is signifantly faster than requiring a
+syncronised section during the fork as the threads can run independently and not have to wait
+for each thread to syncronise the sum or lock and unlock (in the case of an
+atomic variable) the values.
 
 Another consideration when writing a parallel program is the number of cores
 to use. In a bluecrystal node there are 2 sockets, which house 2 \emph{intel
 xeon e5-2680} CPUs. Each of these CPUs have 14 cores, giving a total of 28
 cores per node. \autoref{tab:parallelresults} and \autoref{fig:parallelresults}
 show the run times of the parallel code on different numbers of cores. In the
-larger problems (1024x1024) it is clear that as the number of cores increase
-the run time decreases. Initially, between 1 and 4 cores the rate of decrease
+larger problems (1024x1024) it is clear that as the number of cores increases
+the run time decreases. Initially, between 1 and 4 cores, the rate of decrease
 is linear, meaning as the number of cores increases the run time is halved.
 This is as a result of the work in the critical section being shared over a
 larger pool of cores and thus the total time of the forked region is decreased.
@@ -362,28 +406,28 @@ larger pool of cores and thus the total time of the forked region is decreased.
 However this linear relationship becomes a sublinear plateaus as the number of
 cores increases. The reason for this can be observed in
 \autoref{fig:rlparallel} which shows the roofline analysis for the parallel
-alogirthm running on 28 cores. The results lie in the memory bound region,
+algorithm running on 28 cores. The results lie in the memory bound region,
 this is as a result of the memory bandwidth becoming saturated as the number of
 cores are increased and thus the computation rate increases at a faster rate
 than the memory bandwidth available. 
 
-However in the smaller problems there is a reduction in run time around 14
+However in the smaller problems there is a reduction in run time after 14
 cores. This is observed as once the core count is above 14, two sockets are in
 use (both CPUs) and therefore memory sharing between the sockets is required.
-This is where a shared section of memory is in the cache of one the other
+This is where a shared section of memory is in the cache of the other
 socket so in order to access that section of memory a request has to be routed
 through the other socket. This takes approximately two times as long as
 fetching from the socket's local cache. For this reason when running the
-algorithm on smaller grid sizes 
-% TODO Make this a real thing
-(128x128) only 14 cores were used.
+algorithm on smaller grid sizes (such as 128x128) only 14 cores were used. This
+removes this problem completely as only a single socket is used so all cache
+accesses are for the local CPU's cache.
 
 In general this non-uniform memory access, NUMA, can be mitigated by pinning 
 the threads to a specific core. Setting \verb|OMP_PROC_BIND| to \verb|close|
 tells OpenMP to bind the threads to specific cores and also as the threads are
 assigned, ensure they are assigned to the threads closest to the master (main)
-thread. Also assigning \verb|OMP_PLACES| to \verb|cores| ensures that each
-thread is used as a single place (and no thread sharing occurs such as
+thread. Assigning \verb|OMP_PLACES| to \verb|cores| ensures that each
+core is used as a single place (and no core sharing occurs such as
 hyper-threading). Although the threads are now pinned to individual cores this
 does not mean that the NUMA problem is reduced. This is because during the
 memory assignment, in the \verb|initialise| function, the initial values for the
@@ -396,19 +440,30 @@ values to the cells array. This will ensure the data is allocated in the same
 NUMA region to which it is going to be required in the critical loop. The
 combination of these factors should therefore reduce the number of
 socket-to-socket memory requests allowing for the average time for each memory
-access to be quicker.  
+access to be reduced.  
 
-\begin{lstlisting}[style=CStyle, label={lst:ompparallelloop}, caption={TODO},]
-#pragma omp parallel for schedule(static) reduction(+:tot_cells) reduction(+:tot_u)
-    for (int jj = 0; jj < params.ny; jj++)
-    {    
-#pragma omp simd aligned(cells:64) aligned(tmp_cells:64) aligned(obstacles:64) reduction(+:tot_cells) reduction(+:tot_u)
-      for (int ii = 0; ii < params.nx; ii++)
-      {
-        ...
-      }
-    }
-\end{lstlisting}
+When comparing the run times of the parallel code with the vectorized
+implementation in \autoref{tab:stageruntimes}, for larger problem sizes we see
+an almost 14x reduction. Similarly when comparing the roofline analysis in
+\autoref{fig:rlserial} and \autoref{fig:rlparallel} an over 9 times improvement
+in performance is observed. However similarly to the vectorized code we do not
+observe a 28 times improvement as may be expected when running over 28 cores.
+This is as a result of the memory saturation and the overhead of forking and
+then syncronising the code. In smaller problems this overhead and the need for
+memory sharing can even result in reduced performance as the core count increases
+after a certain point.
+
+% \begin{lstlisting}[style=CStyle, label={lst:ompparallelloop}, caption={TODO},]
+% #pragma omp parallel for schedule(static) reduction(+:tot_cells) reduction(+:tot_u)
+%     for (int jj = 0; jj < params.ny; jj++)
+%     {    
+% #pragma omp simd aligned(cells:64) aligned(tmp_cells:64) aligned(obstacles:64) reduction(+:tot_cells) reduction(+:tot_u)
+%       for (int ii = 0; ii < params.nx; ii++)
+%       {
+%         ...
+%       }
+%     }
+% \end{lstlisting}
 
 % \begin{tikzpicture}
 % \begin{axis}[
@@ -537,20 +592,20 @@ access to be quicker.
 \end{center}
 
 \begin{center}
-  \begin{tabular}{ |p{1.5cm}||p{1.5cm}|p{1.5cm}|p{1.5cm}| }
+  \begin{tabular}{ |p{1.5cm}||p{1cm}|p{1.5cm}|p{2cm}| }
  \hline
  \multicolumn{4}{|c|}{Results} \\
  \hline
- Grid size & Serial & Vectorised & Parallel \\
+ Grid size & Serial & Vectorised & Parallel(cores) \\
  \hline
- 128x128    & 27.0  &    &  1.15(14 cores)   \\
- 128x256    &       &    &  1.85(14 cores)   \\
- 256x256    &       &    &  5.68(28 cores)   \\
- 1024x1024  &       &    &  20.8(28 cores)    \\ 
+ 128x128    & 26.4  & 7.4   &  1.15(14)   \\
+ 128x256    & 53.3  & 16.1  &  1.85(14)   \\
+ 256x256    & 213.6 & 59.6  &  5.68(28)   \\
+ 1024x1024  & 869.1 & 318.9 &  20.8(28)    \\ 
  \hline
 \end{tabular}
-\captionof{table}{Parallel scaling results for 1-28 cores}
-\label{tab:parallelresults}
+\captionof{table}{Run times for optimisation stages}
+\label{tab:stageruntimes}
 \end{center}
 
 \section{Conclusion}
@@ -561,17 +616,22 @@ compiler in its own optimisations. Simple changes such as using compiler
 optimisation flags can have a profound impact on the runtime of the algorithm.
 Similarly with the correct hints and memory aligned compilers are able to
 automatically vertorize a given code. This can dramatically reduce the run time
-by allowing a single instruction to compute multiple values and thus reduce the
-overall number of instructions. In this implementation, the vectorized code ran
-over 2.5 times faster than the optimised serial version. Once a code is well
-optimised in serial further improvements can be gained by making sections of
-the program run in parallel. This can dramatically increase the performance of
-the code as the work is shared across multiple cores. With moder processors
-often having high core counts, this can also result in large performance gains.
-Similarly to vectorization, using OpenMP directives and environment variables
-parallelized code can be achieved with little changed to the implementation. In
-this running the critical sections in parallel resulted in a 13 times reduction
-in overall run time on the largest problem size.
+by allowing a vector instructions to compute multiple values and thus reduce the
+overall number of instructions required. In this implementation, the vectorized code ran
+over 2.5 times faster than the optimised serial version with an approximately 5
+times increase in performance. Once a code is well optimised in serial further
+improvements can be gained by making sections of the program run in parallel.
+This can dramatically increase the performance of the code as the work is
+shared across multiple cores. With modern processors often having high core
+counts, this can also result in large performance gains.  Similarly to
+vectorization, using OpenMP directives and environment variables, parallelized
+code can be achieved with little changed to the implementation. In this running
+the critical sections in parallel resulted in up to a 13 times reduction in
+overall run time on the largest problem size.
+
+
+\bibliographystyle{unsrt}
+\bibliography{report}
 
 \end{multicols}
 \end{document}

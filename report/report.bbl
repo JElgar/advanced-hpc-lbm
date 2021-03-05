@@ -1,0 +1,7 @@
+\begin{thebibliography}{1}
+
+\bibitem{vsaac}
+Kevin~O’Brien Alexandre E.~Eichenberger, Peng~Wu.
+\newblock Vectorization for simd architectures with alignment constraints.
+
+\end{thebibliography}
