@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.14159265-2.6-1.40.21 (TeX Live 2020) (preloaded format=pdflatex 2020.12.6)  4 MAR 2021 19:42
+This is pdfTeX, Version 3.14159265-2.6-1.40.21 (TeX Live 2020) (preloaded format=pdflatex 2020.12.6)  4 MAR 2021 23:58
 entering extended mode
  restricted \write18 enabled.
  file:line:error style messages enabled.
@@ -530,7 +530,11 @@ Package: ifvtex 2019/10/25 v1.7 ifvtex legacy package. Use iftex instead.
 File: l3backend-pdftex.def 2020-09-24 L3 backend support: PDF output (pdfTeX)
 \l__kernel_color_stack_int=\count315
 \l__pdf_internal_box=\box109
-) (./report.aux)
+) (./report.aux
+
+LaTeX Warning: Label `tab:parallelresults' multiply defined.
+
+)
 \openout1 = `report.aux'.
 
 LaTeX Font Info:    Checking defaults for OML/cmm/m/it on input line 68.
@@ -642,60 +646,110 @@ File: lstlang1.sty 2020/03/24 1.8d listings language file
 ) (/usr/local/texlive/2020/texmf-dist/tex/latex/listings/lstmisc.sty
 File: lstmisc.sty 2020/03/24 1.8d (Carsten Heinz)
 )
-Package hyperref Info: bookmark level for unknown lstlisting defaults to 0 on input line 147.
-LaTeX Font Info:    Trying to load font information for OML+cmr on input line 149.
+Package hyperref Info: bookmark level for unknown lstlisting defaults to 0 on input line 149.
+LaTeX Font Info:    Trying to load font information for OML+cmr on input line 151.
  (/usr/local/texlive/2020/texmf-dist/tex/latex/base/omlcmr.fd
 File: omlcmr.fd 2019/12/16 v2.5j Standard LaTeX font definitions
 )
 LaTeX Font Info:    Font shape `OML/cmr/m/n' in size <8> not available
-(Font)              Font shape `OML/cmm/m/it' tried instead on input line 149.
+(Font)              Font shape `OML/cmm/m/it' tried instead on input line 151.
  [1
 
-{/usr/local/texlive/2020/texmf-var/fonts/map/pdftex/updmap/pdftex.map}] [2]
-LaTeX Font Info:    Trying to load font information for OMS+cmr on input line 369.
+{/usr/local/texlive/2020/texmf-var/fonts/map/pdftex/updmap/pdftex.map}]
+
+Package caption Warning: The option `hypcap=true' will be ignored for this
+(caption)                particular \caption on input line 281.
+See the caption package documentation for explanation.
+
+
+Package caption Warning: The option `hypcap=true' will be ignored for this
+(caption)                particular \caption on input line 322.
+See the caption package documentation for explanation.
+
+[2]
+LaTeX Font Info:    Trying to load font information for OMS+cmr on input line 404.
  (/usr/local/texlive/2020/texmf-dist/tex/latex/base/omscmr.fd
 File: omscmr.fd 2019/12/16 v2.5j Standard LaTeX font definitions
 )
 LaTeX Font Info:    Font shape `OMS/cmr/m/n' in size <8> not available
-(Font)              Font shape `OMS/cmsy/m/n' tried instead on input line 369.
+(Font)              Font shape `OMS/cmsy/m/n' tried instead on input line 404.
 
 
 Package caption Warning: The option `hypcap=true' will be ignored for this
-(caption)                particular \caption on input line 444.
+(caption)                particular \caption on input line 508.
 See the caption package documentation for explanation.
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 452--452
+Underfull \hbox (badness 10000) in paragraph at lines 516--516
 []\OT1/cmr/m/n/10 Number
  []
 
 
-Overfull \hbox (2.5988pt too wide) in paragraph at lines 452--453
+Overfull \hbox (2.5988pt too wide) in paragraph at lines 516--517
 []\OT1/cmr/m/n/10 1024x1024| 
  []
 
 
 Package caption Warning: The option `hypcap=true' will be ignored for this
-(caption)                particular \caption on input line 471.
+(caption)                particular \caption on input line 535.
 See the caption package documentation for explanation.
 
-[3] (./report.aux)
+
+Overfull \hbox (2.40427pt too wide) in paragraph at lines 544--544
+[]\OT1/cmr/m/n/10 Vectorised| 
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 546--547
+[]\OT1/cmr/m/n/10 1.15(14
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 547--548
+[]\OT1/cmr/m/n/10 1.85(14
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 548--549
+[]\OT1/cmr/m/n/10 5.68(28
+ []
+
+
+Overfull \hbox (2.5988pt too wide) in paragraph at lines 549--549
+[]\OT1/cmr/m/n/10 1024x1024| 
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 549--550
+[]\OT1/cmr/m/n/10 20.8(28
+ []
+
+
+Package caption Warning: The option `hypcap=true' will be ignored for this
+(caption)                particular \caption on input line 552.
+See the caption package documentation for explanation.
+
+[3] [4] (./report.aux)
 Package rerunfilecheck Info: File `report.out' has not changed.
-(rerunfilecheck)             Checksum: 7D77C4136DD72B71EDDD5FEF665F1F0F;353.
+(rerunfilecheck)             Checksum: 63BC6AE7497F21EB297F2FEC5572C1DE;470.
+
+
+LaTeX Warning: There were multiply-defined labels.
+
  ) 
 Here is how much of TeX's memory you used:
- 30476 strings out of 479383
+ 30480 strings out of 479383
  728990 string characters out of 5869373
- 1452028 words of memory out of 5000000
- 47082 multiletter control sequences out of 15000+600000
+ 1395394 words of memory out of 5000000
+ 47080 multiletter control sequences out of 15000+600000
  406403 words of font info for 37 fonts, out of 8000000 for 9000
  1141 hyphenation exceptions out of 8191
  108i,17n,111p,731b,2339s stack positions out of 5000i,500n,10000p,200000b,80000s
 {/usr/local/texlive/2020/texmf-dist/fonts/enc/dvips/cm-super/cm-super-ts1.enc}</usr/local/texlive/2020/texmf-dist/fonts/type1/public/amsfonts/cm/cmbx12.pfb></usr/local/texlive/2020/texmf-dist/fonts/type1/public/amsfonts/cm/cmmi10.pfb></usr/local/texlive/2020/texmf-dist/fonts/type1/public/amsfonts/cm/cmmi8.pfb></usr/local/texlive/2020/texmf-dist/fonts/type1/public/amsfonts/cm/cmr10.pfb></usr/local/texlive/2020/texmf-dist/fonts/type1/public/amsfonts/cm/cmr5.pfb></usr/local/texlive/2020/texmf-dist/fonts/type1/public/amsfonts/cm/cmr7.pfb></usr/local/texlive/2020/texmf-dist/fonts/type1/public/amsfonts/cm/cmr8.pfb></usr/local/texlive/2020/texmf-dist/fonts/type1/public/amsfonts/cm/cmsy7.pfb></usr/local/texlive/2020/texmf-dist/fonts/type1/public/amsfonts/cm/cmsy8.pfb></usr/local/texlive/2020/texmf-dist/fonts/type1/public/amsfonts/cm/cmti10.pfb></usr/local/texlive/2020/texmf-dist/fonts/type1/public/amsfonts/cm/cmtt10.pfb></usr/local/texlive/2020/texmf-dist/fonts/type1/public/cm-super/sfrm0800.pfb>
-Output written on report.pdf (3 pages, 145484 bytes).
+Output written on report.pdf (4 pages, 149703 bytes).
 PDF statistics:
- 132 PDF objects out of 1000 (max. 8388607)
- 113 compressed objects within 2 object streams
- 31 named destinations out of 1000 (max. 500000)
- 61 words of extra memory for PDF output out of 10000 (max. 10000000)
+ 152 PDF objects out of 1000 (max. 8388607)
+ 132 compressed objects within 2 object streams
+ 37 named destinations out of 1000 (max. 500000)
+ 77 words of extra memory for PDF output out of 10000 (max. 10000000)
 
