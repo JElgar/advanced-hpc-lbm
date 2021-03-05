@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.14159265-2.6-1.40.21 (TeX Live 2020) (preloaded format=pdflatex 2020.12.6)  5 MAR 2021 15:39
+This is pdfTeX, Version 3.14159265-2.6-1.40.21 (TeX Live 2020) (preloaded format=pdflatex 2020.12.6)  5 MAR 2021 16:16
 entering extended mode
  restricted \write18 enabled.
  file:line:error style messages enabled.
@@ -671,42 +671,42 @@ See the caption package documentation for explanation.
 [2] [3]
 
 Package caption Warning: The option `hypcap=true' will be ignored for this
-(caption)                particular \caption on input line 569.
+(caption)                particular \caption on input line 572.
 See the caption package documentation for explanation.
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 577--577
+Underfull \hbox (badness 10000) in paragraph at lines 580--580
 []\OT1/cmr/m/n/10 Number
  []
 
 
-Overfull \hbox (2.5988pt too wide) in paragraph at lines 577--578
+Overfull \hbox (2.5988pt too wide) in paragraph at lines 580--581
 []\OT1/cmr/m/n/10 1024x1024| 
  []
 
 
 Package caption Warning: The option `hypcap=true' will be ignored for this
-(caption)                particular \caption on input line 596.
+(caption)                particular \caption on input line 599.
 See the caption package documentation for explanation.
 
 
-Overfull \hbox (2.40427pt too wide) in paragraph at lines 605--605
+Overfull \hbox (2.40427pt too wide) in paragraph at lines 608--608
 []\OT1/cmr/m/n/10 Vectorised| 
  []
 
 
-Overfull \hbox (5.8446pt too wide) in paragraph at lines 605--606
+Overfull \hbox (5.8446pt too wide) in paragraph at lines 608--609
 []\OT1/cmr/m/n/10 Parallel(cores)| 
  []
 
 
-Overfull \hbox (2.5988pt too wide) in paragraph at lines 610--610
+Overfull \hbox (2.5988pt too wide) in paragraph at lines 613--613
 []\OT1/cmr/m/n/10 1024x1024| 
  []
 
 
 Package caption Warning: The option `hypcap=true' will be ignored for this
-(caption)                particular \caption on input line 613.
+(caption)                particular \caption on input line 616.
 See the caption package documentation for explanation.
 
 (./report.bbl) [4] (./report.aux)
@@ -714,15 +714,15 @@ Package rerunfilecheck Info: File `report.out' has not changed.
 (rerunfilecheck)             Checksum: 9D49D36565B2FD630CB845E1E19969ED;398.
  ) 
 Here is how much of TeX's memory you used:
- 30444 strings out of 479383
- 728433 string characters out of 5869373
- 1364846 words of memory out of 5000000
- 47047 multiletter control sequences out of 15000+600000
+ 30452 strings out of 479383
+ 728573 string characters out of 5869373
+ 1364862 words of memory out of 5000000
+ 47055 multiletter control sequences out of 15000+600000
  408563 words of font info for 44 fonts, out of 8000000 for 9000
  1141 hyphenation exceptions out of 8191
  108i,17n,111p,731b,2350s stack positions out of 5000i,500n,10000p,200000b,80000s
 {/usr/local/texlive/2020/texmf-dist/fonts/enc/dvips/cm-super/cm-super-ts1.enc}</usr/local/texlive/2020/texmf-dist/fonts/type1/public/amsfonts/cm/cmbx12.pfb></usr/local/texlive/2020/texmf-dist/fonts/type1/public/amsfonts/cm/cmmi10.pfb></usr/local/texlive/2020/texmf-dist/fonts/type1/public/amsfonts/cm/cmmi8.pfb></usr/local/texlive/2020/texmf-dist/fonts/type1/public/amsfonts/cm/cmr10.pfb></usr/local/texlive/2020/texmf-dist/fonts/type1/public/amsfonts/cm/cmr12.pfb></usr/local/texlive/2020/texmf-dist/fonts/type1/public/amsfonts/cm/cmr17.pfb></usr/local/texlive/2020/texmf-dist/fonts/type1/public/amsfonts/cm/cmr5.pfb></usr/local/texlive/2020/texmf-dist/fonts/type1/public/amsfonts/cm/cmr7.pfb></usr/local/texlive/2020/texmf-dist/fonts/type1/public/amsfonts/cm/cmr8.pfb></usr/local/texlive/2020/texmf-dist/fonts/type1/public/amsfonts/cm/cmsy7.pfb></usr/local/texlive/2020/texmf-dist/fonts/type1/public/amsfonts/cm/cmti10.pfb></usr/local/texlive/2020/texmf-dist/fonts/type1/public/amsfonts/cm/cmtt10.pfb></usr/local/texlive/2020/texmf-dist/fonts/type1/public/cm-super/sfrm0800.pfb></usr/local/texlive/2020/texmf-dist/fonts/type1/public/cm-super/sfrm1000.pfb>
-Output written on report.pdf (4 pages, 172272 bytes).
+Output written on report.pdf (4 pages, 172543 bytes).
 PDF statistics:
  149 PDF objects out of 1000 (max. 8388607)
  127 compressed objects within 2 object streams
