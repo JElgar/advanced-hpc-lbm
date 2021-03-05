@@ -109,11 +109,10 @@ int initialise(const char* paramfile, const char* obstaclefile,
 ** accelerate_flow(), propagate(), rebound() & collision()
 */
 
-float timestep(const t_param params, t_speed* cells, t_speed* tmp_cells, char* obstacles);
-int accelerate_flow(const t_param params, t_speed* cells, char* obstacles);
-float propagate_rebound_and_collisions(const int nx, const int ny, const float omega, t_speed* cells, t_speed* tmp_cells, char* obstacles);
+float timestep(const t_param params, t_speed* cells, t_speed* tmp_cells, const char* obstacles, const int number_of_threads);
+int accelerate_flow(const t_param params, t_speed* cells, char* obstacles, const int number_of_threads);
+float propagate_rebound_and_collisions(const int nx, const int ny, const float omega, t_speed* cells, t_speed* tmp_cells, char* obstacles, int number_of_threads);
 int write_values(const t_param params, t_speed* cells, char* obstacles, float* av_vels);
-int collision(const t_param params, t_speed* cells, t_speed* tmp_cells, char* obstacles);
 
 /* finalise, including freeing up allocated memory */
 int finalise(const t_param* params, t_speed* cells_ptr, t_speed* tmp_cells_ptr,
@@ -163,6 +162,7 @@ int main(int argc, char* argv[])
 
   /* initialise our data structures and load values from file */
   initialise(paramfile, obstaclefile, &params, cells, tmp_cells, &obstacles, &av_vels);
+  const int number_of_threads = (params.nx * params.ny > 34000) ? 28 : 14;
 
   /* iterate for maxIters timesteps */
   gettimeofday(&timstr, NULL);
@@ -171,7 +171,7 @@ int main(int argc, char* argv[])
 
   for (int tt = 0; tt < params.maxIters; tt++)
   {
-    final_av_velocity = timestep(params, cells, tmp_cells, obstacles);
+    final_av_velocity = timestep(params, cells, tmp_cells, obstacles, number_of_threads);
     av_vels[tt] = final_av_velocity;
 
 #ifdef DEBUG
@@ -201,15 +201,15 @@ int main(int argc, char* argv[])
   return EXIT_SUCCESS;
 }
 
-float timestep(const t_param params, t_speed* cells, t_speed* tmp_cells, char* restrict obstacles)
+float timestep(const t_param params, t_speed* cells, t_speed* tmp_cells, char* restrict obstacles, const int number_of_threads)
 {
-  accelerate_flow(params, cells, obstacles);
-  float time_step_solution = propagate_rebound_and_collisions(params.nx, params.ny, params.omega, cells, tmp_cells, obstacles);
+  accelerate_flow(params, cells, obstacles, number_of_threads);
+  float time_step_solution = propagate_rebound_and_collisions(params.nx, params.ny, params.omega, cells, tmp_cells, obstacles, number_of_threads);
   swap(cells, tmp_cells);
   return time_step_solution;
 }
 
-int accelerate_flow(const t_param params, t_speed* restrict cells, char* restrict obstacles)
+int accelerate_flow(const t_param params, t_speed* restrict cells, char* restrict obstacles, int number_of_threads)
 {
   /* compute weighting factors */
   const float w1 = params.density * params.accel / 9.f;
@@ -239,7 +239,7 @@ int accelerate_flow(const t_param params, t_speed* restrict cells, char* restric
   __assume(params.nx%2==0);
 
   // #pragma omp simd
-  #pragma omp parallel for
+  #pragma omp parallel for num_threads(number_of_threads)
   for (int ii = 0; ii < params.nx; ii++)
   {
     /* if the cell is not occupied and
@@ -263,7 +263,7 @@ int accelerate_flow(const t_param params, t_speed* restrict cells, char* restric
   return EXIT_SUCCESS;
 }
 
-float propagate_rebound_and_collisions(const int nx, const int ny, const float omega, const t_speed* restrict cells, t_speed* restrict tmp_cells, char* restrict obstacles)
+float propagate_rebound_and_collisions(const int nx, const int ny, const float omega, const t_speed* restrict cells, t_speed* restrict tmp_cells, char* restrict obstacles, const int number_of_threads)
 {
   int   tot_cells = 0;  /* no. of cells used in calculation */
   float tot_u = 0.f;          /* accumulated magnitudes of velocity for each cell */
@@ -308,7 +308,7 @@ float propagate_rebound_and_collisions(const int nx, const int ny, const float o
   // #pragma omp parallel
   // #pragma distribute_point
   {
-     #pragma omp parallel for schedule(static) reduction(+:tot_cells) reduction(+:tot_u)
+     #pragma omp parallel for schedule(static) reduction(+:tot_cells) reduction(+:tot_u) num_threads(number_of_threads)
     // #pragma omp parallel for simd collapse(2) schedule(static) reduction(+:tot_cells) reduction(+:tot_u) aligned(cells:64) aligned(tmp_cells:64) aligned(obstacles:64)
     for (int jj = 0; jj < ny; jj++)
     {    
@@ -537,7 +537,8 @@ int initialise(const char* paramfile, const char* obstaclefile,
   float w1 = params->density      / 9.f;
   float w2 = params->density      / 36.f;
 
-  #pragma omp parallel for schedule(static)
+  const int number_of_threads = (params->nx * params->ny > 34000) ? 28 : 14;
+  #pragma omp parallel for schedule(static) num_threads(number_of_threads)
   for (int jj = 0; jj < params->ny; jj++)
   {
     #pragma omp simd aligned(cells_ptr:64) aligned(obstacles_ptr:64)
