@@ -80,13 +80,13 @@ This report will explore the optimizations applied to the implementation of
 a given algorithm to solve a d2q9-bgk Lattice Boltzmann scheme.  Starting with
 an unoptimized serial implementation, it will apply three stages of optimisation
 and compare the results. The first stage will be serial optimisations which
-make the general alogirthm more efficient mainly by reducing the number of
+make the general algorithm more efficient mainly by reducing the number of
 parses over the cells array to one, reducing the memory bandwidth required. The
 second stage will make use of SIMD, single instruction multiple data, where the
 compiler can vectorize certain sections of the algorithm allowing it to compute
 multiple data values with single instructions by making use of vector registers
 and instructions. The final stage will explore using OpenMP to run section of
-the algorithm in parallel and convey the large benifits of being able to spread
+the algorithm in parallel and convey the large benefits of being able to spread
 out the required computation over multiple cores. However it will also look at
 the limitation of this approach as memory bandwidth and sharing can continue to
 limit performance. Throughout the stages few changes will be made to the
@@ -164,7 +164,7 @@ were then swapped which set the \verb|cells| array to the correct value without
 having to write directly to the array. Overall these optimisations reduced the 
 runtime of the serial implementation from 38.5 seconds to 26.4.
 
-\subsection{Vecotrisation}
+\subsection{Vectorisation}
 
 Having improved the implementation of the serial code, there is now a clear
 critical section (the section which takes the most time), inside the single
@@ -196,8 +196,8 @@ compiler is also not able to assume that an array of floats, such as the arrays
 of speeds in the new \verb|t_speed| struct are aligned. Therefore it will have
 to complete this prior step regardless. To prevent this the arrays can be
 aligned when they are created using the \verb|__mm_malloc| function, as shown in \autoref{lst:cellsdataalign}. This
-ensure the created array is aligned on the request boundry, in this case 64
-bytes was used to match the size of the cache line in an \emph{intel xeon
+ensure the created array is aligned on the request boundary, in this case 64
+bytes was used to match the size of the cache line in an \emph{Intel Xeon
 e5-2680}. Compiler directives can then be use to tell the compiler that the arrays
 are aligned. This allows the compiler to skip the "proluge" step and use the
 aligned instructions. This significantly reduces the overhead of vectorizing as
@@ -233,13 +233,13 @@ directive \verb|#pragma omp simd| to the inner for loop. This explicitly tells
 the compiler that this section of the code should be vectorized. 
 
 This alone, although successfully vectorizing the loop, did not result in a
-significant performance gain. Observing the roofline graph showed that this
+significant performance gain. Observing the Roofline graph showed that this
 version of the vectorized code was very heavily memory bandwidth bound. This
 was as a result of the data layout of the cells array. 
 
 In the original implementation the speeds for each cell were stored in a
 structure (\verb|t_speed|) and the whole grid of cells was an array of these
-structures. This implementation does not lend it self to vetorization as it
+structures. This implementation does not lend it self to vectorization as it
 can result in unnecessary fetches from memory. This is because when a single
 speed value is fetch an entire cache line (64 bits) will be used to fetch the
 structure. This results in a waste of memory bandwidth as the rest of the
@@ -249,24 +249,31 @@ required. Therefore switching the implementation to use a structure of arrays
 efficiently as each fetch for a speed only fetched a single float and therefore
 reduced the overall memory bandwidth required. 
 
-When comparing the roofline results in \autoref{fig:rlserial} we can see a
+When comparing the Roofline results in \autoref{fig:rlserial} we can see a
 large improvement in the performance, from 2.49 GLOPs to 13.2 GLOPs, once the
-vectorization is introduced. Similarly we also see a reduction in the run times
-as shown in \autoref{tab:stageruntimes}. These improvements are as a direct
+vectorization is introduced. These improvements are as a direct
 result of vectorization and the update to the data layout which reduces the
-memory bandwidth requirements. The intel compiler also provides a vectorized
+memory bandwidth requirements. The Intel compiler also provides a vectorized
 implementation for the \verb|sqrt| function which allows for the majority of
 the computation in the critical section to be vectorized.
 
 Despite the large improvements, it may have been expected to see a larger
-improvement when the majority of instructions are now vectorized, which in the
-critical section could reduce the number of required instruction by a
-significant factor since the vector length is 32 bits. However such a large
-improvement is not observed as the problem remains memory bandwidth bound
-meaning as the number of instruction reduces and the size of the vectors
-increase, the memory bandwidth required increase as more data is required at
-the same time. Moreover there is some additional overhead to vectorizing the
-code and thus this will impact the overall run time.
+improvement when the majority of instructions are now vectorized. In the
+critical section this vectorization could be expected to reduce the number of
+required instruction by a significant factor as a result of the vector length
+being 32 bits. However such a large improvement is not observed as the problem
+remains memory bandwidth bound meaning as the number of instructions is reduces
+and the size of the vectors increase, the memory bandwidth required increases
+as more data is required at to compute these vector instructions. Moreover
+there is some additional overhead to vectorizing the code and thus this will
+impact the overall run time.
+
+Overall the use of vectorization reduces the run time by a factor of 2.7 to 3.5
+times as shown in \autoref{tab:stageruntimes}. It is therefore a very valuable
+approach in order to reduce the run time, however it can require some
+significant changes to the algorithm in order to setup efficiently such as
+ensuring the correct data layout and alignment.
+
 
 \begin{tikzpicture}
 \begin{axis}[
@@ -390,17 +397,17 @@ values rather than accumulating the values across all the threads.
 In order to efficiently calculate these shared sums a \verb|reduction| is
 required. The \verb|reduction| directive tells the compiler that the given
 variable is going to be accumulated over the duration of the parallel region. This allows
-each thread to calculate its own sum without having to syncronise the global
+each thread to calculate its own sum without having to synchronize the global
 shared value on every write. Once the forked section is complete and the
-threads syncronise then all the sums can be combined to determine the final
-value of the accumulated variables. This is signifantly faster than requiring a
-syncronised section during the fork as the threads can run independently and not have to wait
-for each thread to syncronise the sum or lock and unlock (in the case of an
+threads synchronize then all the sums can be combined to determine the final
+value of the accumulated variables. This is significantly faster than requiring a
+synchronized section during the fork as the threads can run independently and not have to wait
+for each thread to synchronize the sum or lock and unlock (in the case of an
 atomic variable) the values.
 
 Another consideration when writing a parallel program is the number of cores
-to use. In a bluecrystal node there are 2 sockets, which house 2 \emph{intel
-xeon e5-2680} CPUs. Each of these CPUs have 14 cores, giving a total of 28
+to use. In a bluecrystal node there are 2 sockets, which house 2 \emph{Intel
+Xeon e5-2680} CPUs. Each of these CPUs have 14 cores, giving a total of 28
 cores per node. \autoref{tab:parallelresults} and \autoref{fig:parallelresults}
 show the run times of the parallel code on different numbers of cores. In the
 larger problems (1024x1024) it is clear that as the number of cores increases
@@ -409,9 +416,9 @@ is linear, meaning as the number of cores increases the run time is halved.
 This is as a result of the work in the critical section being shared over a
 larger pool of cores and thus the total time of the forked region is decreased.
 
-However this linear relationship becomes a sublinear plateaus as the number of
+However this linear relationship becomes a sub-linear plateaus as the number of
 cores increases. The reason for this can be observed in
-\autoref{fig:rlparallel} which shows the roofline analysis for the parallel
+\autoref{fig:rlparallel} which shows the Roofline analysis for the parallel
 algorithm running on 28 cores. The results lie in the memory bound region,
 this is as a result of the memory bandwidth becoming saturated as the number of
 cores are increased and thus the computation rate increases at a faster rate
@@ -439,7 +446,7 @@ does not mean that the NUMA problem is reduced. This is because during the
 memory assignment, in the \verb|initialise| function, the initial values for the
 cells array are assigned serially (on a single thread). This means all the
 values will in exist the same cache, linked to this single NUMA region. This
-can be prevented by ensuring the initialisation of the values is parallelised
+can be prevented by ensuring the initialisation of the values is parallelized
 in the same way as the it is accessed in the critical region. In this case this
 means also using the \verb|#pragma omp parallel for| directive when assigning the initial
 values to the cells array. This will ensure the data is allocated in the same
@@ -450,12 +457,12 @@ access to be reduced.
 
 When comparing the run times of the parallel code with the vectorized
 implementation in \autoref{tab:stageruntimes}, for larger problem sizes we see
-an almost 14x reduction. Similarly when comparing the roofline analysis in
+an almost 14x reduction. Similarly when comparing the Roofline analysis in
 \autoref{fig:rlserial} and \autoref{fig:rlparallel} an over 9 times improvement
 in performance is observed. However similarly to the vectorized code we do not
 observe a 28 times improvement as may be expected when running over 28 cores.
 This is as a result of the memory saturation and the overhead of forking and
-then syncronising the code. In smaller problems this overhead and the need for
+then synchronising the code. In smaller problems this overhead and the need for
 memory sharing can even result in reduced performance as the core count increases
 after a certain point.
 
@@ -624,7 +631,7 @@ Often the most efficient approach to optimising a code can be to assist the
 compiler in its own optimisations. Simple changes such as using compiler
 optimisation flags can have a profound impact on the runtime of the algorithm.
 Similarly with the correct hints and memory aligned compilers are able to
-automatically vertorize a given code. This can dramatically reduce the run time
+automatically vectorize a given code. This can dramatically reduce the run time
 by allowing a vector instructions to compute multiple values and thus reduce the
 overall number of instructions required. In this implementation, the vectorized code ran
 over 2.5 times faster than the optimised serial version with an approximately 5
