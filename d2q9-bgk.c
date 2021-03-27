@@ -64,6 +64,7 @@
 #include <sys/time.h>
 #include <sys/resource.h>
 #include <xmmintrin.h>
+#include <mpi.h>
 
 #define NSPEEDS         9
 #define FINALSTATEFILE  "final_state.dat"
@@ -72,13 +73,15 @@
 /* struct to hold the parameter values */
 typedef struct
 {
-  int    nx;            /* no. of cells in x-direction */
-  int    ny;            /* no. of cells in y-direction */
+  int    nx;            /* no. of cells in x-direction for each rank */
+  int    ny;            /* no. of cells in y-direction for each rank */
   int    maxIters;      /* no. of iterations */
   int    reynolds_dim;  /* dimension for Reynolds number */
   float density;       /* density per link */
   float accel;         /* density redistribution */
   float omega;         /* relaxation parameter */
+  int number_of_ranks;
+  int rank_id;
 } t_param;
 
 /* struct to hold the 'speed' arrays */
@@ -110,7 +113,7 @@ int initialise(const char* paramfile, const char* obstaclefile,
 ** accelerate_flow(), propagate(), rebound() & collision()
 */
 
-float timestep(const t_param params, t_speed* cells, t_speed* tmp_cells, char* obstacles);
+float timestep(const t_param params, t_speed* cells, t_speed* tmp_cells, char* obstacles, int rank_id, int number_of_ranks);
 int accelerate_flow(const t_param params, t_speed* cells, char* obstacles);
 float propagate_rebound_and_collisions(const t_param params, t_speed* cells, t_speed* tmp_cells, char* obstacles);
 int write_values(const t_param params, t_speed* cells, char* obstacles, float* av_vels);
@@ -138,6 +141,16 @@ void swap(t_speed* cells, t_speed* cells2);
 */
 int main(int argc, char* argv[])
 {
+  int flag;               /* for checking whether MPI_Init() has been called */
+  /* Initialize MPI */
+  MPI_Init(&argc, &argv);
+
+  /* check whether the initialisation was successful */
+  MPI_Initialized(&flag);
+  if ( flag != 1 ) {
+    MPI_Abort(MPI_COMM_WORLD,EXIT_FAILURE);
+  }
+  
   char*    paramfile = NULL;    /* name of the input parameter file */
   char*    obstaclefile = NULL; /* name of a the input obstacle file */
   t_param  params;              /* struct to hold parameter values */
@@ -165,53 +178,75 @@ int main(int argc, char* argv[])
   init_tic=tot_tic;
   /* initialise our data structures and load values from file */
   initialise(paramfile, obstaclefile, &params, cells, tmp_cells, &obstacles, &av_vels);
+ 
+  int number_of_obstacles = 0;
+  int number_of_cells = 0;
+  for (int jj = 1; jj < params.ny + 1; jj++)
+  {    
+    for (int ii = 0; ii < params.nx; ii++)
+    {
+      number_of_cells++;
+      if (obstacles[jj*params.nx + ii]) {
+        number_of_obstacles++;
+      }
+    }
+  }
+
+  printf("Hello, world; process %d of %d. I have %d obstacles and %d cells.\n", params.rank_id, params.number_of_ranks, number_of_obstacles, number_of_cells);
 
   /* Init time stops here, compute time starts*/
-  gettimeofday(&timstr, NULL);
-  init_toc = timstr.tv_sec + (timstr.tv_usec / 1000000.0);
-  comp_tic=init_toc;
-
-  float final_av_velocity;
-  for (int tt = 0; tt < params.maxIters; tt++)
-  {
-    final_av_velocity = timestep(params, cells, tmp_cells, obstacles);
-    av_vels[tt] = final_av_velocity;
-
-#ifdef DEBUG
-    printf("==timestep: %d==\n", tt);
-    printf("av velocity: %.12E\n", av_vels[tt]);
-    printf("tot density: %.12E\n", total_density(params, cells));
-#endif
-  }
-  
-  /* Compute time stops here, collate time starts*/
-  gettimeofday(&timstr, NULL);
-  comp_toc = timstr.tv_sec + (timstr.tv_usec / 1000000.0);
-  col_tic=comp_toc;
-
-  // Collate data from ranks here 
-
-  /* Total/collate time stops here.*/
-  gettimeofday(&timstr, NULL);
-  col_toc = timstr.tv_sec + (timstr.tv_usec / 1000000.0);
-  tot_toc = col_toc;
-  
-  /* write final values and free memory */
-  printf("==done==\n");
-  printf("Reynolds number:\t\t%.12E\n", calc_reynolds(params, final_av_velocity));
-  printf("Elapsed Init time:\t\t\t%.6lf (s)\n",    init_toc - init_tic);
-  printf("Elapsed Compute time:\t\t\t%.6lf (s)\n", comp_toc - comp_tic);
-  printf("Elapsed Collate time:\t\t\t%.6lf (s)\n", col_toc  - col_tic);
-  printf("Elapsed Total time:\t\t\t%.6lf (s)\n",   tot_toc  - tot_tic);
-  write_values(params, cells, obstacles, av_vels);
+//   gettimeofday(&timstr, NULL);
+//   init_toc = timstr.tv_sec + (timstr.tv_usec / 1000000.0);
+//   comp_tic=init_toc;
+// 
+//   float final_av_velocity;
+//   for (int tt = 0; tt < params.maxIters; tt++)
+//   {
+//     final_av_velocity = timestep(params, cells, tmp_cells, obstacles, rank_id, number_of_ranks);
+//     av_vels[tt] = final_av_velocity;
+// 
+// #ifdef DEBUG
+//     printf("==timestep: %d==\n", tt);
+//     printf("av velocity: %.12E\n", av_vels[tt]);
+//     printf("tot density: %.12E\n", total_density(params, cells));
+// #endif
+//   }
+//   
+//   /* Compute time stops here, collate time starts*/
+//   gettimeofday(&timstr, NULL);
+//   comp_toc = timstr.tv_sec + (timstr.tv_usec / 1000000.0);
+//   col_tic=comp_toc;
+// 
+//   // Collate data from ranks here 
+// 
+//   /* Total/collate time stops here.*/
+//   gettimeofday(&timstr, NULL);
+//   col_toc = timstr.tv_sec + (timstr.tv_usec / 1000000.0);
+//   tot_toc = col_toc;
+//   
+//   /* write final values and free memory */
+//   printf("==done==\n");
+//   printf("Hello, world; process %d of %d\n", rank_id, number_of_ranks);
+//   printf("Reynolds number:\t\t%.12E\n", calc_reynolds(params, final_av_velocity));
+//   printf("Elapsed Init time:\t\t\t%.6lf (s)\n",    init_toc - init_tic);
+//   printf("Elapsed Compute time:\t\t\t%.6lf (s)\n", comp_toc - comp_tic);
+//   printf("Elapsed Collate time:\t\t\t%.6lf (s)\n", col_toc  - col_tic);
+//   printf("Elapsed Total time:\t\t\t%.6lf (s)\n",   tot_toc  - tot_tic);
+//   write_values(params, cells, obstacles, av_vels);
   finalise(&params, cells, tmp_cells, &obstacles, &av_vels);
+  
+  /* finialise the MPI enviroment */
+  MPI_Finalize();
 
   return EXIT_SUCCESS;
 }
 
-float timestep(const t_param params, t_speed* cells, t_speed* tmp_cells, char* obstacles)
+float timestep(const t_param params, t_speed* cells, t_speed* tmp_cells, char* obstacles, int rank_id, int number_of_ranks)
 {
-  accelerate_flow(params, cells, obstacles);
+  /* This only affects the 2nd row of the grid, so only the first rank will have to edit these cells */
+  if (rank_id == 0) {
+    accelerate_flow(params, cells, obstacles);
+  }
   float time_step_solution = propagate_rebound_and_collisions(params, cells, tmp_cells, obstacles);
   swap(cells, tmp_cells);
   return time_step_solution;
@@ -238,8 +273,6 @@ int accelerate_flow(const t_param params, t_speed* cells, char* restrict obstacl
   
   __assume(params.nx%128==0);
 
-  // #pragma omp simd
-  #pragma omp parallel for
   for (int ii = 0; ii < params.nx; ii++)
   {
     /* if the cell is not occupied and
@@ -313,11 +346,9 @@ float propagate_rebound_and_collisions(const t_param params, t_speed* cells, t_s
   __assume(params.ny%128==0);
 
   /* loop over _all_ cells */
-  // #pragma omp parallel
-  // #pragma distribute_point
   {
-     #pragma omp parallel for schedule(static) reduction(+:tot_cells) reduction(+:tot_u)
-    // #pragma omp parallel for simd collapse(2) schedule(static) reduction(+:tot_cells) reduction(+:tot_u) aligned(cells:64) aligned(tmp_cells:64) aligned(obstacles:64)
+    /* Before we start this we should grab the data from the other rank for the top and bottom row */
+    // MPI_Sendrecv();
     for (int jj = 0; jj < params.ny; jj++)
     {    
       #pragma omp simd aligned(cells:64) aligned(tmp_cells:64) aligned(obstacles:64) reduction(+:tot_cells) reduction(+:tot_u)
@@ -327,7 +358,7 @@ float propagate_rebound_and_collisions(const t_param params, t_speed* cells, t_s
         const int x_e = (ii + 1) & (params.nx - 1);
         const int y_s = (jj == 0) ? (jj + params.ny - 1) : (jj - 1);
         const int x_w = (ii == 0) ? (ii + params.nx - 1) : (ii - 1);
-        
+       
         /* if the cell contains an obstacle */
         if (obstacles[jj*params.nx + ii])
         {
@@ -466,6 +497,9 @@ int initialise(const char* paramfile, const char* obstaclefile,
   int    xx, yy;         /* generic array indices */
   int    blocked;        /* indicates whether a cell is blocked by an obstacle */
   int    retval;         /* to hold return value for checking */
+  int rank_id;               /* 'rank' of process among it's cohort */ 
+  int number_of_ranks;               /* size of cohort, i.e. num processes started */
+
 
   /* open the parameter file */
   fp = fopen(paramfile, "r");
@@ -507,6 +541,20 @@ int initialise(const char* paramfile, const char* obstaclefile,
 
   /* and close up the file */
   fclose(fp);
+  
+  /* Set rank */
+  MPI_Comm_rank(MPI_COMM_WORLD,&rank_id);
+  params->rank_id = rank_id;
+  MPI_Comm_size(MPI_COMM_WORLD,&number_of_ranks);
+  params->number_of_ranks = number_of_ranks;
+  
+  /* Set grid size values */
+  int full_grid_height = params->ny;
+  params->ny /= params->number_of_ranks;
+
+  /* Calculate actual row range of this rank */
+  int start_row = params->ny * params->rank_id;
+  int end_row = params->ny * params->rank_id + params->ny - 1;
 
   /*
   ** Allocate memory.
@@ -527,34 +575,35 @@ int initialise(const char* paramfile, const char* obstaclefile,
   ** a 1D array of these structs.
   */
 
+  int number_of_cells = (params->ny + 2) * params->nx;
+
   /* main grid */
-  cells_ptr->speed0 = _mm_malloc(params->nx * params->ny * sizeof(float), 64);
-  cells_ptr->speed1 = _mm_malloc(params->nx * params->ny * sizeof(float), 64);
-  cells_ptr->speed2 = _mm_malloc(params->nx * params->ny * sizeof(float), 64);
-  cells_ptr->speed3 = _mm_malloc(params->nx * params->ny * sizeof(float), 64);
-  cells_ptr->speed4 = _mm_malloc(params->nx * params->ny * sizeof(float), 64);
-  cells_ptr->speed5 = _mm_malloc(params->nx * params->ny * sizeof(float), 64);
-  cells_ptr->speed6 = _mm_malloc(params->nx * params->ny * sizeof(float), 64);
-  cells_ptr->speed7 = _mm_malloc(params->nx * params->ny * sizeof(float), 64);
-  cells_ptr->speed8 = _mm_malloc(params->nx * params->ny * sizeof(float), 64);
+  cells_ptr->speed0 = _mm_malloc(number_of_cells * sizeof(float), 64);
+  cells_ptr->speed1 = _mm_malloc(number_of_cells * sizeof(float), 64);
+  cells_ptr->speed2 = _mm_malloc(number_of_cells * sizeof(float), 64);
+  cells_ptr->speed3 = _mm_malloc(number_of_cells * sizeof(float), 64);
+  cells_ptr->speed4 = _mm_malloc(number_of_cells * sizeof(float), 64);
+  cells_ptr->speed5 = _mm_malloc(number_of_cells * sizeof(float), 64);
+  cells_ptr->speed6 = _mm_malloc(number_of_cells * sizeof(float), 64);
+  cells_ptr->speed7 = _mm_malloc(number_of_cells * sizeof(float), 64);
+  cells_ptr->speed8 = _mm_malloc(number_of_cells * sizeof(float), 64);
 
   if (cells_ptr == NULL) die("cannot allocate memory for cells", __LINE__, __FILE__);
 
   /* 'helper' grid, used as scratch space */
-  tmp_cells_ptr->speed0 = _mm_malloc(params->nx * params->ny * sizeof(float), 64);
-  tmp_cells_ptr->speed1 = _mm_malloc(params->nx * params->ny * sizeof(float), 64);
-  tmp_cells_ptr->speed2 = _mm_malloc(params->nx * params->ny * sizeof(float), 64);
-  tmp_cells_ptr->speed3 = _mm_malloc(params->nx * params->ny * sizeof(float), 64);
-  tmp_cells_ptr->speed4 = _mm_malloc(params->nx * params->ny * sizeof(float), 64);
-  tmp_cells_ptr->speed5 = _mm_malloc(params->nx * params->ny * sizeof(float), 64);
-  tmp_cells_ptr->speed6 = _mm_malloc(params->nx * params->ny * sizeof(float), 64);
-  tmp_cells_ptr->speed7 = _mm_malloc(params->nx * params->ny * sizeof(float), 64);
-  tmp_cells_ptr->speed8 = _mm_malloc(params->nx * params->ny * sizeof(float), 64);
+  tmp_cells_ptr->speed0 = _mm_malloc(number_of_cells * sizeof(float), 64);
+  tmp_cells_ptr->speed1 = _mm_malloc(number_of_cells * sizeof(float), 64);
+  tmp_cells_ptr->speed2 = _mm_malloc(number_of_cells * sizeof(float), 64);
+  tmp_cells_ptr->speed3 = _mm_malloc(number_of_cells * sizeof(float), 64);
+  tmp_cells_ptr->speed4 = _mm_malloc(number_of_cells * sizeof(float), 64);
+  tmp_cells_ptr->speed5 = _mm_malloc(number_of_cells * sizeof(float), 64);
+  tmp_cells_ptr->speed6 = _mm_malloc(number_of_cells * sizeof(float), 64);
+  tmp_cells_ptr->speed7 = _mm_malloc(number_of_cells * sizeof(float), 64);
+  tmp_cells_ptr->speed8 = _mm_malloc(number_of_cells * sizeof(float), 64);
   if (tmp_cells_ptr == NULL) die("cannot allocate memory for tmp_cells", __LINE__, __FILE__);
 
   /* the map of obstacles */
-  *obstacles_ptr = _mm_malloc(sizeof(char) * (params->ny * params->nx), 64);
-  // *obstacles_ptr = malloc(sizeof(int) * (params->ny * params->nx));
+  *obstacles_ptr = _mm_malloc(sizeof(char) * number_of_cells, 64);
 
   if (*obstacles_ptr == NULL) die("cannot allocate column memory for obstacles", __LINE__, __FILE__);
 
@@ -563,8 +612,8 @@ int initialise(const char* paramfile, const char* obstaclefile,
   float w1 = params->density      / 9.f;
   float w2 = params->density      / 36.f;
 
-  #pragma omp parallel for
-  for (int jj = 0; jj < params->ny; jj++)
+  // Initalize all values that are outside the halo region
+  for (int jj = 1; jj < params->ny - 1; jj++)
   {
     for (int ii = 0; ii < params->nx; ii++)
     {
@@ -584,8 +633,7 @@ int initialise(const char* paramfile, const char* obstaclefile,
   }
 
   /* first set all cells in obstacle array to zero */
-  #pragma omp parallel for
-  for (int jj = 0; jj < params->ny; jj++)
+  for (int jj = 0; jj < params->ny + 2; jj++)
   {
     for (int ii = 0; ii < params->nx; ii++)
     {
@@ -610,13 +658,35 @@ int initialise(const char* paramfile, const char* obstaclefile,
 
     if (xx < 0 || xx > params->nx - 1) die("obstacle x-coord out of range", __LINE__, __FILE__);
 
-    if (yy < 0 || yy > params->ny - 1) die("obstacle y-coord out of range", __LINE__, __FILE__);
-
     if (blocked != 1) die("obstacle blocked value should be 1", __LINE__, __FILE__);
 
-    /* assign to array */
-    (*obstacles_ptr)[xx + yy*params->nx] = blocked;
+    /* Grab the halo obstacles */
+    if (start_row - 1 == -1 && yy == full_grid_height - 1) {
+      (*obstacles_ptr)[xx] = blocked;
+    }
+    if (end_row + 1 == full_grid_height && yy == 0) {
+      (*obstacles_ptr)[xx + (full_grid_height + 1)*params->nx] = blocked;
+    }
+
+    int obstacle_start_row = start_row - 1;
+    if (obstacle_start_row == -1) {
+      obstacle_start_row = 0;
+    }
+    
+    int obstacle_end_row = end_row + 1;
+    if (obstacle_end_row == full_grid_height) {
+      obstacle_end_row = full_grid_height - 1; 
+    }
+
+
+    /* If in this rank's grid assigned to array */
+    if (yy >= obstacle_start_row && yy <= obstacle_end_row) 
+    {
+      int index = yy - start_row;
+      (*obstacles_ptr)[xx + (index+1)*params->nx] = blocked;
+    }
   }
+  printf("Process %d of %d. My starting row is %d and my end row is %d.\n", params->rank_id, params->number_of_ranks, start_row, end_row);
 
   /* and close the file */
   fclose(fp);
@@ -802,13 +872,6 @@ void usage(const char* exe)
   fprintf(stderr, "Usage: %s <paramfile> <obstaclefile>\n", exe);
   exit(EXIT_FAILURE);
 }
-
-// void swap(t_speed* cells, t_speed* cells2) {
-//   /* Swaps pointers of cells */
-//   t_speed* tmp = cells;
-//   cells = cells2;
-//   cells2 = tmp;
-// }
 
 void swap(t_speed *a, t_speed *b) {
   t_speed tmp = *a;

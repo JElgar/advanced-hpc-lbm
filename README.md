@@ -69,12 +69,6 @@ When finished, the output from your job will be in a file called
 If you wish to run a different set of input parameters, you should
 modify `job_submit_d2q9-bgk` to update the value assigned to `options`.
 
-### Other job stuff
-
-To run interactively:
-
-`srun --partition test --pty /bin/bash`
-
 ## Checking submission content
 
 Before handing in the coursework, you can use the `check_submission.sh` script to make sure that your code builds in a clean environment. This will reduce the chances of the automarker failing to build or run your code.
