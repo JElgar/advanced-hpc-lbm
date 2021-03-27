@@ -181,7 +181,7 @@ int main(int argc, char* argv[])
  
   int number_of_obstacles = 0;
   int number_of_cells = 0;
-  for (int jj = 1; jj < params.ny + 1; jj++)
+  for (int jj = 0; jj < params.ny + 2; jj++)
   {    
     for (int ii = 0; ii < params.nx; ii++)
     {
@@ -665,7 +665,7 @@ int initialise(const char* paramfile, const char* obstaclefile,
       (*obstacles_ptr)[xx] = blocked;
     }
     if (end_row + 1 == full_grid_height && yy == 0) {
-      (*obstacles_ptr)[xx + (full_grid_height + 1)*params->nx] = blocked;
+      (*obstacles_ptr)[xx + (params->ny + 1)*params->nx] = blocked;
     }
 
     int obstacle_start_row = start_row - 1;
