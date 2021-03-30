@@ -113,7 +113,7 @@ int initialise(const char* paramfile, const char* obstaclefile,
 ** accelerate_flow(), propagate(), rebound() & collision()
 */
 
-float timestep(const t_param params, t_speed* cells, t_speed* tmp_cells, char* obstacles, int rank_id, int number_of_ranks);
+float timestep(const t_param params, t_speed* cells, t_speed* tmp_cells, char* obstacles);
 int accelerate_flow(const t_param params, t_speed* cells, char* obstacles);
 float propagate_rebound_and_collisions(const t_param params, t_speed* cells, t_speed* tmp_cells, char* obstacles);
 int write_values(const t_param params, t_speed* cells, char* obstacles, float* av_vels);
@@ -195,44 +195,43 @@ int main(int argc, char* argv[])
   printf("Hello, world; process %d of %d. I have %d obstacles and %d cells.\n", params.rank_id, params.number_of_ranks, number_of_obstacles, number_of_cells);
 
   /* Init time stops here, compute time starts*/
-//   gettimeofday(&timstr, NULL);
-//   init_toc = timstr.tv_sec + (timstr.tv_usec / 1000000.0);
-//   comp_tic=init_toc;
-// 
-//   float final_av_velocity;
-//   for (int tt = 0; tt < params.maxIters; tt++)
-//   {
-//     final_av_velocity = timestep(params, cells, tmp_cells, obstacles, rank_id, number_of_ranks);
-//     av_vels[tt] = final_av_velocity;
-// 
-// #ifdef DEBUG
-//     printf("==timestep: %d==\n", tt);
-//     printf("av velocity: %.12E\n", av_vels[tt]);
-//     printf("tot density: %.12E\n", total_density(params, cells));
-// #endif
-//   }
-//   
-//   /* Compute time stops here, collate time starts*/
-//   gettimeofday(&timstr, NULL);
-//   comp_toc = timstr.tv_sec + (timstr.tv_usec / 1000000.0);
-//   col_tic=comp_toc;
-// 
-//   // Collate data from ranks here 
-// 
-//   /* Total/collate time stops here.*/
-//   gettimeofday(&timstr, NULL);
-//   col_toc = timstr.tv_sec + (timstr.tv_usec / 1000000.0);
-//   tot_toc = col_toc;
-//   
-//   /* write final values and free memory */
-//   printf("==done==\n");
-//   printf("Hello, world; process %d of %d\n", rank_id, number_of_ranks);
-//   printf("Reynolds number:\t\t%.12E\n", calc_reynolds(params, final_av_velocity));
-//   printf("Elapsed Init time:\t\t\t%.6lf (s)\n",    init_toc - init_tic);
-//   printf("Elapsed Compute time:\t\t\t%.6lf (s)\n", comp_toc - comp_tic);
-//   printf("Elapsed Collate time:\t\t\t%.6lf (s)\n", col_toc  - col_tic);
-//   printf("Elapsed Total time:\t\t\t%.6lf (s)\n",   tot_toc  - tot_tic);
-//   write_values(params, cells, obstacles, av_vels);
+  gettimeofday(&timstr, NULL);
+  init_toc = timstr.tv_sec + (timstr.tv_usec / 1000000.0);
+  comp_tic=init_toc;
+
+  float final_av_velocity;
+  for (int tt = 0; tt < params.maxIters; tt++)
+  {
+    final_av_velocity = timestep(params, cells, tmp_cells, obstacles);
+    av_vels[tt] = final_av_velocity;
+
+#ifdef DEBUG
+    printf("==timestep: %d==\n", tt);
+    printf("av velocity: %.12E\n", av_vels[tt]);
+    printf("tot density: %.12E\n", total_density(params, cells));
+#endif
+  }
+  
+  /* Compute time stops here, collate time starts*/
+  gettimeofday(&timstr, NULL);
+  comp_toc = timstr.tv_sec + (timstr.tv_usec / 1000000.0);
+  col_tic=comp_toc;
+
+  // Collate data from ranks here 
+
+  /* Total/collate time stops here.*/
+  gettimeofday(&timstr, NULL);
+  col_toc = timstr.tv_sec + (timstr.tv_usec / 1000000.0);
+  tot_toc = col_toc;
+  
+  /* write final values and free memory */
+  printf("==done==\n");
+  printf("Reynolds number:\t\t%.12E\n", calc_reynolds(params, final_av_velocity));
+  printf("Elapsed Init time:\t\t\t%.6lf (s)\n",    init_toc - init_tic);
+  printf("Elapsed Compute time:\t\t\t%.6lf (s)\n", comp_toc - comp_tic);
+  printf("Elapsed Collate time:\t\t\t%.6lf (s)\n", col_toc  - col_tic);
+  printf("Elapsed Total time:\t\t\t%.6lf (s)\n",   tot_toc  - tot_tic);
+  write_values(params, cells, obstacles, av_vels);
   finalise(&params, cells, tmp_cells, &obstacles, &av_vels);
   
   /* finialise the MPI enviroment */
@@ -241,10 +240,10 @@ int main(int argc, char* argv[])
   return EXIT_SUCCESS;
 }
 
-float timestep(const t_param params, t_speed* cells, t_speed* tmp_cells, char* obstacles, int rank_id, int number_of_ranks)
+float timestep(const t_param params, t_speed* cells, t_speed* tmp_cells, char* obstacles)
 {
   /* This only affects the 2nd row of the grid, so only the first rank will have to edit these cells */
-  if (rank_id == 0) {
+  if (params.rank_id == 0) {
     accelerate_flow(params, cells, obstacles);
   }
   float time_step_solution = propagate_rebound_and_collisions(params, cells, tmp_cells, obstacles);
@@ -307,6 +306,56 @@ float propagate_rebound_and_collisions(const t_param params, t_speed* cells, t_s
   
   int   tot_cells = 0;  /* no. of cells used in calculation */
   float tot_u = 0.f;          /* accumulated magnitudes of velocity for each cell */
+
+  /* Halo exchange */
+
+  int send_rank_id = params.rank_id - 1;
+  if (send_rank_id == -1) {
+    send_rank_id = params.number_of_ranks - 1;
+  }
+  int rec_rank_id = (params.rank_id + 1) % params.number_of_ranks;
+  // Send top seeds
+  MPI_Status status;
+  MPI_Sendrecv(
+      // Send the first non halo row
+      &(cells->speed0[params.nx]),  // src data
+      params.nx,  // amount of data to send
+      MPI_FLOAT,  // data type
+      send_rank_id,  // Which rank to send to
+      0,
+      
+      // Recieve and store in halo top row
+      cells->speed0,
+      params.nx,  // amount of data
+      MPI_FLOAT,  // data type
+      rec_rank_id,  // Which rank to recieve from 
+      0,
+
+      //
+      MPI_COMM_WORLD,
+      &status
+  );
+  
+  MPI_Sendrecv(
+      // Send the last non halo row
+      &(cells->speed0[(params.ny) * params.nx]),  // src data
+      params.nx,  // amount of data to send
+      MPI_FLOAT,  // data type
+      send_rank_id,  // Which rank to send to
+      0,
+      
+      // Recieve and store in halo bottom row
+      &(cells->speed0[(params.ny + 1) * params.nx]),  // src data
+      params.nx,  // amount of data
+      MPI_FLOAT,  // data type
+      rec_rank_id,  // Which rank to recieve from 
+      0,
+
+      //
+      MPI_COMM_WORLD,
+      &status
+  );
+  printf("Data send from %d to %d and recieve from %d. \n", params.rank_id, send_rank_id, rec_rank_id);
 
   __assume_aligned(cells->speed0, 64);
   __assume_aligned(cells->speed1, 64);
@@ -788,7 +837,7 @@ int write_values(const t_param params, t_speed* cells, char* obstacles, float* a
     die("could not open file output file", __LINE__, __FILE__);
   }
 
-  for (int jj = 0; jj < params.ny; jj++)
+  for (int jj = 1; jj < params.ny + 1; jj++)
   {
     for (int ii = 0; ii < params.nx; ii++)
     {
@@ -835,8 +884,11 @@ int write_values(const t_param params, t_speed* cells, char* obstacles, float* a
         pressure = local_density * c_sq;
       }
 
+      // Global index
+      int x = ii;
+      int y = params.rank_id * params.ny + jj;    
       /* write to file */
-      fprintf(fp, "%d %d %.12E %.12E %.12E %.12E %d\n", ii, jj, u_x, u_y, u, pressure, obstacles[ii * params.nx + jj]);
+      fprintf(fp, "%d %d %.12E %.12E %.12E %.12E %d\n", x, y, u_x, u_y, u, pressure, obstacles[ii * params.nx + jj]);
     }
   }
 
