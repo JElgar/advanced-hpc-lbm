@@ -1,0 +1,1 @@
+unison -auto -ignore 'Path .git' . ssh://bluecrystal/advanced-hpc-lbm

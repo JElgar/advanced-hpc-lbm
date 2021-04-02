@@ -63,6 +63,8 @@
 #include <time.h>
 #include <sys/time.h>
 #include <sys/resource.h>
+#include <mpi.h>
+
 
 #define NSPEEDS         9
 #define FINALSTATEFILE  "final_state.dat"
@@ -78,6 +80,8 @@ typedef struct
   float density;       /* density per link */
   float accel;         /* density redistribution */
   float omega;         /* relaxation parameter */
+  int number_of_ranks;
+  int rank_id;
 } t_param;
 
 /* struct to hold the 'speed' values */
@@ -129,6 +133,17 @@ void swap(t_speed** cells, t_speed** cells2);
 */
 int main(int argc, char* argv[])
 {
+
+  int flag;               /* for checking whether MPI_Init() has been called */
+  /* Initialize MPI */
+  MPI_Init(&argc, &argv);
+
+  /* check whether the initialisation was successful */
+  MPI_Initialized(&flag);
+  if ( flag != 1 ) {
+    MPI_Abort(MPI_COMM_WORLD,EXIT_FAILURE);
+  }
+
   char*    paramfile = NULL;    /* name of the input parameter file */
   char*    obstaclefile = NULL; /* name of a the input obstacle file */
   t_param  params;              /* struct to hold parameter values */
@@ -189,6 +204,9 @@ int main(int argc, char* argv[])
   write_values(params, cells, obstacles, av_vels);
   finalise(&params, &cells, &tmp_cells, &obstacles, &av_vels);
 
+  /* finialise the MPI enviroment */
+  MPI_Finalize();
+
   return EXIT_SUCCESS;
 }
 
@@ -245,6 +263,10 @@ float propagate_rebound_and_collisions(const t_param params, t_speed* restrict c
   
   int    tot_cells = 0;  /* no. of cells used in calculation */
   float tot_u = 0.f;          /* accumulated magnitudes of velocity for each cell */
+
+  // Create mpi datatype
+  MPI_Datatype mpi_t_speed;
+  MPI_Afloat offsets[2];
 
   /* loop over _all_ cells */
   {
@@ -375,6 +397,8 @@ int initialise(const char* paramfile, const char* obstaclefile,
   int    xx, yy;         /* generic array indices */
   int    blocked;        /* indicates whether a cell is blocked by an obstacle */
   int    retval;         /* to hold return value for checking */
+  int rank_id;               /* 'rank' of process among it's cohort */ 
+  int number_of_ranks;               /* size of cohort, i.e. num processes started */
 
   /* open the parameter file */
   fp = fopen(paramfile, "r");
@@ -417,6 +441,21 @@ int initialise(const char* paramfile, const char* obstaclefile,
   /* and close up the file */
   fclose(fp);
 
+  /* Set rank */
+  MPI_Comm_rank(MPI_COMM_WORLD,&rank_id);
+  params->rank_id = rank_id;
+  MPI_Comm_size(MPI_COMM_WORLD,&number_of_ranks);
+  params->number_of_ranks = number_of_ranks;
+
+  /* Set grid size values */
+  int full_grid_height = params->ny;
+  params->ny /= params->number_of_ranks;
+
+  /* Calculate actual row range of this rank */
+  int start_row = params->ny * params->rank_id;
+  int end_row = params->ny * params->rank_id + params->ny - 1;
+  int number_of_cells = (params->ny + 2) * params->nx;
+
   /*
   ** Allocate memory.
   **
@@ -437,17 +476,17 @@ int initialise(const char* paramfile, const char* obstaclefile,
   */
 
   /* main grid */
-  *cells_ptr = (t_speed*)malloc(sizeof(t_speed) * (params->ny * params->nx));
+  *cells_ptr = (t_speed*)malloc(sizeof(t_speed) * number_of_cells);
 
   if (*cells_ptr == NULL) die("cannot allocate memory for cells", __LINE__, __FILE__);
 
   /* 'helper' grid, used as scratch space */
-  *tmp_cells_ptr = (t_speed*)malloc(sizeof(t_speed) * (params->ny * params->nx));
+  *tmp_cells_ptr = (t_speed*)malloc(sizeof(t_speed) * number_of_cells);
 
   if (*tmp_cells_ptr == NULL) die("cannot allocate memory for tmp_cells", __LINE__, __FILE__);
 
   /* the map of obstacles */
-  *obstacles_ptr = malloc(sizeof(int) * (params->ny * params->nx));
+  *obstacles_ptr = malloc(sizeof(int) * number_of_cells);
 
   if (*obstacles_ptr == NULL) die("cannot allocate column memory for obstacles", __LINE__, __FILE__);
 
@@ -456,7 +495,7 @@ int initialise(const char* paramfile, const char* obstaclefile,
   float w1 = params->density      / 9.f;
   float w2 = params->density      / 36.f;
 
-  for (int jj = 0; jj < params->ny; jj++)
+  for (int jj = 1; jj < params->ny-1; jj++)
   {
     for (int ii = 0; ii < params->nx; ii++)
     {
@@ -476,7 +515,7 @@ int initialise(const char* paramfile, const char* obstaclefile,
   }
 
   /* first set all cells in obstacle array to zero */
-  for (int jj = 0; jj < params->ny; jj++)
+  for (int jj = 0; jj < params->ny + 2; jj++)
   {
     for (int ii = 0; ii < params->nx; ii++)
     {
@@ -501,13 +540,37 @@ int initialise(const char* paramfile, const char* obstaclefile,
 
     if (xx < 0 || xx > params->nx - 1) die("obstacle x-coord out of range", __LINE__, __FILE__);
 
-    if (yy < 0 || yy > params->ny - 1) die("obstacle y-coord out of range", __LINE__, __FILE__);
+    // if (yy < 0 || yy > params->ny - 1) die("obstacle y-coord out of range", __LINE__, __FILE__);
 
     if (blocked != 1) die("obstacle blocked value should be 1", __LINE__, __FILE__);
 
-    /* assign to array */
-    (*obstacles_ptr)[xx + yy*params->nx] = blocked;
+        /* Grab the halo obstacles */
+    if (start_row - 1 == -1 && yy == full_grid_height - 1) {
+      (*obstacles_ptr)[xx] = blocked;
+    }
+    if (end_row + 1 == full_grid_height && yy == 0) {
+      (*obstacles_ptr)[xx + (params->ny + 1)*params->nx] = blocked;
+    }
+
+    int obstacle_start_row = start_row - 1;
+    if (obstacle_start_row == -1) {
+      obstacle_start_row = 0;
+    }
+    
+    int obstacle_end_row = end_row + 1;
+    if (obstacle_end_row == full_grid_height) {
+      obstacle_end_row = full_grid_height - 1; 
+    }
+
+
+    /* If in this rank's grid assigned to array */
+    if (yy >= obstacle_start_row && yy <= obstacle_end_row) 
+    {
+      int index = yy - start_row;
+      (*obstacles_ptr)[xx + (index+1)*params->nx] = blocked;
+    }
   }
+  printf("Process %d of %d. My starting row is %d and my end row is %d.\n", params->rank_id, params->number_of_ranks, start_row, end_row);
 
   /* and close the file */
   fclose(fp);

@@ -2,9 +2,8 @@
 
 EXE=d2q9-bgk
 
-CC=gcc
-# CFLAGS= -std=c99 -Wall -O3
-CFLAGS = -std=c99 -Wall -Ofast -mtune=native -fopenmp 
+CC=mpiicc
+CFLAGS = -std=c99 -Wall -Ofast -mtune=native -fopenmp -no-prec-sqrt -xCORE-AVX2 -axCOMMON-AVX512
 LIBS = -lm
 
 FINAL_STATE_FILE=./final_state.dat
@@ -16,6 +15,9 @@ all: $(EXE)
 
 $(EXE): $(EXE).c
 	$(CC) $(CFLAGS) $^ $(LIBS) -o $@
+
+check:
+	python check/check.py --ref-av-vels-file=$(REF_AV_VELS_FILE) --ref-final-state-file=$(REF_FINAL_STATE_FILE) --av-vels-file=$(AV_VELS_FILE) --final-state-file=$(FINAL_STATE_FILE)
 
 profile-run: $(EXE).c
 	$(CC) $(CFLAGS) -pg $^ $(LIBS) -o $(EXE)
@@ -29,8 +31,13 @@ submit-clean:
 	sbatch job_submit_d2q9-bgk
 
 
-check:
-	python check/check.py --ref-av-vels-file=$(REF_AV_VELS_FILE) --ref-final-state-file=$(REF_FINAL_STATE_FILE) --av-vels-file=$(AV_VELS_FILE) --final-state-file=$(FINAL_STATE_FILE)
+ts:
+	mpiicc test_mpi.c 
+	sbatch test_job_submit_d2q9-bgk
+
+sc:
+	make submit-clean
+
 
 .PHONY: all check clean
 

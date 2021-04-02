@@ -2,12 +2,12 @@
 
 #SBATCH --job-name d2q9-bgk
 #SBATCH --nodes 1
-#SBATCH --ntasks-per-node 4
+#SBATCH --ntasks-per-node 2
 #SBATCH --time 00:10:00
 #SBATCH --partition veryshort
 #SBATCH --reservation=COSC024002
 #SBATCH --account=COSC024002
-#SBATCH --output d2q9-bgk.out
+#SBATCH --output test.out
 
 echo Running on host `hostname`
 echo Time is `date`
@@ -26,4 +26,4 @@ echo `echo $SLURM_JOB_NODELIST | uniq`
 export I_MPI_PMI_LIBRARY=/usr/lib64/libpmi.so
 
 # Run the parallel MPI executable
-srun ./d2q9-bgk input_128x128.params obstacles_128x128.dat
+srun ./a.out
