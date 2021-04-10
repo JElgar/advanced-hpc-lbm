@@ -284,7 +284,7 @@ float propagate_rebound_and_collisions(const t_param params, t_speed* restrict c
   MPI_Type_commit(&MPI_T_SPEEDS);
   
   MPI_Status status;
-  
+ 
   // Send the first non halo row
   MPI_Sendrecv(
       &cells[params.nx],  // src data
@@ -293,7 +293,7 @@ float propagate_rebound_and_collisions(const t_param params, t_speed* restrict c
       send_rank_id,  // Which rank to send to
       0,
       
-      // Recieve and store in halo top row
+      // Recieve and store in the bottom halo row
       &cells[(params.ny + 1) * params.nx],
       params.nx,  // amount of data
       MPI_T_SPEEDS,  // data type
@@ -330,7 +330,11 @@ float propagate_rebound_and_collisions(const t_param params, t_speed* restrict c
       MPI_COMM_WORLD,
       &status
   );
-
+  
+  if (params.rank_id == 0) {
+    printf("%.12f", cells[0].speeds[0]);
+  }
+  
   /* loop over _all_ cells */
   {
     // #pragma omp parallel for simd collapse(2)
@@ -338,10 +342,10 @@ float propagate_rebound_and_collisions(const t_param params, t_speed* restrict c
     {
       for (int ii = 0; ii < params.nx; ii++)
       {
-        int y_n = (jj + 1) % params.ny;
-        int x_e = (ii + 1) % params.nx;
-        int y_s = (jj == 0) ? (jj + params.ny - 1) : (jj - 1);
-        int x_w = (ii == 0) ? (ii + params.nx - 1) : (ii - 1);
+        int y_n = jj + 1;
+        int x_e = ii + 1;
+        int y_s = jj - 1;
+        int x_w = ii - 1;
         
         /* if the cell contains an obstacle */
         if (obstacles[jj*params.nx + ii])
