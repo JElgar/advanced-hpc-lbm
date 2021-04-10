@@ -83,9 +83,16 @@ int main(int argc, char* argv[])
       &status
   );
 
+  float grid_sum = 1;
+  float global_sum;
+
+  MPI_Allreduce(&grid_sum, &global_sum, 1, MPI_FLOAT, MPI_SUM, MPI_COMM_WORLD);
+
 
   printf("Value in cell 0, 0 for rank %d: %f\n", rank_id, cells[0].speeds[0]);
+  printf("Value in cell 0, 3 for rank %d: %f\n", rank_id, cells[3].speeds[2]);
   printf("Value in cell 1, 0 for rank %d: %f\n", rank_id, cells[NX].speeds[0]);
+  printf("Global sum for rank %d: %f\n", rank_id, global_sum);
   printf("Process %d of %d.\n", rank_id, number_of_ranks);
   
   MPI_Finalize();

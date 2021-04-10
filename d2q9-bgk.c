@@ -226,7 +226,7 @@ int accelerate_flow(const t_param params, t_speed* cells, char* obstacles)
   float w2 = params.density * params.accel / 36.f;
 
   /* modify the 2nd row of the grid */
-  int jj = params.ny - 2;
+  int jj = params.ny - 2 + 1;
 
   for (int ii = 0; ii < params.nx; ii++)
   {
@@ -265,14 +265,76 @@ float propagate_rebound_and_collisions(const t_param params, t_speed* restrict c
   float tot_u = 0.f;          /* accumulated magnitudes of velocity for each cell */
 
   // Create mpi datatype
-  MPI_Datatype mpi_t_speed;
-  MPI_Afloat offsets[2];
+  MPI_Datatype MPI_T_SPEEDS;
+  MPI_Aint displacements[1];
+  const int nr_blocks = 1;
+  int blocklengths[1] = {NSPEEDS};
+  MPI_Datatype oldtypes[1] = {MPI_FLOAT};
+
+  displacements[0] = offsetof(t_speed, speeds);
+
+  int send_rank_id = params.rank_id - 1;
+  if (send_rank_id == -1) {
+    send_rank_id = params.number_of_ranks - 1;
+  }
+  int rec_rank_id = (params.rank_id + 1) % params.number_of_ranks;
+  
+  MPI_Type_create_struct(nr_blocks, blocklengths, displacements,
+                   oldtypes, &MPI_T_SPEEDS);
+  MPI_Type_commit(&MPI_T_SPEEDS);
+  
+  MPI_Status status;
+  
+  // Send the first non halo row
+  MPI_Sendrecv(
+      &cells[params.nx],  // src data
+      params.nx,  // amount of data to send
+      MPI_T_SPEEDS,  // data type
+      send_rank_id,  // Which rank to send to
+      0,
+      
+      // Recieve and store in halo top row
+      &cells[(params.ny + 1) * params.nx],
+      params.nx,  // amount of data
+      MPI_T_SPEEDS,  // data type
+      rec_rank_id,  // Which rank to recieve from 
+      0,
+
+      //
+      MPI_COMM_WORLD,
+      &status
+  );
+  
+  send_rank_id = (params.rank_id + 1) % params.number_of_ranks;
+  rec_rank_id = params.rank_id - 1;
+  if (rec_rank_id == -1) {
+    rec_rank_id = params.number_of_ranks - 1;
+  }
+  
+  // Send the last non halo row
+  MPI_Sendrecv(
+      &(cells[(params.ny) * params.nx]),
+      params.nx,  // amount of data to send
+      MPI_T_SPEEDS,  // data type
+      send_rank_id,  // Which rank to send to
+      0,
+      
+      // Recieve and store in halo top row
+      &(cells[0]),
+      params.nx,  // amount of data
+      MPI_T_SPEEDS,  // data type
+      rec_rank_id,  // Which rank to recieve from 
+      0,
+
+      //
+      MPI_COMM_WORLD,
+      &status
+  );
 
   /* loop over _all_ cells */
   {
     // #pragma omp parallel for simd collapse(2)
-    #pragma omp simd collapse(2)
-    for (int jj = 0; jj < params.ny; jj++)
+    for (int jj = 1; jj < params.ny + 1; jj++)
     {
       for (int ii = 0; ii < params.nx; ii++)
       {
@@ -385,7 +447,13 @@ float propagate_rebound_and_collisions(const t_param params, t_speed* restrict c
     }
   }
 
-  return tot_u / (float)tot_cells;
+  float all_grids_tot_u;
+  int all_grids_tot_cells;
+  // TODO only do this reduce for 1 thing
+  MPI_Allreduce(&tot_u, &all_grids_tot_u, 1, MPI_FLOAT, MPI_SUM, MPI_COMM_WORLD);
+  // TODO just store the number of cells
+  MPI_Allreduce(&tot_cells, &all_grids_tot_cells, 1, MPI_INT, MPI_SUM, MPI_COMM_WORLD);
+  return all_grids_tot_u/ (float)all_grids_tot_cells;
 }
 
 int initialise(const char* paramfile, const char* obstaclefile,
@@ -495,7 +563,7 @@ int initialise(const char* paramfile, const char* obstaclefile,
   float w1 = params->density      / 9.f;
   float w2 = params->density      / 36.f;
 
-  for (int jj = 1; jj < params->ny-1; jj++)
+  for (int jj = 1; jj < params->ny+1; jj++)
   {
     for (int ii = 0; ii < params->nx; ii++)
     {
@@ -609,7 +677,6 @@ int finalise(const t_param* params, t_speed** cells_ptr, t_speed** tmp_cells_ptr
 float calc_reynolds(const t_param params, t_speed* cells, char* obstacles, float av_velocity)
 {
   const float viscosity = 1.f / 6.f * (2.f / params.omega - 1.f);
-
   return av_velocity * params.reynolds_dim / viscosity;
 }
 
@@ -642,6 +709,8 @@ int write_values(const t_param params, t_speed* cells, char* obstacles, float* a
   float u;                     /* norm--root of summed squares--of u_x and u_y */
 
   fp = fopen(FINALSTATEFILE, "w");
+  // MPI_File *fp;
+  // MPI_File_open(MPI_COMM_WORLD, FINALSTATEFILE, MPI_MODE_WRONLY, MPI_INFO_NULL, fp)
 
   if (fp == NULL)
   {
@@ -691,12 +760,16 @@ int write_values(const t_param params, t_speed* cells, char* obstacles, float* a
       }
 
       /* write to file */
+      // MPI_File_write_at(fp, MPI_Offset offset, ROMIO_CONST void *buf,
+      //        int count, MPI_Datatype datatype, MPI_Status *status);
       fprintf(fp, "%d %d %.12E %.12E %.12E %.12E %d\n", ii, jj, u_x, u_y, u, pressure, obstacles[ii * params.nx + jj]);
     }
   }
 
   fclose(fp);
+  // MPI_File_close(fp)
 
+  // MPI_File_open(MPI_COMM_WORLD, AVVELSFILE, MPI_MODE_WRONLY, MPI_INFO_NULL, fp)
   fp = fopen(AVVELSFILE, "w");
 
   if (fp == NULL)

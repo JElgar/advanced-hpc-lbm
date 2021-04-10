@@ -1,10 +1,16 @@
 Running on host compute085.bc4.acrc.priv
-Time is Fri Apr 2 17:41:49 BST 2021
+Time is Sun Apr 4 19:52:07 BST 2021
 Directory is /mnt/storage/home/za18968/advanced-hpc-lbm
-Slurm job ID is 4302764
+Slurm job ID is 4305402
 This job runs on the following machines:
 compute085
 Value in cell 0, 0 for rank 0: 1.000000
+Value in cell 0, 3 for rank 0: 1.000000
+Value in cell 1, 0 for rank 0: 0.000000
+Global sum for rank 0: 2.000000
 Process 0 of 2.
 Value in cell 0, 0 for rank 1: 0.000000
+Value in cell 0, 3 for rank 1: 0.000000
+Value in cell 1, 0 for rank 1: 1.000000
+Global sum for rank 1: 2.000000
 Process 1 of 2.
