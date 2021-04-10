@@ -38,6 +38,9 @@ ts:
 sc:
 	make submit-clean
 
+old:
+	make -f Makefile-old sc
+
 
 .PHONY: all check clean
 

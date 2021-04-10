@@ -176,15 +176,18 @@ int main(int argc, char* argv[])
   tic = timstr.tv_sec + (timstr.tv_usec / 1000000.0);
   float final_av_velocity;
 
-  for (int tt = 0; tt < params.maxIters; tt++)
+  // for (int tt = 0; tt < params.maxIters; tt++)
+  for (int tt = 0; tt < 1; tt++)
   {
     final_av_velocity = timestep(params, &cells, &tmp_cells, obstacles);
     av_vels[tt] = final_av_velocity;
-#ifdef DEBUG
-    printf("==timestep: %d==\n", tt);
-    printf("av velocity: %.12E\n", av_vels[tt]);
-    printf("tot density: %.12E\n", total_density(params, cells));
-#endif
+// #ifdef DEBUG
+    if (params.rank_id == 0) {
+      printf("==timestep: %d==\n", tt);
+      printf("av velocity: %.12E\n", av_vels[tt]);
+      printf("tot density: %.12E\n", total_density(params, cells));
+    }
+// #endif
   }
 
   gettimeofday(&timstr, NULL);
@@ -196,12 +199,14 @@ int main(int argc, char* argv[])
   systim = timstr.tv_sec + (timstr.tv_usec / 1000000.0);
 
   /* write final values and free memory */
-  printf("==done==\n");
-  printf("Reynolds number:\t\t%.12E\n", calc_reynolds(params, cells, obstacles, final_av_velocity));
-  printf("Elapsed time:\t\t\t%.6lf (s)\n", toc - tic);
-  printf("Elapsed user CPU time:\t\t%.6lf (s)\n", usrtim);
-  printf("Elapsed system CPU time:\t%.6lf (s)\n", systim);
-  write_values(params, cells, obstacles, av_vels);
+  if (params.rank_id == 0) {
+    printf("==done==\n");
+    printf("Reynolds number:\t\t%.12E\n", calc_reynolds(params, cells, obstacles, final_av_velocity));
+    printf("Elapsed time:\t\t\t%.6lf (s)\n", toc - tic);
+    printf("Elapsed user CPU time:\t\t%.6lf (s)\n", usrtim);
+    printf("Elapsed system CPU time:\t%.6lf (s)\n", systim);
+    write_values(params, cells, obstacles, av_vels);
+  }
   finalise(&params, &cells, &tmp_cells, &obstacles, &av_vels);
 
   /* finialise the MPI enviroment */
@@ -273,18 +278,18 @@ float propagate_rebound_and_collisions(const t_param params, t_speed* restrict c
 
   displacements[0] = offsetof(t_speed, speeds);
 
-  int send_rank_id = params.rank_id - 1;
-  if (send_rank_id == -1) {
-    send_rank_id = params.number_of_ranks - 1;
-  }
-  int rec_rank_id = (params.rank_id + 1) % params.number_of_ranks;
-  
   MPI_Type_create_struct(nr_blocks, blocklengths, displacements,
                    oldtypes, &MPI_T_SPEEDS);
   MPI_Type_commit(&MPI_T_SPEEDS);
   
   MPI_Status status;
  
+  int send_rank_id = params.rank_id - 1;
+  if (send_rank_id == -1) {
+    send_rank_id = params.number_of_ranks - 1;
+  }
+  int rec_rank_id = (params.rank_id + 1) % params.number_of_ranks;
+  
   // Send the first non halo row
   MPI_Sendrecv(
       &cells[params.nx],  // src data
@@ -331,8 +336,13 @@ float propagate_rebound_and_collisions(const t_param params, t_speed* restrict c
       &status
   );
   
+  if (params.rank_id == 3) {
+    printf("-1, 0, 0, 3: %.12f\n", cells[(params.ny + 1) * params.nx].speeds[0]);
+  }
   if (params.rank_id == 0) {
-    printf("%.12f", cells[0].speeds[0]);
+    printf("-1, 0, 0: %.12f\n", cells[params.nx].speeds[0]);
+    printf("-1, 0, 0: %.12f\n", cells[0].speeds[0]);
+    printf("-1, 0, 0: %.12f\n", cells[(params.ny + 1) * params.nx].speeds[0]);
   }
   
   /* loop over _all_ cells */
@@ -342,10 +352,10 @@ float propagate_rebound_and_collisions(const t_param params, t_speed* restrict c
     {
       for (int ii = 0; ii < params.nx; ii++)
       {
-        int y_n = jj + 1;
-        int x_e = ii + 1;
-        int y_s = jj - 1;
-        int x_w = ii - 1;
+        const int y_n = jj + 1;
+        const int x_e = (ii + 1) & (params.nx - 1);
+        const int y_s = jj - 1;
+        const int x_w = (ii == 0) ? (ii + params.nx - 1) : (ii - 1);
         
         /* if the cell contains an obstacle */
         if (obstacles[jj*params.nx + ii])
@@ -457,6 +467,11 @@ float propagate_rebound_and_collisions(const t_param params, t_speed* restrict c
   MPI_Allreduce(&tot_u, &all_grids_tot_u, 1, MPI_FLOAT, MPI_SUM, MPI_COMM_WORLD);
   // TODO just store the number of cells
   MPI_Allreduce(&tot_cells, &all_grids_tot_cells, 1, MPI_INT, MPI_SUM, MPI_COMM_WORLD);
+    
+  if (params.rank_id == 0) {
+    printf("tot_cells: %d\n", all_grids_tot_cells);
+    printf("tot_u: %.12f\n", all_grids_tot_u);
+  }
   return all_grids_tot_u/ (float)all_grids_tot_cells;
 }
 
@@ -721,7 +736,7 @@ int write_values(const t_param params, t_speed* cells, char* obstacles, float* a
     die("could not open file output file", __LINE__, __FILE__);
   }
 
-  for (int jj = 0; jj < params.ny; jj++)
+  for (int jj = 1; jj < params.ny + 1; jj++)
   {
     for (int ii = 0; ii < params.nx; ii++)
     {
@@ -766,7 +781,7 @@ int write_values(const t_param params, t_speed* cells, char* obstacles, float* a
       /* write to file */
       // MPI_File_write_at(fp, MPI_Offset offset, ROMIO_CONST void *buf,
       //        int count, MPI_Datatype datatype, MPI_Status *status);
-      fprintf(fp, "%d %d %.12E %.12E %.12E %.12E %d\n", ii, jj, u_x, u_y, u, pressure, obstacles[ii * params.nx + jj]);
+      fprintf(fp, "%d %d %.12E %.12E %.12E %.12E %d\n", ii + (params.rank_id * params.ny), jj, u_x, u_y, u, pressure, obstacles[ii * params.nx + jj]);
     }
   }
 
