@@ -131,6 +131,7 @@ float calc_reynolds(const t_param params, float av_velocity);
 void die(const char* message, const int line, const char* file);
 void usage(const char* exe);
 void swap(t_speed* cells, t_speed* cells2);
+void debug_print_cells(t_speed* cells, const t_param params);
 
 /*
 ** main program:
@@ -309,6 +310,18 @@ float propagate_rebound_and_collisions(const t_param params, t_speed* cells, t_s
   printf("-1, 0, 0, 3: %.12f\n", cells->speed0[0]);
   printf("-1, 0, 0: %.12f\n", cells->speed0[(params.ny - 1) * params.nx]);
   printf("-1, 0, 0: %.12f\n", cells->speed0[32 * params.nx]);
+  
+  float speed_1_sum = 0;
+  for (int jj = 0; jj < params.ny; jj++)
+  {
+    for (int ii = 0; ii < params.nx; ii++)
+    {
+      speed_1_sum += cells->speed3[(jj * params.nx) + ii];
+    }
+  }
+  printf("speed3 sum: %.12f\n", speed_1_sum);
+
+  debug_print_cells(cells, params);
 
   /* loop over _all_ cells */
   // #pragma omp parallel
@@ -316,11 +329,20 @@ float propagate_rebound_and_collisions(const t_param params, t_speed* cells, t_s
   {
      #pragma omp parallel for schedule(static) reduction(+:tot_cells) reduction(+:tot_u)
     // #pragma omp parallel for simd collapse(2) schedule(static) reduction(+:tot_cells) reduction(+:tot_u) aligned(cells:64) aligned(tmp_cells:64) aligned(obstacles:64)
-    for (int jj = 0; jj < params.ny; jj++)
+    for (int jj = 1; jj < 2; jj++)
     {    
       #pragma omp simd aligned(cells:64) aligned(tmp_cells:64) aligned(obstacles:64) reduction(+:tot_cells) reduction(+:tot_u)
-      for (int ii = 0; ii < params.nx; ii++)
+      for (int ii = 1; ii < 2; ii++)
       {
+        printf("Cell values speed 0: %.12f\n", cells->speed0[ii + jj * params.nx]);
+        printf("Cell values speed 1: %.12f\n", cells->speed1[ii + jj * params.nx]);
+        printf("Cell values speed 2: %.12f\n", cells->speed2[ii + jj * params.nx]);
+        printf("Cell values speed 3: %.12f\n", cells->speed3[ii + jj * params.nx]);
+        printf("Cell values speed 4: %.12f\n", cells->speed4[ii + jj * params.nx]);
+        printf("Cell values speed 5: %.12f\n", cells->speed5[ii + jj * params.nx]);
+        printf("Cell values speed 6: %.12f\n", cells->speed6[ii + jj * params.nx]);
+        printf("Cell values speed 7: %.12f\n", cells->speed7[ii + jj * params.nx]);
+        printf("Cell values speed 8: %.12f\n", cells->speed8[ii + jj * params.nx]);
         const int y_n = (jj + 1) & (params.ny - 1);
         const int x_e = (ii + 1) & (params.nx - 1);
         const int y_s = (jj == 0) ? (jj + params.ny - 1) : (jj - 1);
@@ -366,6 +388,14 @@ float propagate_rebound_and_collisions(const t_param params, t_speed* cells, t_s
             - cells->speed7[x_e + y_n*params.nx]
             + cells->speed8[x_w + y_n*params.nx]
           ) / local_density;
+          printf("local_density: %.32f\n", local_density);
+          printf("value: %.32f\n", cells->speed1[x_w + jj*params.nx]);
+          printf("value: %.32f\n", cells->speed3[x_e + jj*params.nx]);
+          printf("value: %.32f\n", cells->speed5[x_w + y_s*params.nx]);
+          printf("value: %.32f\n", cells->speed6[x_e + y_s*params.nx]);
+          printf("value: %.32f\n", cells->speed7[x_e + y_n*params.nx]);
+          printf("value: %.32f\n", cells->speed8[x_w + y_n*params.nx]);
+          printf("u_x: %.32f\n", u_x);
           /* compute y velocity component */
           const float u_y = (
               cells->speed2[ii + y_s*params.nx]
@@ -375,6 +405,7 @@ float propagate_rebound_and_collisions(const t_param params, t_speed* cells, t_s
             - cells->speed7[x_e + y_n*params.nx]
             - cells->speed8[x_w + y_n*params.nx]
             ) / local_density;
+          printf("u_y: %.32f\n", u_y);
 
           /* velocity squared */
           const float u_sq = u_x * u_x + u_y * u_y;
@@ -451,7 +482,7 @@ float propagate_rebound_and_collisions(const t_param params, t_speed* cells, t_s
     }
   }
   printf("tot_cells: %d\n", tot_cells);
-  printf("tot_u: %.12f\n", tot_u);
+  printf("tot_u: %.32f\n", tot_u);
   return tot_u / (float)tot_cells;
 }
 
@@ -626,6 +657,16 @@ int initialise(const char* paramfile, const char* obstaclefile,
   ** at each timestep
   */
   *av_vels_ptr = (float*)malloc(sizeof(float) * params->maxIters);
+  
+  float speed_1_sum = 0;
+  for (int jj = 0; jj < params->ny; jj++)
+  {
+    for (int ii = 0; ii < params->nx; ii++)
+    {
+      speed_1_sum += cells_ptr->speed3[(jj * params->nx) + ii];
+    }
+  }
+  printf("init speed3 sum: %.12f\n", speed_1_sum);
 
   return EXIT_SUCCESS;
 }
@@ -814,4 +855,15 @@ void swap(t_speed *a, t_speed *b) {
   t_speed tmp = *a;
   *a = *b;
   *b = tmp;
+}
+
+void debug_print_cells(t_speed* cells, const t_param params) {
+  FILE* fp = fopen("debug_cells_output.dat", "w");
+  for (int jj = 1; jj < params.ny + 1; jj++)
+  {
+    for (int ii = 0; ii < params.nx; ii++)
+    {
+      fprintf(fp, "%d %d %.12E\n", ii, jj, cells->speed0[ii * params.nx + jj]);
+    }
+  }
 }

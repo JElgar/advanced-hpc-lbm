@@ -126,6 +126,7 @@ float calc_reynolds(const t_param params, t_speed* cells, char* obstacles, float
 void die(const char* message, const int line, const char* file);
 void usage(const char* exe);
 void swap(t_speed** cells, t_speed** cells2);
+void debug_print_cells(t_speed* cells, const t_param params);
 
 /*
 ** main program:
@@ -335,7 +336,32 @@ float propagate_rebound_and_collisions(const t_param params, t_speed* restrict c
       MPI_COMM_WORLD,
       &status
   );
+  printf("nx = %d, ny = %d\n", params.nx, params.ny);
+  printf("%d is sending to %d and recieving from %d\n", params.rank_id, send_rank_id, rec_rank_id);
+  if (params.rank_id == 0) {
+    printf("rec value: %.12f\n", cells[0].speeds[0]);
+    printf("rec value: %.12f\n", cells[0].speeds[8]);
+  } else if (params.rank_id == 3) {
+    printf("sent value: %.12f\n", cells[(params.ny) * params.nx].speeds[0]);
+    printf("sent value: %.12f\n", cells[(params.ny) * params.nx].speeds[8]);
+  }
+
+
+  float speed_1_sum = 0;
+  float all_speed_1_sum;
+  for (int jj = 1; jj < params.ny + 1; jj++)
+  {
+    for (int ii = 0; ii < params.nx; ii++)
+    {
+      speed_1_sum += cells[(jj * params.nx) + ii].speeds[3];
+    }
+  }
+  MPI_Allreduce(&speed_1_sum, &all_speed_1_sum, 1, MPI_FLOAT, MPI_SUM, MPI_COMM_WORLD);
+  printf("speed3 sum: %.12f\n", all_speed_1_sum);
   
+ 
+  debug_print_cells(cells, params);
+
   if (params.rank_id == 3) {
     printf("-1, 0, 0, 3: %.12f\n", cells[(params.ny + 1) * params.nx].speeds[0]);
   }
@@ -346,12 +372,22 @@ float propagate_rebound_and_collisions(const t_param params, t_speed* restrict c
   }
   
   /* loop over _all_ cells */
+  if (params.rank_id == 0)
   {
     // #pragma omp parallel for simd collapse(2)
-    for (int jj = 1; jj < params.ny + 1; jj++)
+    for (int jj = 2; jj < 3; jj++)
     {
-      for (int ii = 0; ii < params.nx; ii++)
+      for (int ii = 1; ii < 2; ii++)
       {
+        printf("Cell values speed 0: %.12f\n", cells[ii + jj * params.nx].speeds[0]);
+        printf("Cell values speed 1: %.12f\n", cells[ii + jj * params.nx].speeds[1]);
+        printf("Cell values speed 2: %.12f\n", cells[ii + jj * params.nx].speeds[2]);
+        printf("Cell values speed 3: %.12f\n", cells[ii + jj * params.nx].speeds[3]);
+        printf("Cell values speed 4: %.12f\n", cells[ii + jj * params.nx].speeds[4]);
+        printf("Cell values speed 5: %.12f\n", cells[ii + jj * params.nx].speeds[5]);
+        printf("Cell values speed 6: %.12f\n", cells[ii + jj * params.nx].speeds[6]);
+        printf("Cell values speed 7: %.12f\n", cells[ii + jj * params.nx].speeds[7]);
+        printf("Cell values speed 8: %.12f\n", cells[ii + jj * params.nx].speeds[8]);
         const int y_n = jj + 1;
         const int x_e = (ii + 1) & (params.nx - 1);
         const int y_s = jj - 1;
@@ -375,6 +411,12 @@ float propagate_rebound_and_collisions(const t_param params, t_speed* restrict c
         // Deal with collisions
         else
         {
+          // printf("value: %.32f\n", cells[x_w + jj*params.nx].speeds[1]);
+          // printf("value: %.32f\n", cells[x_e + jj*params.nx].speeds[3]);
+          // printf("value: %.32f\n", cells[x_w + y_s*params.nx].speeds[5]);
+          // printf("value: %.32f\n", cells[x_e + y_s*params.nx].speeds[6]);
+          // printf("value: %.32f\n", cells[x_e + y_n*params.nx].speeds[7]);
+          // printf("value: %.32f\n", cells[x_w + y_n*params.nx].speeds[8]);
 
           // Propogate
           tmp_cells[ii + jj*params.nx].speeds[0] = cells[ii + jj*params.nx].speeds[0]; /* central cell, no movement */
@@ -396,14 +438,40 @@ float propagate_rebound_and_collisions(const t_param params, t_speed* restrict c
           }
 
           /* compute x velocity component */
-          float u_x = (
+          const float u_x_pre_div = (
               cells[x_w + jj*params.nx].speeds[1]
             - cells[x_e + jj*params.nx].speeds[3]
             + cells[x_w + y_s*params.nx].speeds[5]
             - cells[x_e + y_s*params.nx].speeds[6]
             - cells[x_e + y_n*params.nx].speeds[7]
             + cells[x_w + y_n*params.nx].speeds[8]
-          ) / local_density;
+          );
+
+          const float left = (cells[x_w + jj*params.nx].speeds[1] - cells[x_e + jj*params.nx].speeds[3]);
+          const float right = (cells[x_w + y_s*params.nx].speeds[5] - cells[x_e + y_s*params.nx].speeds[6]);
+          const float leftandright = (cells[x_w + jj*params.nx].speeds[1] - cells[x_e + jj*params.nx].speeds[3]) + (cells[x_w + y_s*params.nx].speeds[5] - cells[x_e + y_s*params.nx].speeds[6]);
+          printf("test value right : %.32f\n",  right);
+          printf("test value left: %.32f\n",  left);
+          printf("test value left and right: %.32f\n",  leftandright);
+          printf("test value: %.32f\n",  left + right);
+
+          const float u_x = u_x_pre_div / local_density;
+          printf("%d, %d\n", x_w, jj);
+          printf("%d, %d\n", x_e, jj);
+          printf("%d, %d\n", x_w, y_s);
+          printf("%d, %d\n", x_e, y_s);
+          printf("%d, %d\n", x_e, y_n);
+          printf("%d, %d\n", x_w, y_n);
+          
+          printf("local_density: %.32f\n", local_density);
+          printf("value: %.32f\n", cells[x_w + jj*params.nx].speeds[1]);
+          printf("value: %.32f\n", cells[x_e + jj*params.nx].speeds[3]);
+          printf("value: %.32f\n", cells[x_w + y_s*params.nx].speeds[5]);
+          printf("value: %.32f\n", cells[x_e + y_s*params.nx].speeds[6]);
+          printf("value: %.32f\n", cells[x_e + y_n*params.nx].speeds[7]);
+          printf("value: %.32f\n", cells[x_w + y_n*params.nx].speeds[8]);
+          printf("u_x_pre_div: %.32f\n", u_x_pre_div);
+          printf("u_x: %.32f\n", u_x);
           /* compute y velocity component */
           float u_y = (
               cells[ii + y_s*params.nx].speeds[2]
@@ -413,6 +481,7 @@ float propagate_rebound_and_collisions(const t_param params, t_speed* restrict c
             - cells[x_e + y_n*params.nx].speeds[7]
             - cells[x_w + y_n*params.nx].speeds[8]
             ) / local_density;
+          printf("u_y: %.32f\n", u_y);
 
           /* velocity squared */
           float u_sq = u_x * u_x + u_y * u_y;
@@ -470,7 +539,7 @@ float propagate_rebound_and_collisions(const t_param params, t_speed* restrict c
     
   if (params.rank_id == 0) {
     printf("tot_cells: %d\n", all_grids_tot_cells);
-    printf("tot_u: %.12f\n", all_grids_tot_u);
+    printf("tot_u: %.32f\n", all_grids_tot_u);
   }
   return all_grids_tot_u/ (float)all_grids_tot_cells;
 }
@@ -573,7 +642,7 @@ int initialise(const char* paramfile, const char* obstaclefile,
   if (*tmp_cells_ptr == NULL) die("cannot allocate memory for tmp_cells", __LINE__, __FILE__);
 
   /* the map of obstacles */
-  *obstacles_ptr = malloc(sizeof(int) * number_of_cells);
+  *obstacles_ptr = malloc(sizeof(char) * number_of_cells);
 
   if (*obstacles_ptr == NULL) die("cannot allocate column memory for obstacles", __LINE__, __FILE__);
 
@@ -582,7 +651,7 @@ int initialise(const char* paramfile, const char* obstaclefile,
   float w1 = params->density      / 9.f;
   float w2 = params->density      / 36.f;
 
-  for (int jj = 1; jj < params->ny+1; jj++)
+  for (int jj = 0; jj < params->ny+2; jj++)
   {
     for (int ii = 0; ii < params->nx; ii++)
     {
@@ -631,32 +700,37 @@ int initialise(const char* paramfile, const char* obstaclefile,
 
     if (blocked != 1) die("obstacle blocked value should be 1", __LINE__, __FILE__);
 
-        /* Grab the halo obstacles */
-    if (start_row - 1 == -1 && yy == full_grid_height - 1) {
-      (*obstacles_ptr)[xx] = blocked;
-    }
-    if (end_row + 1 == full_grid_height && yy == 0) {
-      (*obstacles_ptr)[xx + (params->ny + 1)*params->nx] = blocked;
-    }
-
-    int obstacle_start_row = start_row - 1;
-    if (obstacle_start_row == -1) {
-      obstacle_start_row = 0;
-    }
-    
-    int obstacle_end_row = end_row + 1;
-    if (obstacle_end_row == full_grid_height) {
-      obstacle_end_row = full_grid_height - 1; 
-    }
-
-
     /* If in this rank's grid assigned to array */
-    if (yy >= obstacle_start_row && yy <= obstacle_end_row) 
+    if (yy >= start_row && yy <= end_row) 
     {
       int index = yy - start_row;
-      (*obstacles_ptr)[xx + (index+1)*params->nx] = blocked;
+      (*obstacles_ptr)[xx + (index + 1)*params->nx] = blocked;
+      printf("Setting obstacle in position: %d\n", xx + (index+1)*params->nx);
     }
   }
+  
+  float speed_1_sum = 0;
+  float all_speed_1_sum;
+  int num_cells = 0;
+  int all_num_cells;
+
+  float value = (*cells_ptr)[params->nx].speeds[3];
+  printf("first value = %.12f", value);
+  for (int jj = 1; jj < params->ny + 1; jj++)
+  {
+    for (int ii = 0; ii < params->nx; ii++)
+    {
+      if ((*cells_ptr)[(jj * params->nx) + ii].speeds[3] != value) {
+        printf("Wrong value detected!!! %.12f", (*cells_ptr)[(jj * params->nx) + ii].speeds[3]);
+      }
+      speed_1_sum += (*cells_ptr)[(jj * params->nx) + ii].speeds[3];
+      num_cells++;
+    }
+  }
+  MPI_Allreduce(&speed_1_sum, &all_speed_1_sum, 1, MPI_FLOAT, MPI_SUM, MPI_COMM_WORLD);
+  MPI_Allreduce(&num_cells, &all_num_cells, 1, MPI_INT, MPI_SUM, MPI_COMM_WORLD);
+  printf("init speed3 sum: %.12f, in %d cells\n", all_speed_1_sum, all_num_cells);
+  
   printf("Process %d of %d. My starting row is %d and my end row is %d.\n", params->rank_id, params->number_of_ranks, start_row, end_row);
 
   /* and close the file */
@@ -825,4 +899,27 @@ void swap(t_speed** cells, t_speed** cells2) {
   t_speed *tmp = *cells;
   *cells = *cells2;
   *cells2 = tmp;
+}
+
+void debug_print_cells(t_speed* cells, const t_param params) {
+  // FILE* fp = fopen("debug_cells_output.dat", "w");
+  MPI_File fh;
+  MPI_Status status;
+ 
+  MPI_File_open(MPI_COMM_SELF, "test.txt",MPI_MODE_CREATE | MPI_MODE_WRONLY,MPI_INFO_NULL,&fh);
+  // if (fp == NULL)
+  // {
+  //   die("could not open debug output file", __LINE__, __FILE__);
+  // }
+
+  for (int xx = 0; xx < params.nx; xx++)
+  {
+    for (int yy = 1; yy < params.ny + 1; yy++)
+    {
+      char buf[40];
+      snprintf(buf, 40, "%d %d %.12E\n", xx, yy + (params.rank_id * params.ny), cells[yy * params.nx + xx].speeds[0]);
+      MPI_File_write(fh,buf,40, MPI_CHAR,&status);
+    }
+  }
+  MPI_File_close(&fh);
 }
