@@ -180,8 +180,7 @@ int main(int argc, char* argv[])
   tic = timstr.tv_sec + (timstr.tv_usec / 1000000.0);
   float final_av_velocity;
 
-  //for (int tt = 0; tt < params.maxIters; tt++)
-  for (int tt = 0; tt < 1; tt++)
+  for (int tt = 0; tt < params.maxIters; tt++)
   {
     printf("Starting time step\n");
     final_av_velocity = timestep(params, &cells, &tmp_cells, obstacles);
@@ -335,9 +334,9 @@ float propagate_rebound_and_collisions(const t_param params, t_speed* restrict c
     {
       for (int ii = 0; ii < params.nx; ii++)
       {
-        int y_n = (jj + 1) % params.ny;
+        int y_n = jj + 1;
         int x_e = (ii + 1) % params.nx;
-        int y_s = (jj == 0) ? (jj + params.ny - 1) : (jj - 1);
+        int y_s = (jj == 0) ? (params.ny + 1) : (jj - 1);
         int x_w = (ii == 0) ? (ii + params.nx - 1) : (ii - 1);
         
         /* if the cell contains an obstacle */
@@ -551,7 +550,7 @@ int initialise(const char* paramfile, const char* obstaclefile,
   if (*cells_ptr == NULL) die("cannot allocate memory for cells", __LINE__, __FILE__);
 
   /* 'helper' grid, used as scratch space */
-  *tmp_cells_ptr = (t_speed*)malloc(sizeof(t_speed) * number_of_cells);
+  *tmp_cells_ptr = (t_speed*)malloc(sizeof(t_speed) * number_of_cells_with_halo);
 
   if (*tmp_cells_ptr == NULL) die("cannot allocate memory for tmp_cells", __LINE__, __FILE__);
 
