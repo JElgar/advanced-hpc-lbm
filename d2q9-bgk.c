@@ -1,5 +1,5 @@
 /*
-** Code to implement a d2q9-bgk lattice boltzmann scheme.
+j* Code to implement a d2q9-bgk lattice boltzmann scheme.
 ** 'd2' inidates a 2-dimensional grid, and
 ** 'q9' indicates 9 velocities per grid cell.
 ** 'bgk' refers to the Bhatnagar-Gross-Krook collision step.
@@ -63,6 +63,7 @@
 #include <time.h>
 #include <sys/time.h>
 #include <sys/resource.h>
+#include <string.h>
 #include <mpi.h>
 
 #define NSPEEDS         9
@@ -169,11 +170,7 @@ int main(int argc, char* argv[])
   }
 
   /* initialise our data structures and load values from file */
-  printf("Starting init\n");
   initialise(paramfile, obstaclefile, &params, &cells, &tmp_cells, &obstacles, &av_vels);
-  printf("Init Completed, dx: %d dy: %d\n", params.nx, params.ny);
-  printf("The value of cell 0 is: %.12f\n", cells[0].speeds[0]);
-
 
   /* iterate for maxIters timesteps */
   gettimeofday(&timstr, NULL);
@@ -182,14 +179,13 @@ int main(int argc, char* argv[])
 
   for (int tt = 0; tt < params.maxIters; tt++)
   {
-    printf("Starting time step\n");
     final_av_velocity = timestep(params, &cells, &tmp_cells, obstacles);
     av_vels[tt] = final_av_velocity;
-// #ifdef DEBUG
+#ifdef DEBUG
     printf("==timestep: %d==\n", tt);
     printf("av velocity: %.12E\n", av_vels[tt]);
     printf("tot density: %.12E\n", total_density(params, cells));
-// #endif
+#endif
   }
 
   gettimeofday(&timstr, NULL);
@@ -228,7 +224,6 @@ float timestep(const t_param params, t_speed** cells, t_speed** tmp_cells, char*
 
 int accelerate_flow(const t_param params, t_speed* cells, char* obstacles)
 {
-  printf("Accelerating flows");
   /* compute weighting factors */
   float w1 = params.density * params.accel / 9.f;
   float w2 = params.density * params.accel / 36.f;
@@ -255,7 +250,6 @@ int accelerate_flow(const t_param params, t_speed* cells, char* obstacles)
       cells[ii + jj*params.nx].speeds[7] -= w2;
     }
   }
-  printf("Flows accelerated");
 
   return EXIT_SUCCESS;
 }
@@ -679,7 +673,11 @@ float total_density(const t_param params, t_speed* cells)
 
 int write_values(const t_param params, t_speed* cells, char* obstacles, float* av_vels)
 {
-  FILE* fp;                     /* file pointer */
+
+  printf("Writing values for rank %d\n", params.rank_id);
+  MPI_File fh;
+  MPI_Status status;
+
   const float c_sq = 1.f / 3.f; /* sq. of speed of sound */
   float local_density;         /* per grid cell sum of densities */
   float pressure;              /* fluid pressure in grid cell */
@@ -687,9 +685,13 @@ int write_values(const t_param params, t_speed* cells, char* obstacles, float* a
   float u_y;                   /* y-component of velocity in grid cell */
   float u;                     /* norm--root of summed squares--of u_x and u_y */
 
-  fp = fopen(FINALSTATEFILE, "w");
+  const int output_line_length = 140;
+  char buf[output_line_length * params.nx * params.ny];
 
-  if (fp == NULL)
+  // fp = fopen(FINALSTATEFILE, "w");
+  MPI_File_open(MPI_COMM_SELF, FINALSTATEFILE, MPI_MODE_CREATE | MPI_MODE_WRONLY,MPI_INFO_NULL, &fh);
+
+  if (fh == NULL)
   {
     die("could not open file output file", __LINE__, __FILE__);
   }
@@ -737,25 +739,52 @@ int write_values(const t_param params, t_speed* cells, char* obstacles, float* a
       }
 
       /* write to file */
-      fprintf(fp, "%d %d %.12E %.12E %.12E %.12E %d\n", ii, jj, u_x, u_y, u, pressure, obstacles[ii * params.nx + jj]);
+      sprintf(buf + strlen(buf), "%d %d %.12E %.12E %.12E %.12E %d\n", ii, jj + (params.rank_id * params.ny), u_x, u_y, u, pressure, obstacles[ii * params.nx + jj]);
     }
   }
+  printf("Wrote to buffer");
 
-  fclose(fp);
+  const int offsets[params.number_of_ranks];
+  const int bufferLength = strlen(buf);
+  MPI_Allgather(&bufferLength, 1, MPI_INT, &offsets, 1, MPI_INT, MPI_COMM_WORLD);
 
-  fp = fopen(AVVELSFILE, "w");
+  int offset = 0;
+  for (int i = 0; i < params.rank_id; i++) {
+    offset += offsets[i];
+  }
+  printf("%d's offset is %d\n", params.rank_id, offset);
 
-  if (fp == NULL)
+  MPI_File_seek(fh, offset, MPI_SEEK_SET);
+  printf("Writing to file");
+  MPI_File_write(fh,buf,strlen(buf), MPI_CHAR,&status);
+  MPI_File_close(&fh);
+
+
+  // Write av vels
+  MPI_File_open(MPI_COMM_SELF, AVVELSFILE, MPI_MODE_CREATE | MPI_MODE_WRONLY,MPI_INFO_NULL, &fh);
+  if (fh == NULL)
   {
     die("could not open file output file", __LINE__, __FILE__);
   }
 
-  for (int ii = 0; ii < params.maxIters; ii++)
-  {
-    fprintf(fp, "%d:\t%.12E\n", ii, av_vels[ii]);
-  }
+  printf("Opened the vel file\n");
 
-  fclose(fp);
+  if (params.rank_id == 0) {
+    FILE* fp;                     /* file pointer */
+    fp = fopen(AVVELSFILE, "w");
+
+    if (fp == NULL)
+    {
+      die("could not open file output file", __LINE__, __FILE__);
+    }
+
+    for (int ii = 0; ii < params.maxIters; ii++)
+    {
+      fprintf(fp, "%d:\t%.12E\n", ii, av_vels[ii]);
+    }
+
+    fclose(fp);
+  }
 
   return EXIT_SUCCESS;
 }

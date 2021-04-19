@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <mpi.h>
+#include <string.h>
 #include <stddef.h>
 
 #define NSPEEDS 9
@@ -94,6 +95,31 @@ int main(int argc, char* argv[])
   printf("Value in cell 1, 0 for rank %d: %f\n", rank_id, cells[NX].speeds[0]);
   printf("Global sum for rank %d: %f\n", rank_id, global_sum);
   printf("Process %d of %d.\n", rank_id, number_of_ranks);
+  
+  printf("Setting varaibles\n");
+  MPI_File fh;
+  char buf[140];
+  int offsets[2];
+  int buff_length = 0;
+
+
+  printf("Opening file\n");
+  MPI_File_open(MPI_COMM_SELF, "test.output", MPI_MODE_CREATE | MPI_MODE_RDWR,MPI_INFO_NULL, &fh);
+  
+  printf("Opened file.\n");
+  sprintf(buf, "Hello from rank %d\n", rank_id);
+  printf(buf, "Hello from rank %d\n", rank_id);
+
+  buff_length = strlen(buf);
+
+  // MPI_Allgather(&buff_length, 1, MPI_INTEGER, offsets, 1, MPI_INT, MPI_COMM_WORLD);
+  MPI_File_seek(fh, 140 * rank_id, MPI_SEEK_SET);
+
+  
+  for (int i = 0; i < 2; i++)  {
+    printf("Length of buffer: %d", offsets[i]);
+  }
+  MPI_File_write(fh,buf,strlen(buf), MPI_CHAR,&status);
   
   MPI_Finalize();
 }
