@@ -1,8 +1,8 @@
 #!/bin/bash
 
 #SBATCH --job-name d2q9-bgk
-#SBATCH --nodes 1
-#SBATCH --ntasks-per-node 4
+#SBATCH --nodes 4
+#SBATCH --ntasks-per-node 1
 #SBATCH --time 00:10:00
 #SBATCH --partition veryshort
 #SBATCH --reservation=COSC024002
@@ -15,6 +15,9 @@ echo Directory is `pwd`
 echo Slurm job ID is $SLURM_JOB_ID
 echo This job runs on the following machines:
 echo `echo $SLURM_JOB_NODELIST | uniq`
+export OMP_NUM_THREADS=28
+export OMP_PROC_BIND=close
+export OMP_PLACES=threads
 
 #! Run the executable
 # ./d2q9-bgk input_128x128.params obstacles_128x128.dat
@@ -26,4 +29,5 @@ echo `echo $SLURM_JOB_NODELIST | uniq`
 export I_MPI_PMI_LIBRARY=/usr/lib64/libpmi.so
 
 # Run the parallel MPI executable
-srun ./d2q9-bgk input_128x128.params obstacles_128x128.dat
+# srun ./d2q9-bgk input_128x128.params obstacles_128x128.dat
+srun ./d2q9-bgk input_256x256.params obstacles_256x256.dat
