@@ -82,6 +82,7 @@ typedef struct
   float omega;         /* relaxation parameter */
   int number_of_ranks;
   int rank_id;
+  int number_of_obstacles;
 } t_param;
 
 /* struct to hold the 'speed' arrays */
@@ -98,6 +99,9 @@ typedef struct
   float* restrict speed8;
 } t_speed;
 
+MPI_Request send_requests[6];
+MPI_Request recv_requests[6];
+int timestep_count = 0;
 /*
 ** function prototypes
 */
@@ -210,12 +214,14 @@ int main(int argc, char* argv[])
   tot_toc = col_toc;
 
   /* write final values and free memory */
-  printf("==done==\n");
-  printf("Reynolds number:\t\t%.12E\n", calc_reynolds(params, final_av_velocity));
-  printf("Elapsed Init time:\t\t\t%.6lf (s)\n",    init_toc - init_tic);
-  printf("Elapsed Compute time:\t\t\t%.6lf (s)\n", comp_toc - comp_tic);
-  printf("Elapsed Collate time:\t\t\t%.6lf (s)\n", col_toc  - col_tic);
-  printf("Elapsed Total time:\t\t\t%.6lf (s)\n",   tot_toc  - tot_tic);
+  if (params.rank_id == 0) {
+    printf("==done==\n");
+    printf("Reynolds number:\t\t%.12E\n", calc_reynolds(params, final_av_velocity));
+    printf("Elapsed Init time:\t\t\t%.6lf (s)\n",    init_toc - init_tic);
+    printf("Elapsed Compute time:\t\t\t%.6lf (s)\n", comp_toc - comp_tic);
+    printf("Elapsed Collate time:\t\t\t%.6lf (s)\n", col_toc  - col_tic);
+    printf("Elapsed Total time:\t\t\t%.6lf (s)\n",   tot_toc  - tot_tic);
+  }
   write_values(params, cells, obstacles, av_vels);
   finalise(&params, cells, tmp_cells, &obstacles, &av_vels);
 
@@ -233,6 +239,7 @@ float timestep(const t_param params, t_speed* cells, t_speed* tmp_cells, char* o
   }
   float time_step_solution = propagate_rebound_and_collisions(params, cells, tmp_cells, obstacles);
   swap(cells, tmp_cells);
+  timestep_count++;
   return time_step_solution;
 }
 
@@ -331,268 +338,131 @@ float propagate_rebound_and_collisions(const t_param params, t_speed* cells, t_s
   __assume(params.nx%128==0);
   __assume(params.ny%128==0);
   
-  MPI_Request send_requests[6];
-  MPI_Request recv_requests[6];
-  MPI_Status status;
-
-  MPI_Irecv(
-      &cells->speed7[(params.ny) * params.nx],
-      params.nx,  // amount of data
-      MPI_FLOAT,  // data type
-      (params.rank_id + 1) % params.number_of_ranks,  // Which rank to send to
-      7,
-      MPI_COMM_WORLD,
-      &recv_requests[0]
-  );
-  MPI_Irecv(
-      &cells->speed4[(params.ny) * params.nx],
-      params.nx,  // amount of data
-      MPI_FLOAT,  // data type
-      (params.rank_id + 1) % params.number_of_ranks,  // Which rank to send to
-      4,
-      MPI_COMM_WORLD,
-      &recv_requests[1]
-  );
-  MPI_Irecv(
-      &cells->speed8[(params.ny) * params.nx],
-      params.nx,  // amount of data
-      MPI_FLOAT,  // data type
-      (params.rank_id + 1) % params.number_of_ranks,  // Which rank to send to
-      8,
-      MPI_COMM_WORLD,
-      &recv_requests[2]
-  );
-  MPI_Isend(
-      &cells->speed7[0],  // src data
-      params.nx,  // amount of data to send
-      MPI_FLOAT,  // data type
-      params.rank_id == 0 ? params.number_of_ranks - 1 : params.rank_id - 1,  // Which rank to recieve from 
-      7,
-      MPI_COMM_WORLD,
-      &send_requests[0]
-  );
-  MPI_Isend(
-      &cells->speed4[0],  // src data
-      params.nx,  // amount of data to send
-      MPI_FLOAT,  // data type
-      params.rank_id == 0 ? params.number_of_ranks - 1 : params.rank_id - 1,  // Which rank to recieve from 
-      4,
-      MPI_COMM_WORLD,
-      &send_requests[1]
-  );
-  MPI_Isend(
-      &cells->speed8[0],  // src data
-      params.nx,  // amount of data to send
-      MPI_FLOAT,  // data type
-      params.rank_id == 0 ? params.number_of_ranks - 1 : params.rank_id - 1,  // Which rank to recieve from 
-      8,
-      MPI_COMM_WORLD,
-      &send_requests[2]
-  );
-
-  MPI_Irecv(
-      &cells->speed6[(params.ny + 1) * params.nx],
-      params.nx,  // amount of data
-      MPI_FLOAT,  // data type
-      params.rank_id - 1 == -1 ? params.number_of_ranks - 1 : params.rank_id - 1,  // Which rank to recieve from 
-      6,
-      MPI_COMM_WORLD,
-      &recv_requests[3]
-  );
-  MPI_Irecv(
-      &cells->speed5[(params.ny + 1) * params.nx],
-      params.nx,  // amount of data
-      MPI_FLOAT,  // data type
-      params.rank_id - 1 == -1 ? params.number_of_ranks - 1 : params.rank_id - 1,  // Which rank to recieve from 
-      5,
-      MPI_COMM_WORLD,
-      &recv_requests[4]
-  );
-  MPI_Irecv(
-      &cells->speed2[(params.ny + 1) * params.nx],
-      params.nx,  // amount of data
-      MPI_FLOAT,  // data type
-      params.rank_id - 1 == -1 ? params.number_of_ranks - 1 : params.rank_id - 1,  // Which rank to recieve from 
-      2,
-      MPI_COMM_WORLD,
-      &recv_requests[5]
-  );
-  MPI_Isend(
-      &cells->speed6[(params.ny - 1) * params.nx],  // src data
-      params.nx,  // amount of data to send
-      MPI_FLOAT,  // data type
-      (params.rank_id + 1) % params.number_of_ranks,  // Which rank to send to
-      6,
-      MPI_COMM_WORLD,
-      &send_requests[3]
-  );
-  MPI_Isend(
-      &cells->speed5[(params.ny - 1) * params.nx],  // src data
-      params.nx,  // amount of data to send
-      MPI_FLOAT,  // data type
-      (params.rank_id + 1) % params.number_of_ranks,  // Which rank to send to
-      5,
-      MPI_COMM_WORLD,
-      &send_requests[4]
-  );
-  MPI_Isend(
-      &cells->speed2[(params.ny - 1) * params.nx],  // src data
-      params.nx,  // amount of data to send
-      MPI_FLOAT,  // data type
-      (params.rank_id + 1) % params.number_of_ranks,  // Which rank to send to
-      2,
-      MPI_COMM_WORLD,
-      &send_requests[5]
-  );
-
-  MPI_Waitall(6, send_requests, MPI_STATUSES_IGNORE);
-  MPI_Waitall(6, recv_requests, MPI_STATUSES_IGNORE);
-
-  // MPI_Sendrecv(
-  //     &cells->speed4[0],  // src data
-  //     params.nx,  // amount of data to send
-  //     MPI_FLOAT,  // data type
-  //     params.rank_id == 0 ? params.number_of_ranks - 1 : params.rank_id - 1,  // Which rank to recieve from 
-  //     0,
-  //     
-  //     // Recieve and store in the bottom halo row
-  //     &cells->speed4[(params.ny) * params.nx],
-  //     params.nx,  // amount of data
-  //     MPI_FLOAT,  // data type
-  //     (params.rank_id + 1) % params.number_of_ranks,  // Which rank to send to
-  //     0,
-
-  //     //
-  //     MPI_COMM_WORLD,
-  //     &status
-  // );
-  // MPI_Sendrecv(
-  //     &cells->speed8[0],  // src data
-  //     params.nx,  // amount of data to send
-  //     MPI_FLOAT,  // data type
-  //     params.rank_id == 0 ? params.number_of_ranks - 1 : params.rank_id - 1,  // Which rank to recieve from 
-  //     0,
-  //     
-  //     // Recieve and store in the bottom halo row
-  //     &cells->speed8[(params.ny) * params.nx],
-  //     params.nx,  // amount of data
-  //     MPI_FLOAT,  // data type
-  //     (params.rank_id + 1) % params.number_of_ranks,  // Which rank to send to
-  //     0,
-
-  //     //
-  //     MPI_COMM_WORLD,
-  //     &status
-  // );
-
-  // MPI_Sendrecv(
-  //     &cells->speed6[(params.ny - 1) * params.nx],  // src data
-  //     params.nx,  // amount of data to send
-  //     MPI_FLOAT,  // data type
-  //     (params.rank_id + 1) % params.number_of_ranks,  // Which rank to send to
-  //     0,
-  //     
-  //     // Recieve and store in the bottom halo row
-  //     &cells->speed6[(params.ny + 1) * params.nx],
-  //     params.nx,  // amount of data
-  //     MPI_FLOAT,  // data type
-  //     params.rank_id - 1 == -1 ? params.number_of_ranks - 1 : params.rank_id - 1,  // Which rank to recieve from 
-  //     0,
-
-  //     //
-  //     MPI_COMM_WORLD,
-  //     &status
-  // );
-  // MPI_Sendrecv(
-  //     &cells->speed2[(params.ny - 1) * params.nx],  // src data
-  //     params.nx,  // amount of data to send
-  //     MPI_FLOAT,  // data type
-  //     (params.rank_id + 1) % params.number_of_ranks,  // Which rank to send to
-  //     0,
-  //     
-  //     // Recieve and store in the bottom halo row
-  //     &cells->speed2[(params.ny + 1) * params.nx],
-  //     params.nx,  // amount of data
-  //     MPI_FLOAT,  // data type
-  //     params.rank_id - 1 == -1 ? params.number_of_ranks - 1 : params.rank_id - 1,  // Which rank to recieve from 
-  //     0,
-
-  //     //
-  //     MPI_COMM_WORLD,
-  //     &status
-  // );
-  // MPI_Sendrecv(
-  //     &cells->speed5[(params.ny - 1) * params.nx],  // src data
-  //     params.nx,  // amount of data to send
-  //     MPI_FLOAT,  // data type
-  //     (params.rank_id + 1) % params.number_of_ranks,  // Which rank to send to
-  //     0,
-  //     
-  //     // Recieve and store in the bottom halo row
-  //     &cells->speed5[(params.ny + 1) * params.nx],
-  //     params.nx,  // amount of data
-  //     MPI_FLOAT,  // data type
-  //     params.rank_id - 1 == -1 ? params.number_of_ranks - 1 : params.rank_id - 1,  // Which rank to recieve from 
-  //     0,
-
-  //     //
-  //     MPI_COMM_WORLD,
-  //     &status
-  // );
-  // 
-  // MPI_Irecv(
-  //     &cells->speed2[(params.ny + 1) * params.nx],
-  //     params.nx,  // amount of data
-  //     MPI_FLOAT,  // data type
-  //     params.rank_id - 1 == -1 ? params.number_of_ranks - 1 : params.rank_id - 1,  // Which rank to recieve from 
-  //     2,
-  //     MPI_COMM_WORLD,
-  //     &s_request
-  // );
-  // MPI_Irecv(
-  //     &cells->speed5[(params.ny + 1) * params.nx],
-  //     params.nx,  // amount of data
-  //     MPI_FLOAT,  // data type
-  //     params.rank_id - 1 == -1 ? params.number_of_ranks - 1 : params.rank_id - 1,  // Which rank to recieve from 
-  //     5,
-  //     MPI_COMM_WORLD,
-  //     &se_request
-  // );
-
-  // MPI_Isend(
-  //     &cells->speed2[(params.ny - 1) * params.nx],  // src data
-  //     params.nx,  // amount of data to send
-  //     MPI_FLOAT,  // data type
-  //     (params.rank_id + 1) % params.number_of_ranks,  // Which rank to send to
-  //     2,
-  //     MPI_COMM_WORLD,
-  //     &s_request
-  // );
-  // MPI_Isend(
-  //     &cells->speed5[(params.ny - 1) * params.nx],  // src data
-  //     params.nx,  // amount of data to send
-  //     MPI_FLOAT,  // data type
-  //     (params.rank_id + 1) % params.number_of_ranks,  // Which rank to send to
-  //     5,
-  //     MPI_COMM_WORLD,
-  //     &se_request
-  // );
-
-  // Wait till we have got the rows required for the top row
-  // MPI_Wait(&sw_request, &status);
-  // MPI_Wait(&s_request, &status);
-  // MPI_Wait(&se_request, &status);
-  // MPI_Wait(&nw_request, &status);
-  // MPI_Wait(&n_request, &status);
-  // MPI_Wait(&ne_request, &status);
+  if (timestep_count == 0) {
+    MPI_Isend(
+        &cells->speed7[0],  // src data
+        params.nx,  // amount of data to send
+        MPI_FLOAT,  // data type
+        params.rank_id == 0 ? params.number_of_ranks - 1 : params.rank_id - 1,  // Which rank to recieve from 
+        7,
+        MPI_COMM_WORLD,
+        &send_requests[0]
+    );
+    MPI_Isend(
+        &cells->speed4[0],  // src data
+        params.nx,  // amount of data to send
+        MPI_FLOAT,  // data type
+        params.rank_id == 0 ? params.number_of_ranks - 1 : params.rank_id - 1,  // Which rank to recieve from 
+        4,
+        MPI_COMM_WORLD,
+        &send_requests[1]
+    );
+    MPI_Isend(
+        &cells->speed8[0],  // src data
+        params.nx,  // amount of data to send
+        MPI_FLOAT,  // data type
+        params.rank_id == 0 ? params.number_of_ranks - 1 : params.rank_id - 1,  // Which rank to recieve from 
+        8,
+        MPI_COMM_WORLD,
+        &send_requests[2]
+    );
+    
+    MPI_Irecv(
+        &cells->speed7[(params.ny) * params.nx],
+        params.nx,  // amount of data
+        MPI_FLOAT,  // data type
+        (params.rank_id + 1) % params.number_of_ranks,  // Which rank to send to
+        7,
+        MPI_COMM_WORLD,
+        &recv_requests[0]
+    );
+    MPI_Irecv(
+        &cells->speed4[(params.ny) * params.nx],
+        params.nx,  // amount of data
+        MPI_FLOAT,  // data type
+        (params.rank_id + 1) % params.number_of_ranks,  // Which rank to send to
+        4,
+        MPI_COMM_WORLD,
+        &recv_requests[1]
+    );
+    MPI_Irecv(
+        &cells->speed8[(params.ny) * params.nx],
+        params.nx,  // amount of data
+        MPI_FLOAT,  // data type
+        (params.rank_id + 1) % params.number_of_ranks,  // Which rank to send to
+        8,
+        MPI_COMM_WORLD,
+        &recv_requests[2]
+    );
   
-  /* loop over _all_ cells */
-  // #pragma omp parallel
-  // #pragma distribute_point
+    MPI_Isend(
+        &cells->speed6[(params.ny - 1) * params.nx],  // src data
+        params.nx,  // amount of data to send
+        MPI_FLOAT,  // data type
+        (params.rank_id + 1) % params.number_of_ranks,  // Which rank to send to
+        6,
+        MPI_COMM_WORLD,
+        &send_requests[3]
+    );
+    MPI_Isend(
+        &cells->speed5[(params.ny - 1) * params.nx],  // src data
+        params.nx,  // amount of data to send
+        MPI_FLOAT,  // data type
+        (params.rank_id + 1) % params.number_of_ranks,  // Which rank to send to
+        5,
+        MPI_COMM_WORLD,
+        &send_requests[4]
+    );
+    MPI_Isend(
+        &cells->speed2[(params.ny - 1) * params.nx],  // src data
+        params.nx,  // amount of data to send
+        MPI_FLOAT,  // data type
+        (params.rank_id + 1) % params.number_of_ranks,  // Which rank to send to
+        2,
+        MPI_COMM_WORLD,
+        &send_requests[5]
+    );
+    // and we have finished with the top buffer so we can get ready to recieve a new one
+    MPI_Irecv(
+        &cells->speed6[(params.ny + 1) * params.nx],
+        params.nx,  // amount of data
+        MPI_FLOAT,  // data type
+        params.rank_id - 1 == -1 ? params.number_of_ranks - 1 : params.rank_id - 1,  // Which rank to recieve from 
+        6,
+        MPI_COMM_WORLD,
+        &recv_requests[3]
+    );
+    MPI_Irecv(
+        &cells->speed5[(params.ny + 1) * params.nx],
+        params.nx,  // amount of data
+        MPI_FLOAT,  // data type
+        params.rank_id - 1 == -1 ? params.number_of_ranks - 1 : params.rank_id - 1,  // Which rank to recieve from 
+        5,
+        MPI_COMM_WORLD,
+        &recv_requests[4]
+    );
+    MPI_Irecv(
+        &cells->speed2[(params.ny + 1) * params.nx],
+        params.nx,  // amount of data
+        MPI_FLOAT,  // data type
+        params.rank_id - 1 == -1 ? params.number_of_ranks - 1 : params.rank_id - 1,  // Which rank to recieve from 
+        2,
+        MPI_COMM_WORLD,
+        &recv_requests[5]
+    );
+  }
+
+  // This will be a thing
+  // int start_row = params.rank_id % 2 == 0 ? 0 : params.ny - 1;
+  // int end_row = params.rank_id % 2 == 0 ? params.ny - 1 : 0;
+  
+  // MPI_Waitall(3, send_requests, MPI_STATUSES_IGNORE);
+  // MPI_Waitall(3, &recv_requests[3], MPI_STATUSES_IGNORE);
+
+  // --- Calculate inner cells in parallel
   {
     #pragma omp parallel for schedule(static) reduction(+:tot_cells) reduction(+:tot_u)
-    // #pragma omp parallel for simd collapse(2) schedule(static) reduction(+:tot_cells) reduction(+:tot_u) aligned(cells:64) aligned(tmp_cells:64) aligned(obstacles:64)
-    for (int jj = 0; jj < params.ny; jj++)
+    for (int jj = 1; jj < params.ny - 1; jj++)
     {    
       #pragma omp simd aligned(cells:64) aligned(tmp_cells:64) aligned(obstacles:64) reduction(+:tot_cells) reduction(+:tot_u)
       for (int ii = 0; ii < params.nx; ii++)
@@ -726,6 +596,402 @@ float propagate_rebound_and_collisions(const t_param params, t_speed* cells, t_s
       }
     }
   }
+  
+  MPI_Waitall(6, send_requests, MPI_STATUSES_IGNORE);
+  MPI_Waitall(6, recv_requests, MPI_STATUSES_IGNORE);
+  
+  // --- Calculate row 0 --- //
+    for (int jj = 0; jj < 1; jj++)
+    {    
+      // If we are doing the last row
+
+      #pragma omp simd aligned(cells:64) aligned(tmp_cells:64) aligned(obstacles:64) reduction(+:tot_cells) reduction(+:tot_u)
+      for (int ii = 0; ii < params.nx; ii++)
+      {
+        const int y_n = jj + 1;
+        const int x_e = (ii + 1) % params.nx;
+        const int y_s = (jj == 0) ? (params.ny + 1) : (jj - 1);
+        const int x_w = (ii == 0) ? (ii + params.nx - 1) : (ii - 1);
+        
+        /* if the cell contains an obstacle */
+        if (obstacles[jj*params.nx + ii])
+        {
+          /* called after propagate, so taking values from scratch space
+          ** mirroring, and writing into main grid */
+          tmp_cells->speed0[ii + jj*params.nx] = cells->speed0[ii + jj*params.nx];
+          tmp_cells->speed1[ii + jj*params.nx] = cells->speed3[x_e + jj*params.nx];
+          tmp_cells->speed2[ii + jj*params.nx] = cells->speed4[ii + y_n*params.nx];
+          tmp_cells->speed3[ii + jj*params.nx] = cells->speed1[x_w + jj*params.nx];
+          tmp_cells->speed4[ii + jj*params.nx] = cells->speed2[ii + y_s*params.nx];
+          tmp_cells->speed5[ii + jj*params.nx] = cells->speed7[x_e + y_n*params.nx];
+          tmp_cells->speed6[ii + jj*params.nx] = cells->speed8[x_w + y_n*params.nx];
+          tmp_cells->speed7[ii + jj*params.nx] = cells->speed5[x_w + y_s*params.nx];
+          tmp_cells->speed8[ii + jj*params.nx] = cells->speed6[x_e + y_s*params.nx];
+        } 
+        // Deal with collisions
+        else
+        {
+
+          /* compute local density total */
+          float local_density = 0.f;
+          local_density += cells->speed0[ii + jj*params.nx];
+          local_density += cells->speed1[x_w + jj*params.nx];
+          local_density += cells->speed2[ii + y_s*params.nx];
+          local_density += cells->speed3[x_e + jj*params.nx];
+          local_density += cells->speed4[ii + y_n*params.nx];
+          local_density += cells->speed5[x_w + y_s*params.nx];
+          local_density += cells->speed6[x_e + y_s*params.nx];
+          local_density += cells->speed7[x_e + y_n*params.nx];
+          local_density += cells->speed8[x_w + y_n*params.nx];
+
+          /* compute x velocity component */
+          const float u_x = (
+              cells->speed1[x_w + jj*params.nx]
+            - cells->speed3[x_e + jj*params.nx]
+            + cells->speed5[x_w + y_s*params.nx]
+            - cells->speed6[x_e + y_s*params.nx]
+            - cells->speed7[x_e + y_n*params.nx]
+            + cells->speed8[x_w + y_n*params.nx]
+          ) / local_density;
+          /* compute y velocity component */
+          const float u_y = (
+              cells->speed2[ii + y_s*params.nx]
+            - cells->speed4[ii + y_n*params.nx]
+            + cells->speed5[x_w + y_s*params.nx]
+            + cells->speed6[x_e + y_s*params.nx]
+            - cells->speed7[x_e + y_n*params.nx]
+            - cells->speed8[x_w + y_n*params.nx]
+            ) / local_density;
+
+          /* velocity squared */
+          const float u_sq = u_x * u_x + u_y * u_y;
+          const float u_sqd2sq = u_sq / c_2sq;
+
+          /* relaxation step */
+          tmp_cells->speed0[ii + jj*params.nx] = cells->speed0[ii + jj*params.nx]
+                                                 + params.omega
+                                                 * (
+                                                    w0 * local_density * (1.f - u_sq / (c_2sq))
+                                                    - cells->speed0[ii + jj*params.nx]
+                                                  );
+          
+          tmp_cells->speed1[ii + jj*params.nx] = cells->speed1[x_w + jj*params.nx]
+                                                 + params.omega
+                                                 * (
+                                                    w1 * local_density * (1.f + u_x / c_sq + (u_x * u_x) / c_2cu - u_sqd2sq)
+                                                    - cells->speed1[x_w + jj*params.nx]
+                                                  );
+          
+          tmp_cells->speed2[ii + jj*params.nx] = cells->speed2[ii + y_s*params.nx]
+                                                 + params.omega
+                                                 * (
+                                                    w1 * local_density * (1.f + u_y / c_sq + (u_y * u_y) / c_2cu - u_sqd2sq)
+                                                    - cells->speed2[ii + y_s*params.nx]
+                                                  );
+          
+          tmp_cells->speed3[ii + jj*params.nx] = cells->speed3[x_e + jj*params.nx]
+                                                 + params.omega
+                                                 * (
+                                                    w1 * local_density * (1.f - u_x / c_sq + (u_x * u_x) / c_2cu - u_sqd2sq) 
+                                                    - cells->speed3[x_e + jj*params.nx]
+                                                  );
+          
+          tmp_cells->speed4[ii + jj*params.nx] = cells->speed4[ii + y_n*params.nx]
+                                                 + params.omega
+                                                 * (
+                                                    w1 * local_density * (1.f - u_y / c_sq + (u_y * u_y) / c_2cu - u_sqd2sq) 
+                                                    - cells->speed4[ii + y_n*params.nx]
+                                                  );
+          
+          tmp_cells->speed5[ii + jj*params.nx] = cells->speed5[x_w + y_s*params.nx]
+                                                 + params.omega
+                                                 * (
+                                                    w2 * local_density * (1.f + (u_x + u_y) / c_sq + ((u_x + u_y) * (u_x + u_y)) / c_2cu - u_sqd2sq)
+                                                    - cells->speed5[x_w + y_s*params.nx]
+                                                  );
+          
+          tmp_cells->speed6[ii + jj*params.nx] = cells->speed6[x_e + y_s*params.nx]
+                                                 + params.omega
+                                                 * (
+                                                    w2 * local_density * (1.f + (-u_x + u_y) / c_sq + ((-u_x + u_y) * (-u_x + u_y))  / c_2cu - u_sqd2sq)
+                                                    - cells->speed6[x_e + y_s*params.nx]
+                                                  );
+          
+          tmp_cells->speed7[ii + jj*params.nx] = cells->speed7[x_e + y_n*params.nx]
+                                                 + params.omega
+                                                 * (
+                                                    w2 * local_density * (1.f - (u_x + u_y) / c_sq + ((u_x + u_y) * (u_x + u_y))    / c_2cu - u_sqd2sq) 
+                                                    - cells->speed7[x_e + y_n*params.nx]
+                                                  );
+          
+          tmp_cells->speed8[ii + jj*params.nx] = cells->speed8[x_w + y_n*params.nx]
+                                                 + params.omega
+                                                 * (
+                                                    w2 * local_density * (1.f + (u_x - u_y) / c_sq + ((u_x - u_y) * (u_x - u_y)) / c_2cu - u_sqd2sq)
+                                                    - cells->speed8[x_w + y_n*params.nx]
+                                                  );
+         
+          tot_u += sqrtf(u_sq);
+          ++tot_cells;
+        }
+      }
+    }
+
+  
+  // --- Calculate last row --- //
+    // If we are doing the last row
+    // Make sure we have the required halo row
+    // MPI_Waitall(3, recv_requests, MPI_STATUSES_IGNORE);
+    // And that we have sent the current row
+    // MPI_Waitall(3, &send_requests[3], MPI_STATUSES_IGNORE);
+    // printf("Rank %d: Waited for top row stuff on timestep_count: %d\n", params.rank_id, timestep_count);
+    for (int jj = params.ny - 1; jj < params.ny; jj++)
+    {    
+      // If we are doing the last row
+
+      #pragma omp simd aligned(cells:64) aligned(tmp_cells:64) aligned(obstacles:64) reduction(+:tot_cells) reduction(+:tot_u)
+      for (int ii = 0; ii < params.nx; ii++)
+      {
+        const int y_n = jj + 1;
+        const int x_e = (ii + 1) % params.nx;
+        const int y_s = (jj == 0) ? (params.ny + 1) : (jj - 1);
+        const int x_w = (ii == 0) ? (ii + params.nx - 1) : (ii - 1);
+        
+        /* if the cell contains an obstacle */
+        if (obstacles[jj*params.nx + ii])
+        {
+          /* called after propagate, so taking values from scratch space
+          ** mirroring, and writing into main grid */
+          tmp_cells->speed0[ii + jj*params.nx] = cells->speed0[ii + jj*params.nx];
+          tmp_cells->speed1[ii + jj*params.nx] = cells->speed3[x_e + jj*params.nx];
+          tmp_cells->speed2[ii + jj*params.nx] = cells->speed4[ii + y_n*params.nx];
+          tmp_cells->speed3[ii + jj*params.nx] = cells->speed1[x_w + jj*params.nx];
+          tmp_cells->speed4[ii + jj*params.nx] = cells->speed2[ii + y_s*params.nx];
+          tmp_cells->speed5[ii + jj*params.nx] = cells->speed7[x_e + y_n*params.nx];
+          tmp_cells->speed6[ii + jj*params.nx] = cells->speed8[x_w + y_n*params.nx];
+          tmp_cells->speed7[ii + jj*params.nx] = cells->speed5[x_w + y_s*params.nx];
+          tmp_cells->speed8[ii + jj*params.nx] = cells->speed6[x_e + y_s*params.nx];
+        } 
+        // Deal with collisions
+        else
+        {
+
+          /* compute local density total */
+          float local_density = 0.f;
+          local_density += cells->speed0[ii + jj*params.nx];
+          local_density += cells->speed1[x_w + jj*params.nx];
+          local_density += cells->speed2[ii + y_s*params.nx];
+          local_density += cells->speed3[x_e + jj*params.nx];
+          local_density += cells->speed4[ii + y_n*params.nx];
+          local_density += cells->speed5[x_w + y_s*params.nx];
+          local_density += cells->speed6[x_e + y_s*params.nx];
+          local_density += cells->speed7[x_e + y_n*params.nx];
+          local_density += cells->speed8[x_w + y_n*params.nx];
+
+          /* compute x velocity component */
+          const float u_x = (
+              cells->speed1[x_w + jj*params.nx]
+            - cells->speed3[x_e + jj*params.nx]
+            + cells->speed5[x_w + y_s*params.nx]
+            - cells->speed6[x_e + y_s*params.nx]
+            - cells->speed7[x_e + y_n*params.nx]
+            + cells->speed8[x_w + y_n*params.nx]
+          ) / local_density;
+          /* compute y velocity component */
+          const float u_y = (
+              cells->speed2[ii + y_s*params.nx]
+            - cells->speed4[ii + y_n*params.nx]
+            + cells->speed5[x_w + y_s*params.nx]
+            + cells->speed6[x_e + y_s*params.nx]
+            - cells->speed7[x_e + y_n*params.nx]
+            - cells->speed8[x_w + y_n*params.nx]
+            ) / local_density;
+
+          /* velocity squared */
+          const float u_sq = u_x * u_x + u_y * u_y;
+          const float u_sqd2sq = u_sq / c_2sq;
+
+          /* relaxation step */
+          tmp_cells->speed0[ii + jj*params.nx] = cells->speed0[ii + jj*params.nx]
+                                                 + params.omega
+                                                 * (
+                                                    w0 * local_density * (1.f - u_sq / (c_2sq))
+                                                    - cells->speed0[ii + jj*params.nx]
+                                                  );
+          
+          tmp_cells->speed1[ii + jj*params.nx] = cells->speed1[x_w + jj*params.nx]
+                                                 + params.omega
+                                                 * (
+                                                    w1 * local_density * (1.f + u_x / c_sq + (u_x * u_x) / c_2cu - u_sqd2sq)
+                                                    - cells->speed1[x_w + jj*params.nx]
+                                                  );
+          
+          tmp_cells->speed2[ii + jj*params.nx] = cells->speed2[ii + y_s*params.nx]
+                                                 + params.omega
+                                                 * (
+                                                    w1 * local_density * (1.f + u_y / c_sq + (u_y * u_y) / c_2cu - u_sqd2sq)
+                                                    - cells->speed2[ii + y_s*params.nx]
+                                                  );
+          
+          tmp_cells->speed3[ii + jj*params.nx] = cells->speed3[x_e + jj*params.nx]
+                                                 + params.omega
+                                                 * (
+                                                    w1 * local_density * (1.f - u_x / c_sq + (u_x * u_x) / c_2cu - u_sqd2sq) 
+                                                    - cells->speed3[x_e + jj*params.nx]
+                                                  );
+          
+          tmp_cells->speed4[ii + jj*params.nx] = cells->speed4[ii + y_n*params.nx]
+                                                 + params.omega
+                                                 * (
+                                                    w1 * local_density * (1.f - u_y / c_sq + (u_y * u_y) / c_2cu - u_sqd2sq) 
+                                                    - cells->speed4[ii + y_n*params.nx]
+                                                  );
+          
+          tmp_cells->speed5[ii + jj*params.nx] = cells->speed5[x_w + y_s*params.nx]
+                                                 + params.omega
+                                                 * (
+                                                    w2 * local_density * (1.f + (u_x + u_y) / c_sq + ((u_x + u_y) * (u_x + u_y)) / c_2cu - u_sqd2sq)
+                                                    - cells->speed5[x_w + y_s*params.nx]
+                                                  );
+          
+          tmp_cells->speed6[ii + jj*params.nx] = cells->speed6[x_e + y_s*params.nx]
+                                                 + params.omega
+                                                 * (
+                                                    w2 * local_density * (1.f + (-u_x + u_y) / c_sq + ((-u_x + u_y) * (-u_x + u_y))  / c_2cu - u_sqd2sq)
+                                                    - cells->speed6[x_e + y_s*params.nx]
+                                                  );
+          
+          tmp_cells->speed7[ii + jj*params.nx] = cells->speed7[x_e + y_n*params.nx]
+                                                 + params.omega
+                                                 * (
+                                                    w2 * local_density * (1.f - (u_x + u_y) / c_sq + ((u_x + u_y) * (u_x + u_y))    / c_2cu - u_sqd2sq) 
+                                                    - cells->speed7[x_e + y_n*params.nx]
+                                                  );
+          
+          tmp_cells->speed8[ii + jj*params.nx] = cells->speed8[x_w + y_n*params.nx]
+                                                 + params.omega
+                                                 * (
+                                                    w2 * local_density * (1.f + (u_x - u_y) / c_sq + ((u_x - u_y) * (u_x - u_y)) / c_2cu - u_sqd2sq)
+                                                    - cells->speed8[x_w + y_n*params.nx]
+                                                  );
+         
+          tot_u += sqrtf(u_sq);
+          ++tot_cells;
+        }
+      }
+    }
+  
+    MPI_Isend(
+        &cells->speed7[0],  // src data
+        params.nx,  // amount of data to send
+        MPI_FLOAT,  // data type
+        params.rank_id == 0 ? params.number_of_ranks - 1 : params.rank_id - 1,  // Which rank to recieve from 
+        7,
+        MPI_COMM_WORLD,
+        &send_requests[0]
+    );
+    MPI_Isend(
+        &cells->speed4[0],  // src data
+        params.nx,  // amount of data to send
+        MPI_FLOAT,  // data type
+        params.rank_id == 0 ? params.number_of_ranks - 1 : params.rank_id - 1,  // Which rank to recieve from 
+        4,
+        MPI_COMM_WORLD,
+        &send_requests[1]
+    );
+    MPI_Isend(
+        &cells->speed8[0],  // src data
+        params.nx,  // amount of data to send
+        MPI_FLOAT,  // data type
+        params.rank_id == 0 ? params.number_of_ranks - 1 : params.rank_id - 1,  // Which rank to recieve from 
+        8,
+        MPI_COMM_WORLD,
+        &send_requests[2]
+    );
+    
+    MPI_Irecv(
+        &cells->speed7[(params.ny) * params.nx],
+        params.nx,  // amount of data
+        MPI_FLOAT,  // data type
+        (params.rank_id + 1) % params.number_of_ranks,  // Which rank to send to
+        7,
+        MPI_COMM_WORLD,
+        &recv_requests[0]
+    );
+    MPI_Irecv(
+        &cells->speed4[(params.ny) * params.nx],
+        params.nx,  // amount of data
+        MPI_FLOAT,  // data type
+        (params.rank_id + 1) % params.number_of_ranks,  // Which rank to send to
+        4,
+        MPI_COMM_WORLD,
+        &recv_requests[1]
+    );
+    MPI_Irecv(
+        &cells->speed8[(params.ny) * params.nx],
+        params.nx,  // amount of data
+        MPI_FLOAT,  // data type
+        (params.rank_id + 1) % params.number_of_ranks,  // Which rank to send to
+        8,
+        MPI_COMM_WORLD,
+        &recv_requests[2]
+    );
+  
+    MPI_Isend(
+        &cells->speed6[(params.ny - 1) * params.nx],  // src data
+        params.nx,  // amount of data to send
+        MPI_FLOAT,  // data type
+        (params.rank_id + 1) % params.number_of_ranks,  // Which rank to send to
+        6,
+        MPI_COMM_WORLD,
+        &send_requests[3]
+    );
+    MPI_Isend(
+        &cells->speed5[(params.ny - 1) * params.nx],  // src data
+        params.nx,  // amount of data to send
+        MPI_FLOAT,  // data type
+        (params.rank_id + 1) % params.number_of_ranks,  // Which rank to send to
+        5,
+        MPI_COMM_WORLD,
+        &send_requests[4]
+    );
+    MPI_Isend(
+        &cells->speed2[(params.ny - 1) * params.nx],  // src data
+        params.nx,  // amount of data to send
+        MPI_FLOAT,  // data type
+        (params.rank_id + 1) % params.number_of_ranks,  // Which rank to send to
+        2,
+        MPI_COMM_WORLD,
+        &send_requests[5]
+    );
+    // and we have finished with the top buffer so we can get ready to recieve a new one
+    MPI_Irecv(
+        &cells->speed6[(params.ny + 1) * params.nx],
+        params.nx,  // amount of data
+        MPI_FLOAT,  // data type
+        params.rank_id - 1 == -1 ? params.number_of_ranks - 1 : params.rank_id - 1,  // Which rank to recieve from 
+        6,
+        MPI_COMM_WORLD,
+        &recv_requests[3]
+    );
+    MPI_Irecv(
+        &cells->speed5[(params.ny + 1) * params.nx],
+        params.nx,  // amount of data
+        MPI_FLOAT,  // data type
+        params.rank_id - 1 == -1 ? params.number_of_ranks - 1 : params.rank_id - 1,  // Which rank to recieve from 
+        5,
+        MPI_COMM_WORLD,
+        &recv_requests[4]
+    );
+    MPI_Irecv(
+        &cells->speed2[(params.ny + 1) * params.nx],
+        params.nx,  // amount of data
+        MPI_FLOAT,  // data type
+        params.rank_id - 1 == -1 ? params.number_of_ranks - 1 : params.rank_id - 1,  // Which rank to recieve from 
+        2,
+        MPI_COMM_WORLD,
+        &recv_requests[5]
+    );
 
   float all_grids_tot_u;
   int all_grids_tot_cells;
