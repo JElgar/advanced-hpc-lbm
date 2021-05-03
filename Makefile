@@ -1,21 +1,33 @@
 # Makefile
 
 EXE=d2q9-bgk
-
-CC=mpiicc
-CFLAGS = -std=c99 -Wall -Ofast -mtune=native -fopenmp -no-prec-sqrt -xCORE-AVX2 -axCOMMON-AVX512
-LIBS = -lm
-
+ 
+# CC=mpiicc
+# CFLAGS = -std=c99 -Wall -Ofast -mtune=native -fopenmp -no-prec-sqrt -xCORE-AVX2 -axCOMMON-AVX512
+# LIBS = -lm
+# 
 FINAL_STATE_FILE=./final_state.dat
 AV_VELS_FILE=./av_vels.dat
-# REF_FINAL_STATE_FILE=check/128x128.final_state.dat
-# REF_AV_VELS_FILE=check/128x128.av_vels.dat
-
-REF_FINAL_STATE_FILE=check/256x256.final_state.dat
-REF_AV_VELS_FILE=check/256x256.av_vels.dat
-
+REF_FINAL_STATE_FILE=check/128x128.final_state.dat
+REF_AV_VELS_FILE=check/128x128.av_vels.dat
+# 
+# REF_FINAL_STATE_FILE=check/256x256.final_state.dat
+# REF_AV_VELS_FILE=check/256x256.av_vels.dat
+# 
 # REF_FINAL_STATE_FILE=check/1024x1024.final_state.dat
 # REF_AV_VELS_FILE=check/1024x1024.av_vels.dat
+
+
+CC=gcc
+CFLAGS= -std=c99 -Wall -O3
+LIBS = -lm
+
+PLATFORM = $(shell uname -s)
+ifeq ($(PLATFORM), Darwin)
+	LIBS += -framework OpenCL
+else
+	LIBS += -lOpenCL
+endif
 
 all: $(EXE)
 
