@@ -67,8 +67,15 @@
 #include <string.h>
 #include <mpi.h>
 
+#ifdef __APPLE__
+#include <OpenCL/opencl.h>
+#else
+#include <CL/opencl.h>
+#endif
+
 #define FINALSTATEFILE  "final_state.dat"
 #define AVVELSFILE      "av_vels.dat"
+#define OCLFILE         "kernels.cl"
 
 /* struct to hold the parameter values */
 typedef struct
@@ -84,6 +91,22 @@ typedef struct
   int rank_id;
   int number_of_obstacles;
 } t_param;
+
+/* struct to hold OpenCL objects */
+typedef struct
+{
+  cl_device_id      device;
+  cl_context        context;
+  cl_command_queue  queue;
+
+  cl_program program;
+  cl_kernel  accelerate_flow;
+  cl_kernel  propagate;
+
+  cl_mem cells;
+  cl_mem tmp_cells;
+  cl_mem obstacles;
+} t_ocl;
 
 /* struct to hold the 'speed' arrays */
 typedef struct
@@ -109,7 +132,7 @@ int timestep_count = 0;
 /* load params, allocate memory, load obstacles & initialise fluid particle densities */
 int initialise(const char* paramfile, const char* obstaclefile,
                t_param* params, t_speed* cells_ptr, t_speed* tmp_cells_ptr,
-               char** obstacles_ptr, float** av_vels_ptr);
+               char** obstacles_ptr, float** av_vels_ptr, t_ocl* ocl);
 
 /*
 ** The main calculation methods.
@@ -117,15 +140,14 @@ int initialise(const char* paramfile, const char* obstaclefile,
 ** accelerate_flow(), propagate(), rebound() & collision()
 */
 
-float timestep(const t_param params, t_speed* cells, t_speed* tmp_cells, char* obstacles);
-int accelerate_flow(const t_param params, t_speed* cells, char* obstacles);
-float propagate_rebound_and_collisions(const t_param params, t_speed* cells, t_speed* tmp_cells, char* obstacles);
+float timestep(const t_param params, t_speed* cells, t_speed* tmp_cells, char* obstacles, t_ocl ocl);
+int accelerate_flow(const t_param params, t_speed* cells, char* obstacles, t_ocl ocl);
+float propagate_rebound_and_collisions(const t_param params, t_speed* cells, t_speed* tmp_cells, char* obstacles, t_ocl ocl);
 int write_values(const t_param params, t_speed* cells, char* obstacles, float* av_vels);
-int collision(const t_param params, t_speed* cells, t_speed* tmp_cells, char* obstacles);
 
 /* finalise, including freeing up allocated memory */
 int finalise(const t_param* params, t_speed* cells_ptr, t_speed* tmp_cells_ptr,
-             char** obstacles_ptr, float** av_vels_ptr);
+             char** obstacles_ptr, float** av_vels_ptr, t_ocl ocl);
 
 /* Sum all the densities in the grid.
 ** The total should remain constant from one timestep to the next. */
@@ -135,6 +157,7 @@ float total_density(const t_param params, t_speed* cells);
 float calc_reynolds(const t_param params, float av_velocity);
 
 /* utility functions */
+void checkError(cl_int err, const char *op, const int line);
 void die(const char* message, const int line, const char* file);
 void usage(const char* exe);
 void swap(t_speed* cells, t_speed* cells2);
@@ -161,6 +184,7 @@ int main(int argc, char* argv[])
   t_param  params;              /* struct to hold parameter values */
   t_speed *cells = malloc(sizeof(t_speed));  /* grid containing fluid densities */
   t_speed *tmp_cells = malloc(sizeof(t_speed));  /* grid indicating which cells are blocked */
+  t_ocl    ocl;                 /* struct to hold OpenCL objects */
   char    *obstacles = NULL;    
   float* av_vels   = NULL;     /* a record of the av. velocity computed for each timestep */
   struct timeval timstr;        /* structure to hold elapsed time */
@@ -181,7 +205,7 @@ int main(int argc, char* argv[])
   gettimeofday(&timstr, NULL);
   tot_tic = timstr.tv_sec + (timstr.tv_usec / 1000000.0);
   init_tic=tot_tic;
-  initialise(paramfile, obstaclefile, &params, cells, tmp_cells, &obstacles, &av_vels);
+  initialise(paramfile, obstaclefile, &params, cells, tmp_cells, &obstacles, &av_vels, &ocl);
 
   /* Init time stops here, compute time starts*/
   gettimeofday(&timstr, NULL);
@@ -191,7 +215,7 @@ int main(int argc, char* argv[])
   float final_av_velocity;
   for (int tt = 0; tt < params.maxIters; tt++)
   {
-    final_av_velocity = timestep(params, cells, tmp_cells, obstacles);
+    final_av_velocity = timestep(params, cells, tmp_cells, obstacles, ocl);
     av_vels[tt] = final_av_velocity;
 
 #ifdef DEBUG
@@ -223,7 +247,7 @@ int main(int argc, char* argv[])
     printf("Elapsed Total time:\t\t\t%.6lf (s)\n",   tot_toc  - tot_tic);
   }
   write_values(params, cells, obstacles, av_vels);
-  finalise(&params, cells, tmp_cells, &obstacles, &av_vels);
+  finalise(&params, cells, tmp_cells, &obstacles, &av_vels, ocl);
 
   /* finialise the MPI enviroment */
   MPI_Finalize();
@@ -231,11 +255,11 @@ int main(int argc, char* argv[])
   return EXIT_SUCCESS;
 }
 
-float timestep(const t_param params, t_speed* cells, t_speed* tmp_cells, char* obstacles)
+float timestep(const t_param params, t_speed* cells, t_speed* tmp_cells, char* obstacles, t_ocl ocl)
 {
   // Only the final rank needs to accelerate_flow
   if (params.rank_id == params.number_of_ranks - 1) {
-    accelerate_flow(params, cells, obstacles);
+    accelerate_flow(params, cells, obstacles, ocl);
   }
   float time_step_solution = propagate_rebound_and_collisions(params, cells, tmp_cells, obstacles);
   swap(cells, tmp_cells);
@@ -243,7 +267,7 @@ float timestep(const t_param params, t_speed* cells, t_speed* tmp_cells, char* o
   return time_step_solution;
 }
 
-int accelerate_flow(const t_param params, t_speed* cells, char* restrict obstacles)
+int accelerate_flow(const t_param params, t_speed* cells, char* restrict obstacles, t_ocl ocl)
 {
   /* compute weighting factors */
   float w1 = params.density * params.accel / 9.f;
@@ -289,7 +313,7 @@ int accelerate_flow(const t_param params, t_speed* cells, char* restrict obstacl
   return EXIT_SUCCESS;
 }
 
-float propagate_rebound_and_collisions(const t_param params, t_speed* cells, t_speed* tmp_cells, char* restrict obstacles)
+float propagate_rebound_and_collisions(const t_param params, t_speed* cells, t_speed* tmp_cells, char* restrict obstacles, t_ocl ocl)
 {
   const float c_sq = 1.f / 3.f; /* square of speed of sound */
   const float c_2sq = 2.f * c_sq; /* 2 times square of speed of sound */
