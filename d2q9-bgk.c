@@ -182,7 +182,7 @@ int main(int argc, char* argv[])
   tot_tic = timstr.tv_sec + (timstr.tv_usec / 1000000.0);
   init_tic=tot_tic;
   initialise(paramfile, obstaclefile, &params, cells, tmp_cells, &obstacles, &av_vels);
-
+  
   /* Init time stops here, compute time starts*/
   gettimeofday(&timstr, NULL);
   init_toc = timstr.tv_sec + (timstr.tv_usec / 1000000.0);
@@ -212,6 +212,7 @@ int main(int argc, char* argv[])
   gettimeofday(&timstr, NULL);
   col_toc = timstr.tv_sec + (timstr.tv_usec / 1000000.0);
   tot_toc = col_toc;
+
 
   /* write final values and free memory */
   if (params.rank_id == 0) {
@@ -338,7 +339,7 @@ float propagate_rebound_and_collisions(const t_param params, t_speed* cells, t_s
   __assume(params.nx%128==0);
   __assume(params.ny%128==0);
   
-  if (timestep_count == 0) {
+  //if (timestep_count == 0) {
     MPI_Isend(
         &cells->speed7[0],  // src data
         params.nx,  // amount of data to send
@@ -450,7 +451,7 @@ float propagate_rebound_and_collisions(const t_param params, t_speed* cells, t_s
         MPI_COMM_WORLD,
         &recv_requests[5]
     );
-  }
+  //}
 
   // This will be a thing
   // int start_row = params.rank_id % 2 == 0 ? 0 : params.ny - 1;
@@ -881,117 +882,117 @@ float propagate_rebound_and_collisions(const t_param params, t_speed* cells, t_s
       }
     }
   
-    MPI_Isend(
-        &cells->speed7[0],  // src data
-        params.nx,  // amount of data to send
-        MPI_FLOAT,  // data type
-        params.rank_id == 0 ? params.number_of_ranks - 1 : params.rank_id - 1,  // Which rank to recieve from 
-        7,
-        MPI_COMM_WORLD,
-        &send_requests[0]
-    );
-    MPI_Isend(
-        &cells->speed4[0],  // src data
-        params.nx,  // amount of data to send
-        MPI_FLOAT,  // data type
-        params.rank_id == 0 ? params.number_of_ranks - 1 : params.rank_id - 1,  // Which rank to recieve from 
-        4,
-        MPI_COMM_WORLD,
-        &send_requests[1]
-    );
-    MPI_Isend(
-        &cells->speed8[0],  // src data
-        params.nx,  // amount of data to send
-        MPI_FLOAT,  // data type
-        params.rank_id == 0 ? params.number_of_ranks - 1 : params.rank_id - 1,  // Which rank to recieve from 
-        8,
-        MPI_COMM_WORLD,
-        &send_requests[2]
-    );
-    
-    MPI_Irecv(
-        &cells->speed7[(params.ny) * params.nx],
-        params.nx,  // amount of data
-        MPI_FLOAT,  // data type
-        (params.rank_id + 1) % params.number_of_ranks,  // Which rank to send to
-        7,
-        MPI_COMM_WORLD,
-        &recv_requests[0]
-    );
-    MPI_Irecv(
-        &cells->speed4[(params.ny) * params.nx],
-        params.nx,  // amount of data
-        MPI_FLOAT,  // data type
-        (params.rank_id + 1) % params.number_of_ranks,  // Which rank to send to
-        4,
-        MPI_COMM_WORLD,
-        &recv_requests[1]
-    );
-    MPI_Irecv(
-        &cells->speed8[(params.ny) * params.nx],
-        params.nx,  // amount of data
-        MPI_FLOAT,  // data type
-        (params.rank_id + 1) % params.number_of_ranks,  // Which rank to send to
-        8,
-        MPI_COMM_WORLD,
-        &recv_requests[2]
-    );
+    // MPI_Isend(
+    //     &cells->speed7[0],  // src data
+    //     params.nx,  // amount of data to send
+    //     MPI_FLOAT,  // data type
+    //     params.rank_id == 0 ? params.number_of_ranks - 1 : params.rank_id - 1,  // Which rank to recieve from 
+    //     7,
+    //     MPI_COMM_WORLD,
+    //     &send_requests[0]
+    // );
+    // MPI_Isend(
+    //     &cells->speed4[0],  // src data
+    //     params.nx,  // amount of data to send
+    //     MPI_FLOAT,  // data type
+    //     params.rank_id == 0 ? params.number_of_ranks - 1 : params.rank_id - 1,  // Which rank to recieve from 
+    //     4,
+    //     MPI_COMM_WORLD,
+    //     &send_requests[1]
+    // );
+    // MPI_Isend(
+    //     &cells->speed8[0],  // src data
+    //     params.nx,  // amount of data to send
+    //     MPI_FLOAT,  // data type
+    //     params.rank_id == 0 ? params.number_of_ranks - 1 : params.rank_id - 1,  // Which rank to recieve from 
+    //     8,
+    //     MPI_COMM_WORLD,
+    //     &send_requests[2]
+    // );
+    // 
+    // MPI_Irecv(
+    //     &cells->speed7[(params.ny) * params.nx],
+    //     params.nx,  // amount of data
+    //     MPI_FLOAT,  // data type
+    //     (params.rank_id + 1) % params.number_of_ranks,  // Which rank to send to
+    //     7,
+    //     MPI_COMM_WORLD,
+    //     &recv_requests[0]
+    // );
+    // MPI_Irecv(
+    //     &cells->speed4[(params.ny) * params.nx],
+    //     params.nx,  // amount of data
+    //     MPI_FLOAT,  // data type
+    //     (params.rank_id + 1) % params.number_of_ranks,  // Which rank to send to
+    //     4,
+    //     MPI_COMM_WORLD,
+    //     &recv_requests[1]
+    // );
+    // MPI_Irecv(
+    //     &cells->speed8[(params.ny) * params.nx],
+    //     params.nx,  // amount of data
+    //     MPI_FLOAT,  // data type
+    //     (params.rank_id + 1) % params.number_of_ranks,  // Which rank to send to
+    //     8,
+    //     MPI_COMM_WORLD,
+    //     &recv_requests[2]
+    // );
   
-    MPI_Isend(
-        &cells->speed6[(params.ny - 1) * params.nx],  // src data
-        params.nx,  // amount of data to send
-        MPI_FLOAT,  // data type
-        (params.rank_id + 1) % params.number_of_ranks,  // Which rank to send to
-        6,
-        MPI_COMM_WORLD,
-        &send_requests[3]
-    );
-    MPI_Isend(
-        &cells->speed5[(params.ny - 1) * params.nx],  // src data
-        params.nx,  // amount of data to send
-        MPI_FLOAT,  // data type
-        (params.rank_id + 1) % params.number_of_ranks,  // Which rank to send to
-        5,
-        MPI_COMM_WORLD,
-        &send_requests[4]
-    );
-    MPI_Isend(
-        &cells->speed2[(params.ny - 1) * params.nx],  // src data
-        params.nx,  // amount of data to send
-        MPI_FLOAT,  // data type
-        (params.rank_id + 1) % params.number_of_ranks,  // Which rank to send to
-        2,
-        MPI_COMM_WORLD,
-        &send_requests[5]
-    );
-    // and we have finished with the top buffer so we can get ready to recieve a new one
-    MPI_Irecv(
-        &cells->speed6[(params.ny + 1) * params.nx],
-        params.nx,  // amount of data
-        MPI_FLOAT,  // data type
-        params.rank_id - 1 == -1 ? params.number_of_ranks - 1 : params.rank_id - 1,  // Which rank to recieve from 
-        6,
-        MPI_COMM_WORLD,
-        &recv_requests[3]
-    );
-    MPI_Irecv(
-        &cells->speed5[(params.ny + 1) * params.nx],
-        params.nx,  // amount of data
-        MPI_FLOAT,  // data type
-        params.rank_id - 1 == -1 ? params.number_of_ranks - 1 : params.rank_id - 1,  // Which rank to recieve from 
-        5,
-        MPI_COMM_WORLD,
-        &recv_requests[4]
-    );
-    MPI_Irecv(
-        &cells->speed2[(params.ny + 1) * params.nx],
-        params.nx,  // amount of data
-        MPI_FLOAT,  // data type
-        params.rank_id - 1 == -1 ? params.number_of_ranks - 1 : params.rank_id - 1,  // Which rank to recieve from 
-        2,
-        MPI_COMM_WORLD,
-        &recv_requests[5]
-    );
+    // MPI_Isend(
+    //     &cells->speed6[(params.ny - 1) * params.nx],  // src data
+    //     params.nx,  // amount of data to send
+    //     MPI_FLOAT,  // data type
+    //     (params.rank_id + 1) % params.number_of_ranks,  // Which rank to send to
+    //     6,
+    //     MPI_COMM_WORLD,
+    //     &send_requests[3]
+    // );
+    // MPI_Isend(
+    //     &cells->speed5[(params.ny - 1) * params.nx],  // src data
+    //     params.nx,  // amount of data to send
+    //     MPI_FLOAT,  // data type
+    //     (params.rank_id + 1) % params.number_of_ranks,  // Which rank to send to
+    //     5,
+    //     MPI_COMM_WORLD,
+    //     &send_requests[4]
+    // );
+    // MPI_Isend(
+    //     &cells->speed2[(params.ny - 1) * params.nx],  // src data
+    //     params.nx,  // amount of data to send
+    //     MPI_FLOAT,  // data type
+    //     (params.rank_id + 1) % params.number_of_ranks,  // Which rank to send to
+    //     2,
+    //     MPI_COMM_WORLD,
+    //     &send_requests[5]
+    // );
+    // // and we have finished with the top buffer so we can get ready to recieve a new one
+    // MPI_Irecv(
+    //     &cells->speed6[(params.ny + 1) * params.nx],
+    //     params.nx,  // amount of data
+    //     MPI_FLOAT,  // data type
+    //     params.rank_id - 1 == -1 ? params.number_of_ranks - 1 : params.rank_id - 1,  // Which rank to recieve from 
+    //     6,
+    //     MPI_COMM_WORLD,
+    //     &recv_requests[3]
+    // );
+    // MPI_Irecv(
+    //     &cells->speed5[(params.ny + 1) * params.nx],
+    //     params.nx,  // amount of data
+    //     MPI_FLOAT,  // data type
+    //     params.rank_id - 1 == -1 ? params.number_of_ranks - 1 : params.rank_id - 1,  // Which rank to recieve from 
+    //     5,
+    //     MPI_COMM_WORLD,
+    //     &recv_requests[4]
+    // );
+    // MPI_Irecv(
+    //     &cells->speed2[(params.ny + 1) * params.nx],
+    //     params.nx,  // amount of data
+    //     MPI_FLOAT,  // data type
+    //     params.rank_id - 1 == -1 ? params.number_of_ranks - 1 : params.rank_id - 1,  // Which rank to recieve from 
+    //     2,
+    //     MPI_COMM_WORLD,
+    //     &recv_requests[5]
+    // );
 
   float all_grids_tot_u;
   int all_grids_tot_cells;
@@ -1283,6 +1284,7 @@ int write_values(const t_param params, t_speed* cells, char* obstacles, float* a
   float u;                     /* norm--root of summed squares--of u_x and u_y */
 
   const int output_line_length = 140;
+
   char buf[output_line_length * params.nx * params.ny];
   MPI_File_open(MPI_COMM_SELF, FINALSTATEFILE, MPI_MODE_CREATE | MPI_MODE_WRONLY,MPI_INFO_NULL, &fh);
 
@@ -1290,6 +1292,8 @@ int write_values(const t_param params, t_speed* cells, char* obstacles, float* a
   {
     die("could not open file output file", __LINE__, __FILE__);
   }
+  
+  printf("Starting write to file\n");
 
   for (int jj = 0; jj < params.ny; jj++)
   {
@@ -1339,9 +1343,11 @@ int write_values(const t_param params, t_speed* cells, char* obstacles, float* a
       }
 
       /* write to file */
-      sprintf(buf + strlen(buf), "%d %d %.12E %.12E %.12E %.12E %d\n", ii, jj + (params.rank_id * params.ny), u_x, u_y, u, pressure, obstacles[ii * params.nx + jj]);
+      sprintf(buf + strlen(buf), "%d %d %.12E %.12E %.12E %.12E %d\n", ii, jj + (params.rank_id * params.ny), u_x, u_y, u, pressure, obstacles[ii + params.nx * jj]);
     }
   }
+  
+  printf("Got buffer values\n");
 
   const int offsets[params.number_of_ranks];
   const int bufferLength = strlen(buf);
@@ -1351,12 +1357,139 @@ int write_values(const t_param params, t_speed* cells, char* obstacles, float* a
   for (int i = 0; i < params.rank_id; i++) {
     offset += offsets[i];
   }
-  printf("%d's offset is %d\n", params.rank_id, offset);
 
   MPI_File_seek(fh, offset, MPI_SEEK_SET);
   printf("Writing to file");
   MPI_File_write(fh,buf,strlen(buf), MPI_CHAR,&status);
   MPI_File_close(&fh);
+
+  if (params.rank_id == 0) {
+    FILE* fp;                     /* file pointer */
+    fp = fopen(AVVELSFILE, "w");
+
+    if (fp == NULL)
+    {
+      die("could not open file output file", __LINE__, __FILE__);
+    }
+
+    for (int ii = 0; ii < params.maxIters; ii++)
+    {
+      fprintf(fp, "%d:\t%.12E\n", ii, av_vels[ii]);
+    }
+
+    fclose(fp);
+  }
+
+  return EXIT_SUCCESS;
+}
+
+int write_values_non_mpi(const t_param params, t_speed* cells, char* obstacles, float* av_vels)
+{  
+  // MPI_File fh;
+  // MPI_Status status;
+  FILE *fp;
+
+  const float c_sq = 1.f / 3.f; /* sq. of speed of sound */
+  float local_density;         /* per grid cell sum of densities */
+  float pressure;              /* fluid pressure in grid cell */
+  float u_x;                   /* x-component of velocity in grid cell */
+  float u_y;                   /* y-component of velocity in grid cell */
+  float u;                     /* norm--root of summed squares--of u_x and u_y */
+
+  // const int output_line_length = 140;
+
+  // char buf[output_line_length * params.nx * params.ny];
+  // printf("Created buffer\n");
+  // MPI_File_open(MPI_COMM_SELF, FINALSTATEFILE, MPI_MODE_CREATE | MPI_MODE_WRONLY,MPI_INFO_NULL, &fh);
+  // printf("opened file\n");
+  
+  for (int i = 0; i < params.number_of_ranks; i++) 
+  {
+    if (params.rank_id == i) {
+      if (params.rank_id == 0) 
+      {
+        fp = fopen(FINALSTATEFILE, "w");
+      } 
+      else 
+      {
+        fp = fopen(FINALSTATEFILE, "a");
+      }
+
+      if (fp == NULL)
+      {
+        die("could not open file output file", __LINE__, __FILE__);
+      }
+
+      for (int jj = 0; jj < params.ny; jj++)
+      {
+        for (int ii = 0; ii < params.nx; ii++)
+        {
+          /* an occupied cell */
+          if (obstacles[ii + jj*params.nx])
+          {
+            u_x = u_y = u = 0.f;
+            pressure = params.density * c_sq;
+          }
+          /* no obstacle */
+          else
+          {
+            local_density = 0.f;
+          
+            local_density += cells->speed0[ii + jj*params.nx];
+            local_density += cells->speed1[ii + jj*params.nx];
+            local_density += cells->speed2[ii + jj*params.nx];
+            local_density += cells->speed3[ii + jj*params.nx];
+            local_density += cells->speed4[ii + jj*params.nx];
+            local_density += cells->speed5[ii + jj*params.nx];
+            local_density += cells->speed6[ii + jj*params.nx];
+            local_density += cells->speed7[ii + jj*params.nx];
+            local_density += cells->speed8[ii + jj*params.nx];
+
+            /* compute x velocity component */
+            u_x = (  cells->speed1[ii + jj*params.nx]
+                   + cells->speed5[ii + jj*params.nx]
+                   + cells->speed8[ii + jj*params.nx]
+                   - (cells->speed3[ii + jj*params.nx]
+                      + cells->speed6[ii + jj*params.nx]
+                      + cells->speed7[ii + jj*params.nx]))
+                  / local_density;
+            /* compute y velocity component */
+            u_y = (cells->speed2[ii + jj*params.nx]
+                   + cells->speed5[ii + jj*params.nx]
+                   + cells->speed6[ii + jj*params.nx]
+                   - (cells->speed4[ii + jj*params.nx]
+                      + cells->speed7[ii + jj*params.nx]
+                      + cells->speed8[ii + jj*params.nx]))
+                  / local_density;
+            /* compute norm of velocity */
+            u = sqrtf((u_x * u_x) + (u_y * u_y));
+            /* compute pressure */
+            pressure = local_density * c_sq;
+          }
+
+          /* write to file */
+          fprintf(fp, "%d %d %.12E %.12E %.12E %.12E %d\n", ii, jj, u_x, u_y, u, pressure, obstacles[ii + params.nx * jj]);
+        }
+      }
+      fclose(fp);
+    }
+    MPI_Barrier(MPI_COMM_WORLD);
+  }
+
+  // const int offsets[params.number_of_ranks];
+  // const int bufferLength = strlen(buf);
+  // MPI_Allgather(&bufferLength, 1, MPI_INT, &offsets, 1, MPI_INT, MPI_COMM_WORLD);
+
+  // int offset = 0;
+  // for (int i = 0; i < params.rank_id; i++) {
+  //   offset += offsets[i];
+  // }
+  // printf("%d's offset is %d\n", params.rank_id, offset);
+
+  // MPI_File_seek(fh, offset, MPI_SEEK_SET);
+  // printf("Writing to file");
+  // MPI_File_write(fh,buf,strlen(buf), MPI_CHAR,&status);
+  // MPI_File_close(&fh);
 
   if (params.rank_id == 0) {
     FILE* fp;                     /* file pointer */
