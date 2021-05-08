@@ -73,11 +73,17 @@ typedef struct
 {
   int    nx;            /* no. of cells in x-direction */
   int    ny;            /* no. of cells in y-direction */
+  int    lnx;           /* Local nx */
+  int    lny;           /* Local ny */
   int    maxIters;      /* no. of iterations */
   int    reynolds_dim;  /* dimension for Reynolds number */
   float density;       /* density per link */
   float accel;         /* density redistribution */
   float omega;         /* relaxation parameter */
+  int number_of_obstacles;
+  int number_of_unblocked_cells;
+  int reduction_index;
+  int reduction_max;
 } t_param;
 
 /* struct to hold OpenCL objects */
@@ -90,10 +96,12 @@ typedef struct
   cl_program program;
   cl_kernel  accelerate_flow;
   cl_kernel  propagate;
+  cl_kernel  prc;
 
   cl_mem cells;
   cl_mem tmp_cells;
   cl_mem obstacles;
+  cl_mem tot_u_wg;
 } t_ocl;
 
 /* struct to hold the 'speed' values */
@@ -109,7 +117,7 @@ typedef struct
 /* load params, allocate memory, load obstacles & initialise fluid particle densities */
 int initialise(const char* paramfile, const char* obstaclefile,
                t_param* params, t_speed** cells_ptr, t_speed** tmp_cells_ptr,
-               int** obstacles_ptr, float** av_vels_ptr, t_ocl* ocl);
+               int** obstacles_ptr, float** tot_u_wg, float** av_vels_ptr, t_ocl* ocl);
 
 /*
 ** The main calculation methods.
@@ -157,7 +165,8 @@ int main(int argc, char* argv[])
   t_speed* cells     = NULL;    /* grid containing fluid densities */
   t_speed* tmp_cells = NULL;    /* scratch space */
   int*     obstacles = NULL;    /* grid indicating which cells are blocked */
-  float* av_vels   = NULL;     /* a record of the av. velocity computed for each timestep */
+  float* av_vels   = NULL;      /* a record of the av. velocity computed for each timestep */
+  float* tot_u_wg = NULL;       /* The tot_u values for each wg */ 
   cl_int err;
   struct timeval timstr;        /* structure to hold elapsed time */
   struct rusage ru;             /* structure to hold CPU time--system and user */
@@ -177,7 +186,7 @@ int main(int argc, char* argv[])
   }
 
   /* initialise our data structures and load values from file */
-  initialise(paramfile, obstaclefile, &params, &cells, &tmp_cells, &obstacles, &av_vels, &ocl);
+  initialise(paramfile, obstaclefile, &params, &cells, &tmp_cells, &obstacles, &av_vels, &tot_u_wg, &ocl);
 
   /* iterate for maxIters timesteps */
   gettimeofday(&timstr, NULL);
@@ -277,6 +286,44 @@ int accelerate_flow(const t_param params, t_speed* cells, int* obstacles, t_ocl 
   // Wait for kernel to finish
   err = clFinish(ocl.queue);
   checkError(err, "waiting for accelerate_flow kernel", __LINE__);
+
+  return EXIT_SUCCESS;
+}
+
+int prc(const t_param params, t_speed* cells, t_speed* tmp_cells, t_ocl ocl)
+{
+  cl_int err;
+  
+  // Set kernel arguments
+  err = clSetKernelArg(ocl.prc, 0, sizeof(cl_mem), &ocl.cells);
+  checkError(err, "setting prc arg 0", __LINE__);
+  err = clSetKernelArg(ocl.prc , 1, sizeof(cl_mem), &ocl.tmp_cells);
+  checkError(err, "setting propagate arg 1", __LINE__);
+  err = clSetKernelArg(ocl.prc , 2, sizeof(cl_mem), &ocl.obstacles);
+  checkError(err, "setting propagate arg 2", __LINE__);
+  err = clSetKernelArg(ocl.prc , 3, sizeof(cl_int), &params.nx);
+  checkError(err, "setting propagate arg 3", __LINE__);
+  err = clSetKernelArg(ocl.prc , 4, sizeof(cl_int), &params.ny);
+  checkError(err, "setting propagate arg 4", __LINE__);
+  err = clSetKernelArg(ocl.prc , 5, sizeof(cl_int), &params.lnx);
+  checkError(err, "setting propagate arg 5 lnx", __LINE__);
+  err = clSetKernelArg(ocl.prc , 6, sizeof(cl_int), &params.lny);
+  checkError(err, "setting propagate arg 6 lny", __LINE__);
+  err = clSetKernelArg(ocl.prc , 7, sizeof(cl_mem), &ocl.tot_u_wg);
+  checkError(err, "setting prc arg 7 wg tot_u", __LINE__);
+  err = clSetKernelArg(ocl.prc , 8, sizeof(cl_float) * NSPEEDS * params.lnx * params.lny, NULL);
+  checkError(err, "setting prc arg 8 local tot_u", __LINE__);
+  
+  // Enqueue kernel
+  size_t global[2] = {params.nx, params.ny};
+  size_t local[2] = {params.lnx, params.lny}; // The local kernel size
+  err = clEnqueueNDRangeKernel(ocl.queue, ocl.propagate,
+                               2, NULL, global, local, 0, NULL, NULL);
+  checkError(err, "enqueueing propagate kernel", __LINE__);
+
+  // Wait for kernel to finish
+  err = clFinish(ocl.queue);
+  checkError(err, "waiting for propagate kernel", __LINE__);
 
   return EXIT_SUCCESS;
 }
@@ -493,7 +540,7 @@ float av_velocity(const t_param params, t_speed* cells, int* obstacles, t_ocl oc
 
 int initialise(const char* paramfile, const char* obstaclefile,
                t_param* params, t_speed** cells_ptr, t_speed** tmp_cells_ptr,
-               int** obstacles_ptr, float** av_vels_ptr, t_ocl *ocl)
+               int** obstacles_ptr, float** av_vels_ptr, float** tot_u_wg_ptr, t_ocl *ocl)
 {
   char   message[1024];  /* message buffer */
   FILE*   fp;            /* file pointer */
@@ -544,6 +591,15 @@ int initialise(const char* paramfile, const char* obstaclefile,
   /* and close up the file */
   fclose(fp);
 
+  params->lnx = 32;
+  params->lny = 32;
+  params->reduction_index = 0;
+  params->reduction_max = 10000;
+
+  int number_of_work_groups_x = params->nx / params->lnx;
+  int number_of_work_groups_y = params->ny / params->lny;
+  int number_of_work_groups = number_of_work_groups_x * number_of_work_groups_y;
+
   /*
   ** Allocate memory.
   **
@@ -577,6 +633,8 @@ int initialise(const char* paramfile, const char* obstaclefile,
   *obstacles_ptr = malloc(sizeof(int) * (params->ny * params->nx));
 
   if (*obstacles_ptr == NULL) die("cannot allocate column memory for obstacles", __LINE__, __FILE__);
+
+  *tot_u_wg_ptr = (float*) malloc(sizeof(float) * number_of_work_groups * params->reduction_max);
 
   /* initialise densities */
   float w0 = params->density * 4.f / 9.f;
@@ -621,6 +679,8 @@ int initialise(const char* paramfile, const char* obstaclefile,
   }
 
   /* read-in the blocked cells list */
+  params->number_of_obstacles = 0;
+  params->number_of_unblocked_cells = 0;
   while ((retval = fscanf(fp, "%d %d %d\n", &xx, &yy, &blocked)) != EOF)
   {
     /* some checks */
@@ -634,6 +694,11 @@ int initialise(const char* paramfile, const char* obstaclefile,
 
     /* assign to array */
     (*obstacles_ptr)[xx + yy*params->nx] = blocked;
+    if (blocked == 1) {
+      params->number_of_obstacles++;
+    } else {
+      params->number_of_unblocked_cells++;
+    }
   }
 
   /* and close the file */
@@ -716,6 +781,10 @@ int initialise(const char* paramfile, const char* obstaclefile,
     ocl->context, CL_MEM_READ_WRITE,
     sizeof(cl_int) * params->nx * params->ny, NULL, &err);
   checkError(err, "creating obstacles buffer", __LINE__);
+  ocl->tot_u_wg = clCreateBuffer(
+    ocl->context, CL_MEM_READ_WRITE,
+    sizeof(cl_float) * number_of_work_groups * params->reduction_max, NULL, &err);
+  checkError(err, "creating partial averages buffer", __LINE__);
 
   return EXIT_SUCCESS;
 }
@@ -741,8 +810,10 @@ int finalise(const t_param* params, t_speed** cells_ptr, t_speed** tmp_cells_ptr
   clReleaseMemObject(ocl.cells);
   clReleaseMemObject(ocl.tmp_cells);
   clReleaseMemObject(ocl.obstacles);
+  clReleaseMemObject(ocl.tot_u_wg);
   clReleaseKernel(ocl.accelerate_flow);
   clReleaseKernel(ocl.propagate);
+  clReleaseKernel(ocl.prc);
   clReleaseProgram(ocl.program);
   clReleaseCommandQueue(ocl.queue);
   clReleaseContext(ocl.context);
