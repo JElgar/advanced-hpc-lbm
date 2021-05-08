@@ -5,7 +5,6 @@
 #SBATCH --ntasks-per-node 1
 #SBATCH --time 00:10:00
 #SBATCH --partition veryshort
-#SBATCH --reservation=COSC024002
 #SBATCH --account=COSC024002
 #SBATCH --output d2q9-bgk.out
 
