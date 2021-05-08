@@ -75,11 +75,7 @@ kernel void prc(
   global t_speed* tmp_cells,
   global int* obstacles,
   int nx, int ny,
-  int lnx, int lny,
-  global float* tot_u_wg,
-  local float* tot_u_local_wg,
-  float omega,
-  int reduction_index
+  float omega
 )
 {
   /* get column and row indices */
@@ -218,22 +214,5 @@ kernel void prc(
                                               w2 * local_density * (1.f + (u_x - u_y) / c_sq + ((u_x - u_y) * (u_x - u_y)) / c_2cu - u_sqd2sq)
                                               - cells[x_w + y_n*nx].speeds[8]
                                             );
-   
-    tot_u_local_wg[lii+ljj*lnx] = native_sqrt(u_sq);
-
-    for (int i = (lnx*lny)/2; i>0; i/=2)
-    {
-      barrier(CLK_LOCAL_MEM_FENCE);
-
-      if ((lii+ljj*lnx) < i) {
-        tot_u_local_wg[(lii+ljj*lnx)] += tot_u_local_wg[(lii+ljj*lnx) + i];
-      }
-    }
-  }
-
-  int idx = ii/lnx + (nx/lnx) * jj/lny;
-  int offset = reduction_index * (lnx/lnx)* (ny/ny) ;
-  if (lii == 0 && ljj == 0){
-    tot_u_wg[ idx + offset ] = tot_u_local_wg[0];
   }
 }
