@@ -315,6 +315,8 @@ int prc(const t_param params, t_speed* cells, t_speed* tmp_cells, t_ocl ocl)
   checkError(err, "setting prc arg 8 local tot_u", __LINE__);
   err = clSetKernelArg(ocl.prc , 9, sizeof(cl_float), &params.omega);
   checkError(err, "setting propagate arg 9 omega", __LINE__);
+  err = clSetKernelArg(ocl.prc , 10, sizeof(cl_float), &params.reduction_index);
+  checkError(err, "setting propagate arg 10 reduction_index", __LINE__);
   
   // Enqueue kernel
   size_t global[2] = {params.nx, params.ny};
