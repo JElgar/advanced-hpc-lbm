@@ -40,10 +40,11 @@ kernel void accelerate_flow(global t_speed* cells,
   }
 }
 
-kernel void propagate(global t_speed* cells,
+kernel void prc(global t_speed* cells,
                       global t_speed* tmp_cells,
                       global int* obstacles,
-                      int nx, int ny)
+                      int nx, int ny, 
+                      float omega)
 {
   /* get column and row indices */
   int ii = get_global_id(0);
@@ -55,35 +56,7 @@ kernel void propagate(global t_speed* cells,
   int x_e = (ii + 1) % nx;
   int y_s = (jj == 0) ? (jj + ny - 1) : (jj - 1);
   int x_w = (ii == 0) ? (ii + nx - 1) : (ii - 1);
-
-  /* propagate densities from neighbouring cells, following
-  ** appropriate directions of travel and writing into
-  ** scratch space grid */
-  tmp_cells[ii + jj*nx].speeds[0] = cells[ii + jj*nx].speeds[0]; /* central cell, no movement */
-  tmp_cells[ii + jj*nx].speeds[1] = cells[x_w + jj*nx].speeds[1]; /* east */
-  tmp_cells[ii + jj*nx].speeds[2] = cells[ii + y_s*nx].speeds[2]; /* north */
-  tmp_cells[ii + jj*nx].speeds[3] = cells[x_e + jj*nx].speeds[3]; /* west */
-  tmp_cells[ii + jj*nx].speeds[4] = cells[ii + y_n*nx].speeds[4]; /* south */
-  tmp_cells[ii + jj*nx].speeds[5] = cells[x_w + y_s*nx].speeds[5]; /* north-east */
-  tmp_cells[ii + jj*nx].speeds[6] = cells[x_e + y_s*nx].speeds[6]; /* north-west */
-  tmp_cells[ii + jj*nx].speeds[7] = cells[x_e + y_n*nx].speeds[7]; /* south-west */
-  tmp_cells[ii + jj*nx].speeds[8] = cells[x_w + y_n*nx].speeds[8]; /* south-east */
-}
-
-kernel void prc(
-  global t_speed* cells,
-  global t_speed* tmp_cells,
-  global int* obstacles,
-  int nx, int ny,
-  float omega
-)
-{
-  /* get column and row indices */
-  int ii = get_global_id(0);
-  int jj = get_global_id(1);
-  int lii = get_local_id(0);
-  int ljj = get_local_id(1);
-
+  
   const float c_sq = 1.f / 3.f; /* square of speed of sound */
   const float c_2sq = 2.f * c_sq; /* 2 times square of speed of sound */
   const float c_2cu = c_2sq * c_sq; /* 2 times cube of speed of sound */
@@ -91,13 +64,9 @@ kernel void prc(
   const float w1 = 1.f / 9.f;  /* weighting factor */
   const float w2 = 1.f / 36.f; /* weighting factor */
 
-
-  /* determine indices of axis-direction neighbours
-  ** respecting periodic boundary conditions (wrap around) */
-  int y_n = (jj + 1) % ny;
-  int x_e = (ii + 1) % nx;
-  int y_s = (jj == 0) ? (jj + ny - 1) : (jj - 1);
-  int x_w = (ii == 0) ? (ii + nx - 1) : (ii - 1);
+  /* propagate densities from neighbouring cells, following
+  ** appropriate directions of travel and writing into
+  ** scratch space grid */
 
   if (obstacles[jj*nx + ii])
   {
