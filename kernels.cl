@@ -44,11 +44,19 @@ kernel void prc(global t_speed* cells,
                       global t_speed* tmp_cells,
                       global int* obstacles,
                       int nx, int ny, 
-                      float omega)
+                      float omega,
+                      local float* l_tot_u_values,
+                      global float* g_tot_u_values
+                    )
 {
+  float tot_u = 0.f;
+
   /* get column and row indices */
   int ii = get_global_id(0);
   int jj = get_global_id(1);
+  int local_id = get_local_id(0);
+  int work_group_number = get_group_id(0);
+  int local_size = get_local_size(0);
 
   /* determine indices of axis-direction neighbours
   ** respecting periodic boundary conditions (wrap around) */
@@ -81,6 +89,7 @@ kernel void prc(global t_speed* cells,
     tmp_cells[ii + jj*nx].speeds[6] = cells[x_w + y_n*nx].speeds[8];
     tmp_cells[ii + jj*nx].speeds[7] = cells[x_w + y_s*nx].speeds[5];
     tmp_cells[ii + jj*nx].speeds[8] = cells[x_e + y_s*nx].speeds[6];
+    l_tot_u_values[local_id] = 0;
   } 
   else
   {
@@ -183,5 +192,25 @@ kernel void prc(global t_speed* cells,
                                               w2 * local_density * (1.f + (u_x - u_y) / c_sq + ((u_x - u_y) * (u_x - u_y)) / c_2cu - u_sqd2sq)
                                               - cells[x_w + y_n*nx].speeds[8]
                                             );
+
+    l_tot_u_values[local_id] = native_sqrt((u_x * u_x) + (u_y * u_y));
   }
+
+  // printf("mylocal id is: %d, my work_group_number is: %d, local_size: %d\n", local_id, work_group_number, local_size);
+  // all threads execute this code simultaneously:
+  // Calculate wg tot_u value from list of local tot_u values 
+  for( int offset = 1; offset < local_size; offset *= 2 )
+  {
+    int mask = 2*offset - 1;
+    barrier( CLK_LOCAL_MEM_FENCE ); // wait for all threads to get here
+    if( ( local_id & mask ) == 0 ) // bit-by-bit and’ing tells us which
+    { // threads need to do work now
+      l_tot_u_values[ local_id ] += l_tot_u_values[ local_id + offset ];
+    }
+  }
+  
+  barrier( CLK_LOCAL_MEM_FENCE );
+
+  // Set wg tot_u value in global list
+  if( local_id == 0 ) g_tot_u_values[ work_group_number ] = l_tot_u_values[ 0 ];
 }
