@@ -82,7 +82,7 @@ typedef struct
   float omega;         /* relaxation parameter */
   int number_of_ranks;
   int rank_id;
-  int number_of_obstacles;
+  int number_of_unblocked_cells;
 } t_param;
 
 /* struct to hold the 'speed' arrays */
@@ -299,7 +299,6 @@ float propagate_rebound_and_collisions(const t_param params, t_speed* cells, t_s
   const float w1 = 1.f / 9.f;  /* weighting factor */
   const float w2 = 1.f / 36.f; /* weighting factor */
   
-  int   tot_cells = 0;  /* no. of cells used in calculation */
   float tot_u = 0.f;          /* accumulated magnitudes of velocity for each cell */
 
   __assume_aligned(cells->speed0, 64);
@@ -339,7 +338,7 @@ float propagate_rebound_and_collisions(const t_param params, t_speed* cells, t_s
   __assume(params.nx%128==0);
   __assume(params.ny%128==0);
   
-  //if (timestep_count == 0) {
+  // if (timestep_count == 0) {
     MPI_Isend(
         &cells->speed7[0],  // src data
         params.nx,  // amount of data to send
@@ -451,7 +450,7 @@ float propagate_rebound_and_collisions(const t_param params, t_speed* cells, t_s
         MPI_COMM_WORLD,
         &recv_requests[5]
     );
-  //}
+  // }
 
   // This will be a thing
   // int start_row = params.rank_id % 2 == 0 ? 0 : params.ny - 1;
@@ -462,10 +461,10 @@ float propagate_rebound_and_collisions(const t_param params, t_speed* cells, t_s
 
   // --- Calculate inner cells in parallel
   {
-    #pragma omp parallel for schedule(static) reduction(+:tot_cells) reduction(+:tot_u)
+    #pragma omp parallel for schedule(static) reduction(+:tot_u)
     for (int jj = 1; jj < params.ny - 1; jj++)
     {    
-      #pragma omp simd aligned(cells:64) aligned(tmp_cells:64) aligned(obstacles:64) reduction(+:tot_cells) reduction(+:tot_u)
+      #pragma omp simd aligned(cells:64) aligned(tmp_cells:64) aligned(obstacles:64) reduction(+:tot_u)
       for (int ii = 0; ii < params.nx; ii++)
       {
         const int y_n = jj + 1;
@@ -592,7 +591,6 @@ float propagate_rebound_and_collisions(const t_param params, t_speed* cells, t_s
                                                   );
          
           tot_u += sqrtf(u_sq);
-          ++tot_cells;
         }
       }
     }
@@ -606,7 +604,7 @@ float propagate_rebound_and_collisions(const t_param params, t_speed* cells, t_s
     {    
       // If we are doing the last row
 
-      #pragma omp simd aligned(cells:64) aligned(tmp_cells:64) aligned(obstacles:64) reduction(+:tot_cells) reduction(+:tot_u)
+      #pragma omp simd aligned(cells:64) aligned(tmp_cells:64) aligned(obstacles:64) reduction(+:tot_u)
       for (int ii = 0; ii < params.nx; ii++)
       {
         const int y_n = jj + 1;
@@ -733,7 +731,6 @@ float propagate_rebound_and_collisions(const t_param params, t_speed* cells, t_s
                                                   );
          
           tot_u += sqrtf(u_sq);
-          ++tot_cells;
         }
       }
     }
@@ -750,7 +747,7 @@ float propagate_rebound_and_collisions(const t_param params, t_speed* cells, t_s
     {    
       // If we are doing the last row
 
-      #pragma omp simd aligned(cells:64) aligned(tmp_cells:64) aligned(obstacles:64) reduction(+:tot_cells) reduction(+:tot_u)
+      #pragma omp simd aligned(cells:64) aligned(tmp_cells:64) aligned(obstacles:64) reduction(+:tot_u)
       for (int ii = 0; ii < params.nx; ii++)
       {
         const int y_n = jj + 1;
@@ -877,129 +874,125 @@ float propagate_rebound_and_collisions(const t_param params, t_speed* cells, t_s
                                                   );
          
           tot_u += sqrtf(u_sq);
-          ++tot_cells;
         }
       }
     }
+    
+   //  MPI_Isend(
+   //      &cells->speed7[0],  // src data
+   //      params.nx,  // amount of data to send
+   //      MPI_FLOAT,  // data type
+   //      params.rank_id == 0 ? params.number_of_ranks - 1 : params.rank_id - 1,  // Which rank to recieve from 
+   //      7,
+   //      MPI_COMM_WORLD,
+   //      &send_requests[0]
+   //  );
+   //  MPI_Isend(
+   //      &cells->speed4[0],  // src data
+   //      params.nx,  // amount of data to send
+   //      MPI_FLOAT,  // data type
+   //      params.rank_id == 0 ? params.number_of_ranks - 1 : params.rank_id - 1,  // Which rank to recieve from 
+   //      4,
+   //      MPI_COMM_WORLD,
+   //      &send_requests[1]
+   //  );
+   //  MPI_Isend(
+   //      &cells->speed8[0],  // src data
+   //      params.nx,  // amount of data to send
+   //      MPI_FLOAT,  // data type
+   //      params.rank_id == 0 ? params.number_of_ranks - 1 : params.rank_id - 1,  // Which rank to recieve from 
+   //      8,
+   //      MPI_COMM_WORLD,
+   //      &send_requests[2]
+   //  );
+   //  
+   //  MPI_Irecv(
+   //      &cells->speed7[(params.ny) * params.nx],
+   //      params.nx,  // amount of data
+   //      MPI_FLOAT,  // data type
+   //      (params.rank_id + 1) % params.number_of_ranks,  // Which rank to send to
+   //      7,
+   //      MPI_COMM_WORLD,
+   //      &recv_requests[0]
+   //  );
+   //  MPI_Irecv(
+   //      &cells->speed4[(params.ny) * params.nx],
+   //      params.nx,  // amount of data
+   //      MPI_FLOAT,  // data type
+   //      (params.rank_id + 1) % params.number_of_ranks,  // Which rank to send to
+   //      4,
+   //      MPI_COMM_WORLD,
+   //      &recv_requests[1]
+   //  );
+   //  MPI_Irecv(
+   //      &cells->speed8[(params.ny) * params.nx],
+   //      params.nx,  // amount of data
+   //      MPI_FLOAT,  // data type
+   //      (params.rank_id + 1) % params.number_of_ranks,  // Which rank to send to
+   //      8,
+   //      MPI_COMM_WORLD,
+   //      &recv_requests[2]
+   //  );
   
-    // MPI_Isend(
-    //     &cells->speed7[0],  // src data
-    //     params.nx,  // amount of data to send
-    //     MPI_FLOAT,  // data type
-    //     params.rank_id == 0 ? params.number_of_ranks - 1 : params.rank_id - 1,  // Which rank to recieve from 
-    //     7,
-    //     MPI_COMM_WORLD,
-    //     &send_requests[0]
-    // );
-    // MPI_Isend(
-    //     &cells->speed4[0],  // src data
-    //     params.nx,  // amount of data to send
-    //     MPI_FLOAT,  // data type
-    //     params.rank_id == 0 ? params.number_of_ranks - 1 : params.rank_id - 1,  // Which rank to recieve from 
-    //     4,
-    //     MPI_COMM_WORLD,
-    //     &send_requests[1]
-    // );
-    // MPI_Isend(
-    //     &cells->speed8[0],  // src data
-    //     params.nx,  // amount of data to send
-    //     MPI_FLOAT,  // data type
-    //     params.rank_id == 0 ? params.number_of_ranks - 1 : params.rank_id - 1,  // Which rank to recieve from 
-    //     8,
-    //     MPI_COMM_WORLD,
-    //     &send_requests[2]
-    // );
-    // 
-    // MPI_Irecv(
-    //     &cells->speed7[(params.ny) * params.nx],
-    //     params.nx,  // amount of data
-    //     MPI_FLOAT,  // data type
-    //     (params.rank_id + 1) % params.number_of_ranks,  // Which rank to send to
-    //     7,
-    //     MPI_COMM_WORLD,
-    //     &recv_requests[0]
-    // );
-    // MPI_Irecv(
-    //     &cells->speed4[(params.ny) * params.nx],
-    //     params.nx,  // amount of data
-    //     MPI_FLOAT,  // data type
-    //     (params.rank_id + 1) % params.number_of_ranks,  // Which rank to send to
-    //     4,
-    //     MPI_COMM_WORLD,
-    //     &recv_requests[1]
-    // );
-    // MPI_Irecv(
-    //     &cells->speed8[(params.ny) * params.nx],
-    //     params.nx,  // amount of data
-    //     MPI_FLOAT,  // data type
-    //     (params.rank_id + 1) % params.number_of_ranks,  // Which rank to send to
-    //     8,
-    //     MPI_COMM_WORLD,
-    //     &recv_requests[2]
-    // );
+   //  MPI_Isend(
+   //      &cells->speed6[(params.ny - 1) * params.nx],  // src data
+   //      params.nx,  // amount of data to send
+   //      MPI_FLOAT,  // data type
+   //      (params.rank_id + 1) % params.number_of_ranks,  // Which rank to send to
+   //      6,
+   //      MPI_COMM_WORLD,
+   //      &send_requests[3]
+   //  );
+   //  MPI_Isend(
+   //      &cells->speed5[(params.ny - 1) * params.nx],  // src data
+   //      params.nx,  // amount of data to send
+   //      MPI_FLOAT,  // data type
+   //      (params.rank_id + 1) % params.number_of_ranks,  // Which rank to send to
+   //      5,
+   //      MPI_COMM_WORLD,
+   //      &send_requests[4]
+   //  );
+   //  MPI_Isend(
+   //      &cells->speed2[(params.ny - 1) * params.nx],  // src data
+   //      params.nx,  // amount of data to send
+   //      MPI_FLOAT,  // data type
+   //      (params.rank_id + 1) % params.number_of_ranks,  // Which rank to send to
+   //      2,
+   //      MPI_COMM_WORLD,
+   //      &send_requests[5]
+   //  );
+   //  // and we have finished with the top buffer so we can get ready to recieve a new one
+   //  MPI_Irecv(
+   //      &cells->speed6[(params.ny + 1) * params.nx],
+   //      params.nx,  // amount of data
+   //      MPI_FLOAT,  // data type
+   //      params.rank_id - 1 == -1 ? params.number_of_ranks - 1 : params.rank_id - 1,  // Which rank to recieve from 
+   //      6,
+   //      MPI_COMM_WORLD,
+   //      &recv_requests[3]
+   //  );
+   //  MPI_Irecv(
+   //      &cells->speed5[(params.ny + 1) * params.nx],
+   //      params.nx,  // amount of data
+   //      MPI_FLOAT,  // data type
+   //      params.rank_id - 1 == -1 ? params.number_of_ranks - 1 : params.rank_id - 1,  // Which rank to recieve from 
+   //      5,
+   //      MPI_COMM_WORLD,
+   //      &recv_requests[4]
+   //  );
+   //  MPI_Irecv(
+   //      &cells->speed2[(params.ny + 1) * params.nx],
+   //      params.nx,  // amount of data
+   //      MPI_FLOAT,  // data type
+   //      params.rank_id - 1 == -1 ? params.number_of_ranks - 1 : params.rank_id - 1,  // Which rank to recieve from 
+   //      2,
+   //      MPI_COMM_WORLD,
+   //      &recv_requests[5]
+   //  );
   
-    // MPI_Isend(
-    //     &cells->speed6[(params.ny - 1) * params.nx],  // src data
-    //     params.nx,  // amount of data to send
-    //     MPI_FLOAT,  // data type
-    //     (params.rank_id + 1) % params.number_of_ranks,  // Which rank to send to
-    //     6,
-    //     MPI_COMM_WORLD,
-    //     &send_requests[3]
-    // );
-    // MPI_Isend(
-    //     &cells->speed5[(params.ny - 1) * params.nx],  // src data
-    //     params.nx,  // amount of data to send
-    //     MPI_FLOAT,  // data type
-    //     (params.rank_id + 1) % params.number_of_ranks,  // Which rank to send to
-    //     5,
-    //     MPI_COMM_WORLD,
-    //     &send_requests[4]
-    // );
-    // MPI_Isend(
-    //     &cells->speed2[(params.ny - 1) * params.nx],  // src data
-    //     params.nx,  // amount of data to send
-    //     MPI_FLOAT,  // data type
-    //     (params.rank_id + 1) % params.number_of_ranks,  // Which rank to send to
-    //     2,
-    //     MPI_COMM_WORLD,
-    //     &send_requests[5]
-    // );
-    // // and we have finished with the top buffer so we can get ready to recieve a new one
-    // MPI_Irecv(
-    //     &cells->speed6[(params.ny + 1) * params.nx],
-    //     params.nx,  // amount of data
-    //     MPI_FLOAT,  // data type
-    //     params.rank_id - 1 == -1 ? params.number_of_ranks - 1 : params.rank_id - 1,  // Which rank to recieve from 
-    //     6,
-    //     MPI_COMM_WORLD,
-    //     &recv_requests[3]
-    // );
-    // MPI_Irecv(
-    //     &cells->speed5[(params.ny + 1) * params.nx],
-    //     params.nx,  // amount of data
-    //     MPI_FLOAT,  // data type
-    //     params.rank_id - 1 == -1 ? params.number_of_ranks - 1 : params.rank_id - 1,  // Which rank to recieve from 
-    //     5,
-    //     MPI_COMM_WORLD,
-    //     &recv_requests[4]
-    // );
-    // MPI_Irecv(
-    //     &cells->speed2[(params.ny + 1) * params.nx],
-    //     params.nx,  // amount of data
-    //     MPI_FLOAT,  // data type
-    //     params.rank_id - 1 == -1 ? params.number_of_ranks - 1 : params.rank_id - 1,  // Which rank to recieve from 
-    //     2,
-    //     MPI_COMM_WORLD,
-    //     &recv_requests[5]
-    // );
-
   float all_grids_tot_u;
-  int all_grids_tot_cells;
   MPI_Allreduce(&tot_u, &all_grids_tot_u, 1, MPI_FLOAT, MPI_SUM, MPI_COMM_WORLD);
-  // TODO just store the number of cells
-  MPI_Allreduce(&tot_cells, &all_grids_tot_cells, 1, MPI_INT, MPI_SUM, MPI_COMM_WORLD);
-  return all_grids_tot_u/ (float)all_grids_tot_cells;
+  return all_grids_tot_u/ (float)params.number_of_unblocked_cells;
 }
 
 
@@ -1172,6 +1165,7 @@ int initialise(const char* paramfile, const char* obstaclefile,
   }
 
   /* read-in the blocked cells list */
+  int number_of_obstacles = 0;
   while ((retval = fscanf(fp, "%d %d %d\n", &xx, &yy, &blocked)) != EOF)
   {
     /* some checks */
@@ -1186,7 +1180,14 @@ int initialise(const char* paramfile, const char* obstaclefile,
       int local_row = yy - rank_start_row;
       (*obstacles_ptr)[xx + local_row*params->nx] = blocked;
     }
+
+    if (blocked) {
+      number_of_obstacles++;
+    }
   }
+ 
+  params->number_of_unblocked_cells = (number_of_cells * params->number_of_ranks) - number_of_obstacles;
+  printf("%d, cells", params->number_of_unblocked_cells);
 
   /* and close the file */
   fclose(fp);
