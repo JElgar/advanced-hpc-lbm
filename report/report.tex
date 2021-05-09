@@ -257,12 +257,45 @@ completed.
 \section{SOA vs AOS}
 
 % Switching to AOS to ensure contigious data sends 
-When sending data with MPI the data must be contiguous. This means the cells
-being sent must either be stored in contiguous memory or be made contiguous
-before the sends. However another consideration of performance is the
-optimizations of individual nodes. Therefore if a data layout is good for the
-MPI communication it may have the opposite effect on the overall performance.
-The clearest example of this is with vectorisation.
+When sending data between ranks with MPI another important consideration is the
+local data layout.  When using MPI sends the data must be contiguous. This
+means the cells being sent must either be stored in contiguous memory or be
+made contiguous before the sends. This means it is often faster to store the
+data in such a matter than it can be directly sent without any preprocessing.
+However another consideration of performance is the optimizations of individual
+nodes. The provious report discussed the importanance of memory layout for
+serial optimizations. The most significant case being vectorisation, where the
+CPU can use vecotr registers and instructions to dramatically reduce the number
+of instructions required.
+
+In many cases therefore a tradeoff has to be made between optimizing the rank
+serial runtime and optimizing the time to send communications. In this case 2
+approaches were used for storing the cells array. 
+
+\begin{itemize}
+    \item{Sotring the cells as an array of strucutres, where each strucutre is
+        9 floats}
+    \item{Storing the cells as a strucutre of arrays, where the strucutre
+        stores an array for each speed}
+\end{itemize}
+
+The first approach, array of strucutres, required only 2 send per timestep, the
+top halo row and the bottom halo row. These sends are acheived by using a
+custom \verb|MPI_Datatype| and an offset. This means the send if very efficient
+as no additional dataprocessing is required before the send.
+
+In contrast when using the second approach, array of structures, 6 sends are
+required (or the data must be arranged first). This is because each array is
+not contiguous in memory and therefore an offset cannot be used to send
+multiple speed arrays at once. When tyring to minimise the overhead of
+communication, the first option would therefore be the clear choice. However as
+shown in \autoref{fig}, the runtime when using this approach is far slower.
+This is because each rank is no longer vectorised and thus each rank takes a
+longer time to complete each timestep.
+
+This effect is also mitigated by using non-blocking sends. When communication
+is able to happen concurrently along side computation, the increase time of
+sending and recieving data can have minimal impact on overall run time.
 
 \section{OpenMP MPI}
 
@@ -278,7 +311,29 @@ This topic was discussed in more depth in the first report.
 
 % Combining shared memory and distributed memory parallelism
 
+\begin{center}
+\begin{tabular}{ |p{2cm}||p{2cm}|p{2cm}| }
+ \hline
+ \multicolumn{3}{|c|}{Frontal face detection results} \\
+ \hline
+ Problem Size & TPR & F1-SCORE \\
+ \hline
+ 128x128 & 601.7  & 1         \\
+ 128x256 & 601.7  & 1         \\
+ 256x256  & 1   & 0.88      \\
+ 1024x1024 & 1   & 0.667  \\ 
+ dart14 & 1   & 0.5       \\ 
+ dart15 & 1   & 0         \\ 
+ \hline
+ Average & 1   & 0.609    \\ 
+ \hline
+\end{tabular}
+\captionof{table}{Blocking vs Non-Blocking Sends}
+\label{tab:vjfacesresults}
+\end{center}
+
 \section{OpenCL}
+
 
 \end{multicols}
 \end{document}
