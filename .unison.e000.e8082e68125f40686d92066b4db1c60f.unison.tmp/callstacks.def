@@ -1,0 +1,118 @@
+# callstacks file version: 7
+#    rowid	    parent	       rva	 loop	 system	                                function	binary	instance_start_rva	instance_size	instance_end_rva	finst_rowid	roi	is_inlined	jit_method_id	tripcounts_roi	flops_roi	cachesim_roi	data_transfer_roi
+         1	        -1	      6896	    0	      0	                                  _start	/mnt/storage/home/za18968/advanced-hpc-lbm/d2q9-bgk	6896	48	0	5	0	0	0	0	0	0	0
+         2	        -1	      6936	    0	      0	                                  _start	/mnt/storage/home/za18968/advanced-hpc-lbm/d2q9-bgk	6896	48	0	5	0	0	0	0	0	0	0
+         3	        99	    138036	    1	      1	     [Loop@0x21a79 in __libc_start_main]	/usr/lib64/libc.so.6	137849	391	0	17	0	0	0	0	0	0	0
+         4	         3	     10607	    0	      0	                                    main	/mnt/storage/home/za18968/advanced-hpc-lbm/d2q9-bgk	10464	3984	0	11	0	0	0	0	0	0	0
+         5	         4	   3025882	    0	      1	                               PMPI_Init	/mnt/storage/software/languages/intel/intel-parallel_studio_xe_2018_u3/compilers_and_libraries_2018.3.222/linux/mpi/intel64/lib/libmpi.so.12	3024416	2032	0	188	0	0	0	0	0	0	0
+         6	         5	   3102282	    0	      1	                        MPIR_Init_thread	/mnt/storage/software/languages/intel/intel-parallel_studio_xe_2018_u3/compilers_and_libraries_2018.3.222/linux/mpi/intel64/lib/libmpi.so.12	3096912	10784	0	189	0	0	0	0	0	0	0
+         7	       110	   3491457	    0	      1	                                 init_pg	/mnt/storage/software/languages/intel/intel-parallel_studio_xe_2018_u3/compilers_and_libraries_2018.3.222/linux/mpi/intel64/lib/libmpi.so.12	3491239	1359	0	190	0	1	0	0	0	0	0
+         8	         7	   4715363	    0	      1	                     iPMI_Virtualization	/mnt/storage/software/languages/intel/intel-parallel_studio_xe_2018_u3/compilers_and_libraries_2018.3.222/linux/mpi/intel64/lib/libmpi.so.12	4715312	1312	0	192	0	0	0	0	0	0	0
+         9	         8	      4176	    0	      1	                                  dlopen	/usr/lib64/libdl.so.2	4128	79	0	3	0	0	0	0	0	0	0
+        10	         9	      5564	    0	      1	                            _dlerror_run	/usr/lib64/libdl.so.2	5456	291	0	4	0	0	0	0	0	0	0
+        11	        10	     61427	    0	      1	                         _dl_catch_error	/lib64/ld-linux-x86-64.so.2	61328	213	0	2	0	0	0	0	0	0	0
+        12	        11	      4026	    0	      1	                             dlopen_doit	/usr/lib64/libdl.so.2	3936	189	0	8	0	0	0	0	0	0	0
+        13	       114	     77802	    1	      1	              [Loop@0x12f99 in _dl_open]	/lib64/ld-linux-x86-64.so.2	77721	1099	0	12	0	0	0	0	0	0	0
+        14	        13	     61427	    0	      1	                         _dl_catch_error	/lib64/ld-linux-x86-64.so.2	61328	213	0	2	0	0	0	0	0	0	0
+        15	        14	     79672	    0	      1	                          dl_open_worker	/lib64/ld-linux-x86-64.so.2	79168	2380	0	15	0	0	0	0	0	0	0
+        16	        15	   6163668	    0	      1	                           func@0x5e0cb0	/mnt/storage/software/languages/intel/intel-parallel_studio_xe_2018_u3/advisor_2018.3.0.558307/lib64/libtpsstool.so	6163632	48	0	37	0	0	0	0	0	0	0
+        17	        16	   6163515	    0	      1	                           func@0x5e0b60	/mnt/storage/software/languages/intel/intel-parallel_studio_xe_2018_u3/advisor_2018.3.0.558307/lib64/libtpsstool.so	6163296	336	0	38	0	0	0	0	0	0	0
+        18	        90	   6157032	    1	      1	        [Loop@0x5deee0 in func@0x5ddf10]	/mnt/storage/software/languages/intel/intel-parallel_studio_xe_2018_u3/advisor_2018.3.0.558307/lib64/libtpsstool.so	6156000	1270	0	55	0	0	0	0	0	0	0
+        19	        18	   5906730	    0	      1	       LEVEL_PINCLIENT::ProcessImageLoad	/mnt/storage/software/languages/intel/intel-parallel_studio_xe_2018_u3/advisor_2018.3.0.558307/lib64/libtpsstool.so	5906656	219	0	147	0	0	0	0	0	0	0
+        20	        19	   5896794	    0	      1	                           func@0x59f5f0	/mnt/storage/software/languages/intel/intel-parallel_studio_xe_2018_u3/advisor_2018.3.0.558307/lib64/libtpsstool.so	5895664	7673	0	153	0	0	0	0	0	0	0
+        21	        20	   6197752	    0	      1	             LEVEL_PINCLIENT::CookRegsym	/mnt/storage/software/languages/intel/intel-parallel_studio_xe_2018_u3/advisor_2018.3.0.558307/lib64/libtpsstool.so	6196912	2672	0	156	0	0	0	0	0	0	0
+        22	        92	   6215870	    1	      1	[Loop@0x5ed860 in LEVEL_PINCLIENT::CookSymSec<Elf64_Sym>]	/mnt/storage/software/languages/intel/intel-parallel_studio_xe_2018_u3/advisor_2018.3.0.558307/lib64/libtpsstool.so	6215776	699	0	157	0	0	0	0	0	0	0
+        23	        97	    271908	    1	      1	                [Loop@0x42620 in strlen]	/mnt/storage/software/languages/intel/intel-parallel_studio_xe_2018_u3/advisor_2018.3.0.558307/lib64/pinruntime/libc-dynamic.so	271904	9	0	6	0	0	0	0	0	0	0
+        24	        19	   5900889	    0	      1	                           func@0x59f5f0	/mnt/storage/software/languages/intel/intel-parallel_studio_xe_2018_u3/advisor_2018.3.0.558307/lib64/libtpsstool.so	5895664	7673	0	153	0	0	0	0	0	0	0
+        25	        24	   6169130	    0	      1	     LEVEL_PINCLIENT::GetSubprogramsInfo	/mnt/storage/software/languages/intel/intel-parallel_studio_xe_2018_u3/advisor_2018.3.0.558307/lib64/libtpsstool.so	6169072	7857	0	160	0	0	0	0	0	0	0
+        26	        25	    233961	    0	      1	               GetSubprogramsListInImage	/mnt/storage/software/languages/intel/intel-parallel_studio_xe_2018_u3/advisor_2018.3.0.558307/lib64/pinruntime/libpin3dwarf.so	233920	796	0	34	0	0	0	0	0	0	0
+        27	        74	    230592	    1	      1	      [Loop@0x38490 in LoadDwarfForFile]	/mnt/storage/software/languages/intel/intel-parallel_studio_xe_2018_u3/advisor_2018.3.0.558307/lib64/pinruntime/libpin3dwarf.so	230544	1493	0	41	0	0	0	0	0	0	0
+        28	        27	    239310	    0	      1	    llvm::DWARFUnit::extractDIEsIfNeeded	/mnt/storage/software/languages/intel/intel-parallel_studio_xe_2018_u3/advisor_2018.3.0.558307/lib64/pinruntime/libpin3dwarf.so	239200	279	0	58	0	0	0	0	0	0	0
+        29	        76	    239985	    1	      1	[Loop@0x3a960 in llvm::DWARFUnit::extractDIEsToVector]	/mnt/storage/software/languages/intel/intel-parallel_studio_xe_2018_u3/advisor_2018.3.0.558307/lib64/pinruntime/libpin3dwarf.so	239968	389	0	60	0	0	0	0	0	0	0
+        30	        78	    306047	    1	      1	[Loop@0x4ab40 in llvm::DWARFDebugInfoEntryMinimal::extractFast]	/mnt/storage/software/languages/intel/intel-parallel_studio_xe_2018_u3/advisor_2018.3.0.558307/lib64/pinruntime/libpin3dwarf.so	305984	74	0	69	0	0	0	0	0	0	0
+        31	        30	    310934	    0	      1	         llvm::DWARFFormValue::skipValue	/mnt/storage/software/languages/intel/intel-parallel_studio_xe_2018_u3/advisor_2018.3.0.558307/lib64/pinruntime/libpin3dwarf.so	310928	282	0	74	0	0	0	0	0	0	0
+        32	        24	   6172760	    0	      1	     LEVEL_PINCLIENT::GetSubprogramsInfo	/mnt/storage/software/languages/intel/intel-parallel_studio_xe_2018_u3/advisor_2018.3.0.558307/lib64/libtpsstool.so	6169072	7857	0	160	0	0	0	0	0	0	0
+        33	        32	   6185119	    0	      1	std::priv::_Rb_tree<unsigned long, std::less<unsigned long>, std::pair<unsigned long const, LEVEL_PINCLIENT::SymbolDebugInfo>, std::priv::_Select1st<std::pair<unsigned long const, LEVEL_PINCLIENT::SymbolDebugInfo>>, std::priv::_MapTraitsT<std::pair<unsigned long const, LEVEL_PINCLIENT::SymbolDebugInfo>>, std::allocator<std::pair<unsigned long const, LEVEL_PINCLIENT::SymbolDebugInfo>>>::_M_insert	/mnt/storage/software/languages/intel/intel-parallel_studio_xe_2018_u3/advisor_2018.3.0.558307/lib64/libtpsstool.so	6184960	1042	0	161	0	0	0	0	0	0	0
+        34	        33	    115208	    0	      1	                                  memcpy	/mnt/storage/software/languages/intel/intel-parallel_studio_xe_2018_u3/advisor_2018.3.0.558307/lib64/pinruntime/libc-dynamic.so	115200	14	0	10	0	0	0	0	0	0	0
+        35	        34	    115499	    0	      1	                                 memmove	/mnt/storage/software/languages/intel/intel-parallel_studio_xe_2018_u3/advisor_2018.3.0.558307/lib64/pinruntime/libc-dynamic.so	115456	1944	0	14	0	0	0	0	0	0	0
+        36	        19	         0	    0	      0	                [Unknown stack frame(s)]	n/a	0	1	0	1	0	0	0	0	0	0	0
+        37	        36	   1573051	    0	      1	                  [ld-linux-x86-64.so.2]	/lib64/ld-linux-x86-64.so.2	0	1	0	16	0	0	0	0	0	0	0
+        38	        37	   2170832	    0	      1	          LEVEL_BASE::SWMALLOC::Allocate	/mnt/storage/software/languages/intel/intel-parallel_studio_xe_2018_u3/advisor_2018.3.0.558307/bin64/pinbin	2170832	7252	0	130	0	0	0	0	0	0	0
+        39	        19	   5897694	    0	      1	                           func@0x59f5f0	/mnt/storage/software/languages/intel/intel-parallel_studio_xe_2018_u3/advisor_2018.3.0.558307/lib64/libtpsstool.so	5895664	7673	0	153	0	0	0	0	0	0	0
+        40	        95	   5876793	    1	      1	        [Loop@0x59a8a0 in func@0x59a7b0]	/mnt/storage/software/languages/intel/intel-parallel_studio_xe_2018_u3/advisor_2018.3.0.558307/lib64/libtpsstool.so	5875872	1098	0	162	0	0	0	0	0	0	0
+        41	        40	   5559201	    0	      1	std::operator+<char, std::char_traits<char>, std::allocator<char>>	/mnt/storage/software/languages/intel/intel-parallel_studio_xe_2018_u3/advisor_2018.3.0.558307/lib64/libtpsstool.so	5559024	479	0	165	0	0	0	0	0	0	0
+        42	         4	   3025027	    0	      1	                               PMPI_Init	/mnt/storage/software/languages/intel/intel-parallel_studio_xe_2018_u3/compilers_and_libraries_2018.3.222/linux/mpi/intel64/lib/libmpi.so.12	3024416	2032	0	188	0	0	0	0	0	0	0
+        43	       112	   2478911	    0	      1	                 MPIR_Handle_fatal_error	/mnt/storage/software/languages/intel/intel-parallel_studio_xe_2018_u3/compilers_and_libraries_2018.3.222/linux/mpi/intel64/lib/libmpi.so.12	2478645	2384	0	193	0	1	0	0	0	0	0
+        44	        43	   3463366	    0	      1	                              MPID_Abort	/mnt/storage/software/languages/intel/intel-parallel_studio_xe_2018_u3/compilers_and_libraries_2018.3.222/linux/mpi/intel64/lib/libmpi.so.12	3463216	320	0	195	0	0	0	0	0	0	0
+        45	        44	      9219	    0	      1	                               PMI_Abort	/usr/lib64/libpmi.so	9034	196	0	9	0	0	0	0	0	0	0
+        46	        45	    142367	    0	      1	                     slurm_kill_job_step	/usr/lib64/libslurm.so.30	142187	266	0	159	0	0	0	0	0	0	0
+        47	        46	    923324	    0	      1	       slurm_send_recv_controller_rc_msg	/usr/lib64/libslurm.so.30	923263	169	0	166	0	0	0	0	0	0	0
+        48	        47	    921189	    0	      1	          slurm_send_recv_controller_msg	/usr/lib64/libslurm.so.30	921023	602	0	167	0	0	0	0	0	0	0
+        49	        48	    910767	    0	      1	              slurm_open_controller_conn	/usr/lib64/libslurm.so.30	910693	768	0	168	0	0	0	0	0	0	0
+        50	        49	    897670	    0	      1	            slurm_api_set_default_config	/usr/lib64/libslurm.so.30	897651	266	0	169	0	0	0	0	0	0	0
+        51	        50	    791773	    0	      1	                         slurm_conf_lock	/usr/lib64/libslurm.so.30	791670	204	0	170	0	0	0	0	0	0	0
+        52	        51	    790459	    0	      1	                        _init_slurm_conf	/usr/lib64/libslurm.so.30	790220	327	0	171	0	0	0	0	0	0	0
+        53	        80	    703945	    1	      1	   [Loop at line 1221 in s_p_parse_file]	/usr/lib64/libslurm.so.30	703808	473	0	172	0	0	0	0	0	0	0
+        54	        53	    701982	    0	      1	                         _parse_next_key	/usr/lib64/libslurm.so.30	701834	433	0	174	0	0	0	0	0	0	0
+        55	        54	    701150	    0	      1	                  _handle_keyvalue_match	/usr/lib64/libslurm.so.30	700879	465	0	175	0	0	0	0	0	0	0
+        56	        55	    698927	    0	      1	                           _handle_array	/usr/lib64/libslurm.so.30	698833	303	0	176	0	0	0	0	0	0	0
+        57	        56	    763239	    0	      1	                         _parse_nodename	/usr/lib64/libslurm.so.30	763151	3386	0	177	0	0	0	0	0	0	0
+        58	        82	    701793	    1	      1	    [Loop at line 964 in s_p_parse_line]	/usr/lib64/libslurm.so.30	701523	186	0	178	0	0	0	0	0	0	0
+        59	        58	    696241	    0	      1	                         _keyvalue_regex	/usr/lib64/libslurm.so.30	695787	547	0	180	0	0	0	0	0	0	0
+        60	        59	   1533291	    0	      1	                                xstrndup	/usr/lib64/libslurm.so.30	1533187	138	0	181	0	0	0	0	0	0	0
+        61	        60	   1528576	    0	      1	                           slurm_xmalloc	/usr/lib64/libslurm.so.30	1528576	162	0	182	0	0	0	0	0	0	0
+        62	        53	    701910	    0	      1	                         _parse_next_key	/usr/lib64/libslurm.so.30	701834	433	0	174	0	0	0	0	0	0	0
+        63	        62	    695964	    0	      1	                         _keyvalue_regex	/usr/lib64/libslurm.so.30	695787	547	0	180	0	0	0	0	0	0	0
+        64	        63	    893428	    0	      1	                                 regexec	/usr/lib64/libc.so.6	893232	283	0	24	0	0	0	0	0	0	0
+        65	       101	    866601	    1	      1	    [Loop@0xd31c8 in re_search_internal]	/usr/lib64/libc.so.6	864712	4509	0	35	0	0	0	0	0	0	0
+        66	        65	    524183	    0	      1	                           __libc_malloc	/usr/lib64/libc.so.6	524144	214	0	79	0	0	0	0	0	0	0
+        67	        80	    704261	    1	      1	   [Loop at line 1221 in s_p_parse_file]	/usr/lib64/libslurm.so.30	703808	473	0	172	0	0	0	0	0	0	0
+        68	        85	    697142	    1	      1	    [Loop at line 473 in _get_next_line]	/usr/lib64/libslurm.so.30	697120	121	0	183	0	0	0	0	0	0	0
+        69	        88	    697001	    1	      1	 [Loop at line 447 in _compute_hash_val]	/usr/lib64/libslurm.so.30	696980	76	0	185	0	0	0	0	0	0	0
+        70	        58	    695964	    0	      1	                         _keyvalue_regex	/usr/lib64/libslurm.so.30	695787	547	0	180	0	0	0	0	0	0	0
+        71	        70	    893428	    0	      1	                                 regexec	/usr/lib64/libc.so.6	893232	283	0	24	0	0	0	0	0	0	0
+        72	       103	    867554	    1	      1	    [Loop@0xd31c8 in re_search_internal]	/usr/lib64/libc.so.6	864712	4509	0	35	0	0	0	0	0	0	0
+        73	       108	    852333	    1	      1	  [Loop@0xd016b in sift_states_backward]	/usr/lib64/libc.so.6	852331	19	0	93	0	0	0	0	0	0	0
+        74	        26	    230544	    0	      1	                        LoadDwarfForFile	/mnt/storage/software/languages/intel/intel-parallel_studio_xe_2018_u3/advisor_2018.3.0.558307/lib64/pinruntime/libpin3dwarf.so	229632	3360	0	42	0	0	0	0	0	0	0
+        75	        26	    230592	    0	      1	                        LoadDwarfForFile	/mnt/storage/software/languages/intel/intel-parallel_studio_xe_2018_u3/advisor_2018.3.0.558307/lib64/pinruntime/libpin3dwarf.so	229632	3360	0	42	0	0	0	0	0	0	0
+        76	        28	    239968	    0	      1	    llvm::DWARFUnit::extractDIEsToVector	/mnt/storage/software/languages/intel/intel-parallel_studio_xe_2018_u3/advisor_2018.3.0.558307/lib64/pinruntime/libpin3dwarf.so	239856	989	0	61	0	0	0	0	0	0	0
+        77	        28	    239985	    0	      1	    llvm::DWARFUnit::extractDIEsToVector	/mnt/storage/software/languages/intel/intel-parallel_studio_xe_2018_u3/advisor_2018.3.0.558307/lib64/pinruntime/libpin3dwarf.so	239856	989	0	61	0	0	0	0	0	0	0
+        78	        29	    305984	    0	      1	llvm::DWARFDebugInfoEntryMinimal::extractFast	/mnt/storage/software/languages/intel/intel-parallel_studio_xe_2018_u3/advisor_2018.3.0.558307/lib64/pinruntime/libpin3dwarf.so	305776	336	0	70	0	0	0	0	0	0	0
+        79	        29	    306047	    0	      1	llvm::DWARFDebugInfoEntryMinimal::extractFast	/mnt/storage/software/languages/intel/intel-parallel_studio_xe_2018_u3/advisor_2018.3.0.558307/lib64/pinruntime/libpin3dwarf.so	305776	336	0	70	0	0	0	0	0	0	0
+        80	        52	    703808	    0	      1	                          s_p_parse_file	/usr/lib64/libslurm.so.30	703369	997	0	173	0	0	0	0	0	0	0
+        81	        52	    703945	    0	      1	                          s_p_parse_file	/usr/lib64/libslurm.so.30	703369	997	0	173	0	0	0	0	0	0	0
+        82	        57	    701523	    0	      1	                          s_p_parse_line	/usr/lib64/libslurm.so.30	701469	365	0	179	0	0	0	0	0	0	0
+        83	        57	    701793	    0	      1	                          s_p_parse_line	/usr/lib64/libslurm.so.30	701469	365	0	179	0	0	0	0	0	0	0
+        84	        52	    704261	    0	      1	                          s_p_parse_file	/usr/lib64/libslurm.so.30	703369	997	0	173	0	0	0	0	0	0	0
+        85	        67	    697120	    0	      1	                          _get_next_line	/usr/lib64/libslurm.so.30	697074	186	0	184	0	0	0	0	0	0	0
+        86	        67	    697142	    0	      1	                          _get_next_line	/usr/lib64/libslurm.so.30	697074	186	0	184	0	0	0	0	0	0	0
+        87	        68	    696935	    0	      1	                       _compute_hash_val	/usr/lib64/libslurm.so.30	696883	191	0	186	0	0	0	0	0	0	0
+        88	        87	    696980	    1	      1	 [Loop at line 444 in _compute_hash_val]	/usr/lib64/libslurm.so.30	696935	137	0	187	0	0	0	0	0	0	0
+        89	        68	    697001	    0	      1	                       _compute_hash_val	/usr/lib64/libslurm.so.30	696883	191	0	186	0	0	0	0	0	0	0
+        90	        17	   6156000	    0	      1	                           func@0x5ddf10	/mnt/storage/software/languages/intel/intel-parallel_studio_xe_2018_u3/advisor_2018.3.0.558307/lib64/libtpsstool.so	6151952	7679	0	57	0	0	0	0	0	0	0
+        91	        17	   6157032	    0	      1	                           func@0x5ddf10	/mnt/storage/software/languages/intel/intel-parallel_studio_xe_2018_u3/advisor_2018.3.0.558307/lib64/libtpsstool.so	6151952	7679	0	57	0	0	0	0	0	0	0
+        92	        21	   6215776	    0	      1	  LEVEL_PINCLIENT::CookSymSec<Elf64_Sym>	/mnt/storage/software/languages/intel/intel-parallel_studio_xe_2018_u3/advisor_2018.3.0.558307/lib64/libtpsstool.so	6215440	5749	0	158	0	0	0	0	0	0	0
+        93	        21	   6215870	    0	      1	  LEVEL_PINCLIENT::CookSymSec<Elf64_Sym>	/mnt/storage/software/languages/intel/intel-parallel_studio_xe_2018_u3/advisor_2018.3.0.558307/lib64/libtpsstool.so	6215440	5749	0	158	0	0	0	0	0	0	0
+        94	        39	   5875760	    0	      1	                           func@0x59a7b0	/mnt/storage/software/languages/intel/intel-parallel_studio_xe_2018_u3/advisor_2018.3.0.558307/lib64/libtpsstool.so	5875632	1680	0	163	0	0	0	0	0	0	0
+        95	        94	   5875872	    1	      1	        [Loop@0x59a830 in func@0x59a7b0]	/mnt/storage/software/languages/intel/intel-parallel_studio_xe_2018_u3/advisor_2018.3.0.558307/lib64/libtpsstool.so	5875760	1244	0	164	0	0	0	0	0	0	0
+        96	        39	   5876793	    0	      1	                           func@0x59a7b0	/mnt/storage/software/languages/intel/intel-parallel_studio_xe_2018_u3/advisor_2018.3.0.558307/lib64/libtpsstool.so	5875632	1680	0	163	0	0	0	0	0	0	0
+        97	        22	    271904	    0	      1	                                  strlen	/mnt/storage/software/languages/intel/intel-parallel_studio_xe_2018_u3/advisor_2018.3.0.558307/lib64/pinruntime/libc-dynamic.so	271888	32	0	7	0	0	0	0	0	0	0
+        98	        22	    271908	    0	      1	                                  strlen	/mnt/storage/software/languages/intel/intel-parallel_studio_xe_2018_u3/advisor_2018.3.0.558307/lib64/pinruntime/libc-dynamic.so	271888	32	0	7	0	0	0	0	0	0	0
+        99	         2	    137849	    0	      1	                       __libc_start_main	/usr/lib64/libc.so.6	137792	448	0	18	0	0	0	0	0	0	0
+       100	         2	    138036	    0	      1	                       __libc_start_main	/usr/lib64/libc.so.6	137792	448	0	18	0	0	0	0	0	0	0
+       101	        64	    864712	    0	      1	                      re_search_internal	/usr/lib64/libc.so.6	863456	7850	0	36	0	0	0	0	0	0	0
+       102	        64	    866601	    0	      1	                      re_search_internal	/usr/lib64/libc.so.6	863456	7850	0	36	0	0	0	0	0	0	0
+       103	        71	    864712	    0	      1	                      re_search_internal	/usr/lib64/libc.so.6	863456	7850	0	36	0	0	0	0	0	0	0
+       104	        71	    867554	    0	      1	                      re_search_internal	/usr/lib64/libc.so.6	863456	7850	0	36	0	0	0	0	0	0	0
+       105	        72	    852096	    0	      1	                    sift_states_backward	/usr/lib64/libc.so.6	851936	1099	0	94	0	0	0	0	0	0	0
+       106	       105	    852208	    1	      1	  [Loop@0xd0080 in sift_states_backward]	/usr/lib64/libc.so.6	852096	805	0	99	0	0	0	0	0	0	0
+       107	       106	    852304	    1	      1	  [Loop@0xd00f0 in sift_states_backward]	/usr/lib64/libc.so.6	852208	639	0	97	0	0	0	0	0	0	0
+       108	       107	    852331	    1	      1	  [Loop@0xd0150 in sift_states_backward]	/usr/lib64/libc.so.6	852304	46	0	95	0	0	0	0	0	0	0
+       109	        72	    852333	    0	      1	                    sift_states_backward	/usr/lib64/libc.so.6	851936	1099	0	94	0	0	0	0	0	0	0
+       110	         6	   3491239	    0	      1	                               MPID_Init	/mnt/storage/software/languages/intel/intel-parallel_studio_xe_2018_u3/compilers_and_libraries_2018.3.222/linux/mpi/intel64/lib/libmpi.so.12	3489840	6432	0	191	0	0	0	0	0	0	0
+       111	         6	   3491457	    0	      1	                               MPID_Init	/mnt/storage/software/languages/intel/intel-parallel_studio_xe_2018_u3/compilers_and_libraries_2018.3.222/linux/mpi/intel64/lib/libmpi.so.12	3489840	6432	0	191	0	0	0	0	0	0	0
+       112	        42	   2478645	    0	      1	                    MPIR_Err_return_comm	/mnt/storage/software/languages/intel/intel-parallel_studio_xe_2018_u3/compilers_and_libraries_2018.3.222/linux/mpi/intel64/lib/libmpi.so.12	2475968	5088	0	194	0	0	0	0	0	0	0
+       113	        42	   2478911	    0	      1	                    MPIR_Err_return_comm	/mnt/storage/software/languages/intel/intel-parallel_studio_xe_2018_u3/compilers_and_libraries_2018.3.222/linux/mpi/intel64/lib/libmpi.so.12	2475968	5088	0	194	0	0	0	0	0	0	0
+       114	        12	     77721	    0	      1	                                _dl_open	/lib64/ld-linux-x86-64.so.2	77632	1242	0	13	0	0	0	0	0	0	0
+       115	        12	     77802	    0	      1	                                _dl_open	/lib64/ld-linux-x86-64.so.2	77632	1242	0	13	0	0	0	0	0	0	0
+       116	        -1	         0	    0	      0	                      [Outside any loop]	n/a	0	0	0	12352	0	0	0	0	0	0	0

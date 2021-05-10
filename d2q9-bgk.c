@@ -1272,7 +1272,7 @@ float total_density(const t_param params, t_speed* cells)
   return total;
 }
 
-int write_values(const t_param params, t_speed* cells, char* obstacles, float* av_vels)
+int write_values_mpi(const t_param params, t_speed* cells, char* obstacles, float* av_vels)
 {
   MPI_File fh;
   MPI_Status status;
@@ -1384,7 +1384,7 @@ int write_values(const t_param params, t_speed* cells, char* obstacles, float* a
   return EXIT_SUCCESS;
 }
 
-int write_values_non_mpi(const t_param params, t_speed* cells, char* obstacles, float* av_vels)
+int write_values(const t_param params, t_speed* cells, char* obstacles, float* av_vels)
 {  
   // MPI_File fh;
   // MPI_Status status;
@@ -1469,7 +1469,7 @@ int write_values_non_mpi(const t_param params, t_speed* cells, char* obstacles, 
           }
 
           /* write to file */
-          fprintf(fp, "%d %d %.12E %.12E %.12E %.12E %d\n", ii, jj, u_x, u_y, u, pressure, obstacles[ii + params.nx * jj]);
+          fprintf(fp, "%d %d %.12E %.12E %.12E %.12E %d\n", ii, jj + (params.rank_id * params.ny), u_x, u_y, u, pressure, obstacles[ii + params.nx * jj]);
         }
       }
       fclose(fp);
